@@ -1,0 +1,70 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,json,jsonc,css}",
+      "!**/bun.lock",
+      "!**/package-lock.json",
+      "!**/next-env.d.ts",
+      "!!**/node_modules",
+      "!!**/.next",
+      "!!**/.react-router",
+      "!!**/dist",
+      "!!**/build",
+      "!!**/coverage",
+      "!!**/generated",
+      "!**/routeTree.gen.ts"
+    ]
+  },
+  "formatter": {
+    "useEditorconfig": true,
+    "lineWidth": 100
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "preset": "none"
+      },
+      "performance": {
+        "preset": "none"
+      },
+      "style": {
+        "preset": "none",
+        "useConst": "warn",
+        "useImportType": "warn",
+        "noNonNullAssertion": "warn"
+      },
+      "correctness": {
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "warn",
+        "noAutofocus": "off"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}
