@@ -1,0 +1,17 @@
+@layer components {
+  [data-blurred-background] {
+    min-inline-size: 0;
+    padding: var(--backdrop-padding, 0.35em 0.75em);
+    border-radius: 0.5rem;
+    background: var(--backdrop-fill, var(--well-fill));
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    [data-blurred-background] {
+      background: var(--frost-fallback);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+}

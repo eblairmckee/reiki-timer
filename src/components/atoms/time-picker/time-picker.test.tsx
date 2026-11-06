@@ -68,6 +68,7 @@ test("tapping a tick selects a value without dragging", () => {
   render(<Example />);
   const input = screen.getByRole("slider", { name: "How long" });
   const dial = geometry(input);
+  expect(dial.querySelectorAll(".time-picker-ticks g")).toHaveLength(12);
   fireEvent.pointerDown(dial, pointer(180));
   fireEvent.pointerUp(dial, pointer(180));
   expect(input.getAttribute("aria-valuetext")).toBe("30 minutes");
@@ -82,6 +83,7 @@ test("independent pickers keep their labels and controlled values", () => {
   );
   const warm = screen.getByRole("slider", { name: "Warm-up time" });
   const cool = screen.getByRole("slider", { name: "Cool-down time" });
+  expect(geometry(warm).querySelectorAll(".time-picker-ticks g")).toHaveLength(10);
   expect(warm.id).not.toBe(cool.id);
   expect(warm.getAttribute("aria-valuetext")).toBe("2 minutes");
   expect(cool.getAttribute("aria-valuetext")).toBe("3 minutes");

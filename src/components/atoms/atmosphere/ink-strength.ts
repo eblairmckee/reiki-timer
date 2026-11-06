@@ -1,8 +1,12 @@
 type RGB = readonly number[];
+const luminanceWeights = [0.2126, 0.7152, 0.0722];
+
+function linear(channel: number) {
+  return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+}
 
 export function luminance(rgb: RGB) {
-  const linear = rgb.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+  return luminanceWeights.reduce((sum, weight, c) => sum + weight * linear(rgb[c]), 0);
 }
 
 /** Conservative RGB intervals cover every mesh mix and black/white grain extreme. */
@@ -15,39 +19,39 @@ export function inkStrengths(colors: readonly RGB[], grainOverlay: number, dim =
     (c) => (Math.max(...colors.map((rgb) => rgb[c])) * (1 - grain) + grain) * (1 - dim),
   );
 
-  function strength(target: number, frost = 0) {
-    const lower = low.map((v) => v * (1 - frost) + frost);
-    const upper = high.map((v) => v * (1 - frost) + frost);
-    const cells: { low: number[]; background: number }[] = [];
-    const divisions = 4;
-    for (let r = 0; r < divisions; r++) {
-      for (let g = 0; g < divisions; g++) {
-        for (let b = 0; b < divisions; b++) {
-          const indices = [r, g, b];
-          cells.push({
-            low: indices.map((v, c) => lower[c] + ((upper[c] - lower[c]) * v) / divisions),
-            background: luminance(
-              indices.map((v, c) => lower[c] + ((upper[c] - lower[c]) * (v + 1)) / divisions),
-            ),
-          });
-        }
-      }
-    }
+  function strength(target: number, { frostAlpha = 0, shadeAlpha = 0, divisions = 4 } = {}) {
+    const transmission = 1 - frostAlpha - shadeAlpha;
+    const channels = low.map((value, c) => {
+      const lower = value * transmission + frostAlpha;
+      const step = ((high[c] - value) * transmission) / divisions;
+      return Array.from({ length: divisions }, (_, i) => ({
+        lower: lower + i * step,
+        background: target * linear(lower + (i + 1) * step),
+      }));
+    });
     let min = 0;
     let max = 1;
     for (let i = 0; i < 10; i++) {
       const alpha = (min + max) / 2;
-      const passes = cells.every(
-        (cell) =>
-          (luminance(cell.low.map((v) => alpha + v * (1 - alpha))) + 0.05) /
-            (cell.background + 0.05) >=
-          target,
-      );
-      if (passes) max = alpha;
+      // Luminance is a weighted sum. Bound each channel independently instead of
+      // visiting every RGB combination when solving (Ltext + .05) / (Lsurface + .05).
+      const margin = channels.reduce((sum, intervals, c) => {
+        let worst = Infinity;
+        for (const { lower, background } of intervals) {
+          worst = Math.min(worst, linear(alpha + lower * (1 - alpha)) - background);
+        }
+        return sum + luminanceWeights[c] * worst;
+      }, 0);
+      if (margin >= (target - 1) * 0.05) max = alpha;
       else min = alpha;
     }
     return max;
   }
-  // Fill + sheen + hover light remain below 24% white at the glyphs.
-  return { text: strength(4.55), display: strength(3.05), control: strength(3.05, 0.24) };
+  return {
+    text: strength(4.55),
+    display: strength(3.05),
+    control: strength(3.05, { frostAlpha: 0.24 }),
+    summary: strength(4.5, { divisions: 12 }),
+    "summary-glass": strength(4.5, { shadeAlpha: 0.18, divisions: 12 }),
+  };
 }

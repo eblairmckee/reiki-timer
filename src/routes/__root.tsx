@@ -19,10 +19,8 @@ export const Route = createRootRoute({
 });
 function RootLayout() {
   return (
-    <>
-      <main id="main">
-        <Outlet />
-      </main>
-    </>
+    <main id="main">
+      <Outlet />
+    </main>
   );
 }

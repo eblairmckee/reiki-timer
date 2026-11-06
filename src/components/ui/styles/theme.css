@@ -3,22 +3,16 @@
 .atmosphere-scope {
   /* Resolve derived colors where runtime strengths are assigned, before inheritance. */
   --color-ink-on-atmosphere: rgb(255 255 255 / var(--ink-text-alpha, 90%));
+  --color-ink-summary: rgb(255 255 255 / var(--ink-summary-alpha, 90%));
+  --color-ink-summary-glass: rgb(255 255 255 / var(--ink-summary-glass-alpha, 76%));
   --color-ink-display: rgb(255 255 255 / var(--ink-display-alpha, 70%));
   --color-ink-on-frost: rgb(255 255 255 / var(--ink-control-alpha, 90%));
-  --color-ink-label: rgb(
-    255 255 255 /
-    calc(var(--ink-display-alpha, 70%) * var(--ink-label-strength))
-  );
-  --color-ink-detail: rgb(
-    255 255 255 /
-    calc(var(--ink-text-alpha, 90%) * var(--ink-detail-strength))
-  );
+  --color-ink-label: color-mix(in srgb, var(--color-ink-on-atmosphere) 65%, var(--color-paper));
+  --letter-frost-crest: color-mix(in srgb, var(--color-ink-display) 40%, var(--color-paper));
 }
 
 :root {
   color-scheme: light;
-  --ink-label-strength: 0.78;
-  --ink-detail-strength: 0.64;
   --color-atmosphere-mist: var(--chakra-bold-root-garnet);
   --color-atmosphere-blue: var(--chakra-bold-root-crimson);
   --color-atmosphere-tide: var(--chakra-bold-root-ruby);
@@ -71,9 +65,14 @@
   /* Recessed wells and frost share their lighting; geometry belongs to the control. */
   --well-fill: rgb(0 0 0 / 8%);
   --well-shade: rgb(0 0 0 / 36%);
+  --summary-details-glass: rgb(21 22 24 / 94%);
+  --color-timeline-event: rgb(255 255 255 / 90%);
+  --color-timeline-time: rgb(255 255 255 / 62%);
   --well-light: rgb(255 255 255 / 24%);
   --well-checked: rgb(0 0 0 / 18%);
   --frost-fill: rgb(255 255 255 / 12%);
+  --frost-fill-selected: rgb(255 255 255 / 26%);
+  --frost-word-fill: rgb(255 255 255 / 60%);
   --frost-light: rgb(255 255 255 / 51%);
   --frost-sheen: rgb(255 255 255 / 10%);
   --frost-shade: rgb(0 0 0 / 6%);
@@ -83,8 +82,13 @@
   --frost-fallback: #34363c;
   --etch-ink: rgb(0 0 0 / 46%);
   --etch-light: rgb(255 255 255 / 44%);
+  --letterpress-shade: rgb(0 0 0 / 68%);
+  --letterpress-rim: rgb(255 255 255 / 24%);
   --ripple-light: rgb(255 255 255 / 22%);
   --ripple-diffusion: rgb(255 255 255 / 9%);
+  --pressure-ring:
+    0 0 0 1px var(--ripple-light), 0 0 9px 3px var(--ripple-diffusion),
+    inset 0 0 5px 1px var(--ripple-diffusion);
   --recess-action-hover: rgb(0 0 0 / 12%);
   --recess-action-active: rgb(0 0 0 / 23%);
   --color-night: #000;
@@ -216,13 +220,15 @@
   --radius-xxl: 48px;
   --radius-rounded: 999px;
   --radius-circled: 50%;
-  --font-family: "Bona Nova SC", Georgia, serif;
-  --font-display-lg: 400 57px / 64px var(--font-family);
-  --font-display-md: 400 45px / 52px var(--font-family);
-  --font-display-sm: 400 36px / 44px var(--font-family);
-  --font-headline-lg: 400 32px / 40px var(--font-family);
-  --font-headline-md: 400 28px / 36px var(--font-family);
-  --font-headline-sm: 400 24px / 32px var(--font-family);
+  --font-heading: "Bona Nova SC", Georgia, serif;
+  --font-reading: Cabin, system-ui, sans-serif;
+  --font-family: var(--font-reading);
+  --font-display-lg: 400 57px / 64px var(--font-heading);
+  --font-display-md: 400 45px / 52px var(--font-heading);
+  --font-display-sm: 400 36px / 44px var(--font-heading);
+  --font-headline-lg: 400 32px / 40px var(--font-heading);
+  --font-headline-md: 400 28px / 36px var(--font-heading);
+  --font-headline-sm: 400 24px / 32px var(--font-heading);
   --font-title-lg: 400 22px / 28px var(--font-family);
   --font-title-md: 500 16px / 24px var(--font-family);
   --font-title-sm: 500 14px / 20px var(--font-family);

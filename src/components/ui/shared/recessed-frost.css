@@ -15,10 +15,7 @@
   }
   [data-ripple="pressure"] {
     background: none;
-    box-shadow:
-      0 0 0 1px var(--ripple-light),
-      0 0 9px 3px var(--ripple-diffusion),
-      inset 0 0 5px 1px var(--ripple-diffusion);
+    box-shadow: var(--pressure-ring);
   }
   [data-recess] {
     position: relative;

@@ -9,50 +9,116 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as TimerRouteRouteImport } from './routes/_timer/route'
+import { Route as TimerIndexRouteImport } from './routes/_timer/index'
+import { Route as TimerReikiOnIndexRouteImport } from './routes/_timer/reiki-on/index'
+import { Route as TimerReikiOnEditRouteImport } from './routes/_timer/reiki-on/edit'
 
-const IndexRoute = IndexRouteImport.update({
+const TimerRouteRoute = TimerRouteRouteImport.update({
+  id: '/_timer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimerIndexRoute = TimerIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => TimerRouteRoute,
+} as any)
+const TimerReikiOnIndexRoute = TimerReikiOnIndexRouteImport.update({
+  id: '/reiki-on/',
+  path: '/reiki-on/',
+  getParentRoute: () => TimerRouteRoute,
+} as any)
+const TimerReikiOnEditRoute = TimerReikiOnEditRouteImport.update({
+  id: '/reiki-on/edit',
+  path: '/reiki-on/edit',
+  getParentRoute: () => TimerRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof TimerIndexRoute
+  '/reiki-on/edit': typeof TimerReikiOnEditRoute
+  '/reiki-on/': typeof TimerReikiOnIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof TimerIndexRoute
+  '/reiki-on/edit': typeof TimerReikiOnEditRoute
+  '/reiki-on': typeof TimerReikiOnIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_timer': typeof TimerRouteRouteWithChildren
+  '/_timer/': typeof TimerIndexRoute
+  '/_timer/reiki-on/edit': typeof TimerReikiOnEditRoute
+  '/_timer/reiki-on/': typeof TimerReikiOnIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/reiki-on/edit' | '/reiki-on/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/reiki-on/edit' | '/reiki-on'
+  id:
+    | '__root__'
+    | '/_timer'
+    | '/_timer/'
+    | '/_timer/reiki-on/edit'
+    | '/_timer/reiki-on/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  TimerRouteRoute: typeof TimerRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_timer': {
+      id: '/_timer'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof TimerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_timer/': {
+      id: '/_timer/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof TimerIndexRouteImport
+      parentRoute: typeof TimerRouteRoute
+    }
+    '/_timer/reiki-on/': {
+      id: '/_timer/reiki-on/'
+      path: '/reiki-on'
+      fullPath: '/reiki-on/'
+      preLoaderRoute: typeof TimerReikiOnIndexRouteImport
+      parentRoute: typeof TimerRouteRoute
+    }
+    '/_timer/reiki-on/edit': {
+      id: '/_timer/reiki-on/edit'
+      path: '/reiki-on/edit'
+      fullPath: '/reiki-on/edit'
+      preLoaderRoute: typeof TimerReikiOnEditRouteImport
+      parentRoute: typeof TimerRouteRoute
     }
   }
 }
 
+interface TimerRouteRouteChildren {
+  TimerIndexRoute: typeof TimerIndexRoute
+  TimerReikiOnEditRoute: typeof TimerReikiOnEditRoute
+  TimerReikiOnIndexRoute: typeof TimerReikiOnIndexRoute
+}
+
+const TimerRouteRouteChildren: TimerRouteRouteChildren = {
+  TimerIndexRoute: TimerIndexRoute,
+  TimerReikiOnEditRoute: TimerReikiOnEditRoute,
+  TimerReikiOnIndexRoute: TimerReikiOnIndexRoute,
+}
+
+const TimerRouteRouteWithChildren = TimerRouteRoute._addFileChildren(
+  TimerRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  TimerRouteRoute: TimerRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

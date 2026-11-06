@@ -2,9 +2,8 @@
   .time-picker {
     display: grid;
     justify-items: center;
-    gap: clamp(1rem, 2.8svh, 1.8rem);
     position: relative;
-    inline-size: var(--time-picker-size, min(78vw, 44svh, 34rem));
+    inline-size: var(--time-picker-size, min(58.5vw, 33svh, 25.5rem));
   }
   .time-picker-value {
     position: absolute;
@@ -13,7 +12,6 @@
     font-size: clamp(0.875rem, 3.5vw, 1.15rem);
     line-height: 1;
     font-weight: 400;
-    font-variant-numeric: tabular-nums;
     white-space: nowrap;
     pointer-events: none;
   }
@@ -42,6 +40,7 @@
   }
   .time-picker-ticks path {
     fill: none;
+    vector-effect: non-scaling-stroke;
     stroke-linecap: round;
   }
   .tick-light {

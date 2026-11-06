@@ -1,56 +1,82 @@
-import { AnimatePresence, motion, useIsPresent } from "motion/react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
+import { AnimatePresence } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { TimerSummary } from "@/components/molecules/timer-summary";
 import { Atmosphere } from "../../components/atoms/atmosphere";
-import { sceneMotion } from "../../components/ui/shared/motion";
-import { useReducedMotion } from "../../components/ui/shared/use-reduced-motion";
+import { FinishTimerDialog } from "./finish-timer-dialog";
+import { TimerContext } from "./timer-context";
+import { loadDraft, readySession, storeDraft } from "./timer-draft";
 import { TimerHud } from "./timer-hud";
-import { TimerSettings } from "./timer-settings";
+import { TimerScene } from "./timer-scene";
 import {
+  crossedChimeBoundary,
   durationMs,
   elapsedAt,
-  formatRemaining,
   loadConfig,
   type Session,
   saveConfig,
   sessionPhase,
+  summarizeTimer,
+  type TimerConfig,
+  timerTimeline,
 } from "./timer-state";
+import { TimerTimeline } from "./timer-timeline";
+import { useChimes } from "./use-chimes";
 import "./style.css";
 
-function ScreenContent({ children }: { children: ReactNode }) {
-  const present = useIsPresent();
-  const reduced = useReducedMotion();
-  return (
-    <motion.div
-      inert={!present}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={reduced ? { duration: 0 } : present ? sceneMotion.enter : sceneMotion.exit}
-    >
-      {children}
-    </motion.div>
-  );
-}
+type Transition = {
+  from: string;
+  to: "/" | "/reiki-on" | "/reiki-on/edit";
+  session: Session;
+  restart: boolean;
+};
 
-export function TimerScreen() {
-  const reduced = useReducedMotion();
-  const [config, setConfig] = useState(loadConfig);
-  const [session, setSession] = useState<Session>({ mode: "setup", elapsed: 0, startedAt: 0 });
+export function TimerLayout() {
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const router = useRouter();
+  const home = pathname === "/";
+  const editing = pathname.replace(/\/$/, "") === "/reiki-on/edit";
+  const playback = !home && !editing;
+  const [{ config, session }, setDraft] = useState(() => loadDraft(!home));
   const [now, setNow] = useState(Date.now);
-  const [editing, setEditing] = useState(false);
   const [resetId, setResetId] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  const [transition, setTransition] = useState<Transition | null>(null);
+  const [saveError, setSaveError] = useState(false);
   const hudRef = useRef<HTMLButtonElement>(null);
+  const finishRef = useRef<HTMLButtonElement>(null);
+  // Restoring a running tab skips cues that occurred while its document was closed.
+  const lastElapsed = useRef(elapsedAt(session, now));
+  const { prepare, play, stop: stopChime, error: audioError } = useChimes();
   const elapsed = elapsedAt(session, now);
   const total = durationMs(config);
-  const remaining = Math.max(0, total - elapsed);
   const phase = sessionPhase(config, elapsed);
-  const showingSettings = session.mode === "setup" || editing;
-  const leaving = session.mode === "starting" || session.mode === "complete";
-  const canResume = session.elapsed < total;
+  const timeline = useMemo(() => timerTimeline(config), [config]);
+  const saved = session.mode === "saved";
+  const completed = saved || session.mode === "complete" || session.mode === "edit-before-save";
+  const saveFirst =
+    editing && (completed || session.mode === "setup" || transition?.session.mode === "saved");
+  const blackout = transition?.restart === true;
 
   useEffect(() => {
-    if (session.mode !== "running") return;
+    storeDraft(home && session.mode === "setup" ? null : { config, session });
+  }, [home, config, session]);
+
+  useEffect(() => {
+    if (transition || session.mode !== "running") return;
+    if (!playback) {
+      // Back/Forward or a direct edit link can leave playback without using Pause.
+      stopChime();
+      const pausedAt = Math.min(total, elapsedAt(session, Date.now()));
+      setDraft((draft) => ({
+        ...draft,
+        session: {
+          mode: pausedAt >= total ? "complete" : "paused",
+          elapsed: pausedAt,
+          startedAt: 0,
+        },
+      }));
+      return;
+    }
     const tick = () => setNow(Date.now());
     const timer = window.setInterval(tick, 250);
     document.addEventListener("visibilitychange", tick);
@@ -58,132 +84,228 @@ export function TimerScreen() {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", tick);
     };
-  }, [session.mode]);
-  useEffect(() => {
-    if (session.mode === "running" && elapsed >= total) {
-      setCompleted(true);
-      setSession({ mode: "complete", elapsed: total, startedAt: 0 });
-    }
-  }, [elapsed, total, session.mode]);
-  useEffect(() => {
-    if (session.mode === "running" || session.mode === "paused")
-      hudRef.current?.focus({ preventScroll: true });
-  }, [session.mode]);
+  }, [playback, session, total, stopChime, transition]);
 
-  function start(restart = true) {
-    saveConfig(config);
-    setCompleted(false);
-    setEditing(false);
-    if (restart) {
-      // The clock starts after the foreground exits and the atmosphere reaches black.
-      setSession({ mode: "starting", elapsed: 0, startedAt: 0 });
-    } else {
-      const timestamp = Date.now();
-      setNow(timestamp);
-      setSession({ mode: "running", elapsed: session.elapsed, startedAt: timestamp });
+  useEffect(() => {
+    if (transition || !playback || session.mode !== "running") return;
+    if (crossedChimeBoundary(timeline, lastElapsed.current, elapsed)) play(config.chime);
+    lastElapsed.current = elapsed;
+    if (elapsed >= total)
+      setDraft((draft) => ({
+        ...draft,
+        session: { mode: "complete", elapsed: total, startedAt: 0 },
+      }));
+  }, [playback, elapsed, total, session.mode, timeline, config.chime, play, transition]);
+
+  useEffect(() => {
+    if (!transition && (editing || session.mode === "running" || session.mode === "paused")) {
+      hudRef.current?.focus({ preventScroll: true });
     }
-    window.scrollTo?.({ top: 0, behavior: "instant" });
+  }, [editing, transition, session.mode]);
+
+  function go(to: Transition["to"], next: Session, restart = false) {
+    setSaveError(false);
+    setTransition({ from: pathname, to, session: next, restart });
   }
-  function stop() {
-    setSession({
-      mode: "paused",
-      elapsed: Math.min(total, elapsedAt(session, Date.now())),
-      startedAt: 0,
+
+  async function afterExit() {
+    if (!transition) return;
+    // A history navigation during the exit takes precedence over the pending action.
+    try {
+      if (router.state.location.pathname !== transition.from) return;
+      // Motion owns this exit and entrance, including browsers without native view transitions.
+      if (transition.to !== transition.from) {
+        await router.navigate({
+          to: transition.to,
+          replace: transition.to === "/",
+          viewTransition: false,
+        });
+        if (router.state.location.pathname !== transition.to) return;
+      }
+      const next = transition.session;
+      const startedAt = next.mode === "running" ? Date.now() : 0;
+      if (next.mode === "running") {
+        lastElapsed.current = next.elapsed;
+        setNow(startedAt);
+      }
+      if (transition.restart) setResetId((id) => id + 1);
+      const homeConfig = transition.to === "/" ? loadConfig() : undefined;
+      setDraft((draft) => ({
+        config: homeConfig ?? draft.config,
+        session: { ...next, startedAt },
+      }));
+      window.scrollTo?.({ top: 0, behavior: "instant" });
+      if (transition.to === "/")
+        requestAnimationFrame(() => hudRef.current?.focus({ preventScroll: true }));
+    } finally {
+      setTransition(null);
+    }
+  }
+
+  function start(restart: boolean) {
+    stopChime();
+    if (config.chimes) prepare(config.chime);
+    const next: Session = { mode: "running", elapsed: restart ? 0 : session.elapsed, startedAt: 0 };
+    if (!restart && playback) {
+      const timestamp = Date.now();
+      lastElapsed.current = next.elapsed;
+      setNow(timestamp);
+      setDraft({ config, session: { ...next, startedAt: timestamp } });
+    } else {
+      go("/reiki-on", next, restart);
+    }
+  }
+  function pause() {
+    const position = Math.min(total, elapsedAt(session, Date.now()));
+    stopChime();
+    if (crossedChimeBoundary(timeline, lastElapsed.current, position)) play(config.chime);
+    setDraft({
+      config,
+      session: { mode: position >= total ? "complete" : "paused", elapsed: position, startedAt: 0 },
     });
   }
   function finish() {
-    setCompleted(false);
-    setEditing(false);
-    setSession({ mode: "complete", elapsed: session.elapsed, startedAt: 0 });
+    stopChime();
+    setSaveError(false);
+    setDraft({
+      config,
+      session: {
+        mode: "complete",
+        elapsed: Math.min(total, elapsedAt(session, Date.now())),
+        startedAt: 0,
+      },
+    });
   }
-  function afterExit() {
-    if (session.mode === "starting") {
-      const timestamp = Date.now();
-      setNow(timestamp);
-      setResetId((id) => id + 1);
-      setSession({ mode: "running", elapsed: 0, startedAt: timestamp });
-    } else if (session.mode === "complete") {
-      setSession({ mode: "setup", elapsed: 0, startedAt: 0 });
-      window.scrollTo?.({ top: 0, behavior: "instant" });
-      requestAnimationFrame(() => hudRef.current?.focus({ preventScroll: true }));
+  function dismissFinish() {
+    setSaveError(false);
+    setDraft((draft) => ({
+      ...draft,
+      session: { ...draft.session, mode: "paused", startedAt: 0 },
+    }));
+  }
+  function edit() {
+    stopChime();
+    const position = Math.min(total, elapsedAt(session, Date.now()));
+    go("/reiki-on/edit", {
+      mode: completed || position >= total ? "edit-before-save" : "paused",
+      elapsed: position,
+      startedAt: 0,
+    });
+  }
+  function leave() {
+    stopChime();
+    go("/", readySession);
+  }
+  function save() {
+    if (!saveConfig(config)) {
+      setSaveError(true);
+      return;
     }
+    setSaveError(false);
+    stopChime();
+    const next: Session = { ...session, mode: "saved" };
+    setDraft({ config, session: next });
+    if (editing) go("/reiki-on", next);
+  }
+  function changeConfig(next: TimerConfig) {
+    if (next.chimes && !config.chimes) prepare(next.chime);
+    if (!next.chimes && config.chimes) stopChime();
+    setSaveError(false);
+    setDraft({ session, config: next });
+  }
+
+  function hudMode() {
+    if (saveFirst) return "save";
+    if (playback && completed) return "paused";
+    if (home || completed) return "setup";
+    return session.mode === "running" ? "running" : session.mode === "paused" ? "paused" : "setup";
   }
 
   return (
-    <Atmosphere
-      cycling={showingSettings && !leaving}
-      phase={phase.index}
-      dim={showingSettings ? 0 : phase.dim}
-      blackout={session.mode === "starting"}
-      resetId={resetId}
+    <TimerContext
+      value={{
+        config,
+        elapsed,
+        phase,
+        saved,
+        audioError,
+        onChange: changeConfig,
+        onPreviewChime: play,
+        onDone: leave,
+      }}
     >
-      <section className="timer-screen" aria-label="Reiki timer">
-        <div className="timer-foreground" inert={leaving}>
-          <header className="timer-header">
-            <AnimatePresence initial={false}>
-              {showingSettings && !leaving && (
-                <motion.h1
-                  className="timer-wordmark"
-                  data-ink="label"
-                  aria-label="Reiki timer"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, transition: reduced ? { duration: 0 } : sceneMotion.exit }}
-                  transition={reduced ? { duration: 0 } : sceneMotion.enter}
-                >
-                  <span className="timer-wordmark-initial">R</span>eiki timer
-                </motion.h1>
+      <Atmosphere
+        cycling={(!playback || saved) && !blackout}
+        phase={phase.index}
+        dim={playback && !completed ? phase.dim : 0}
+        blackout={blackout}
+        resetId={resetId}
+      >
+        <section className="timer-screen" aria-label="Reiki timer">
+          <div className="timer-foreground" inert={!!transition}>
+            <header className="timer-header" data-playback={playback || undefined}>
+              <TimerHud
+                mode={hudMode()}
+                hidden={!!transition || (playback && saved)}
+                summary={
+                  !playback
+                    ? {
+                        content: (
+                          <TimerSummary
+                            {...summarizeTimer(config)}
+                            showTimerIcon={config.showTime}
+                          />
+                        ),
+                        timeline: <TimerTimeline entries={timeline} />,
+                      }
+                    : undefined
+                }
+                editing={editing}
+                canResume={session.elapsed < total}
+                primaryRef={hudRef}
+                finishRef={finishRef}
+                onStart={start}
+                onPause={pause}
+                onFinish={finish}
+                onEdit={edit}
+                onSave={save}
+              />
+              {saveFirst && saveError && (
+                <p className="timer-hud-error" data-ink="detail" role="alert">
+                  Couldn’t save in this browser. Try again.
+                </p>
+              )}
+            </header>
+            <AnimatePresence mode="wait" initial={false} onExitComplete={afterExit}>
+              {!transition && (
+                <TimerScene key="route">
+                  <Outlet />
+                </TimerScene>
               )}
             </AnimatePresence>
-            <TimerHud
-              mode={session.mode}
-              editing={editing}
-              canResume={canResume}
-              primaryRef={hudRef}
-              onStart={start}
-              onStop={stop}
-              onFinish={finish}
-              onEdit={() => {
-                setEditing(!editing);
-                hudRef.current?.focus({ preventScroll: true });
-                window.scrollTo?.({ top: 0, behavior: "instant" });
-              }}
-            />
-          </header>
-          <AnimatePresence mode="wait" initial={false} onExitComplete={afterExit}>
-            {!leaving &&
-              (showingSettings ? (
-                <ScreenContent key="settings">
-                  <TimerSettings config={config} onChange={setConfig} />
-                </ScreenContent>
-              ) : (
-                <ScreenContent key="session">
-                  <div className="timer-session">
-                    {config.showTime && (
-                      <div
-                        className="timer-countdown"
-                        data-ink="display"
-                        role="timer"
-                        aria-label="Time remaining"
-                      >
-                        {formatRemaining(remaining)}
-                      </div>
-                    )}
-                  </div>
-                </ScreenContent>
-              ))}
-          </AnimatePresence>
-        </div>
-        <span className="visually-hidden" role="status">
-          {completed
-            ? "Your Reiki session is complete."
-            : session.mode === "paused"
-              ? "Timer paused."
-              : session.mode === "running"
-                ? "Timer running."
-                : ""}
-        </span>
-      </section>
-    </Atmosphere>
+          </div>
+          <FinishTimerDialog
+            open={playback && completed && !saved && !transition}
+            expired={session.elapsed >= total}
+            saveError={saveError}
+            finishRef={finishRef}
+            onDismiss={dismissFinish}
+            onLeave={leave}
+            onSave={save}
+            onEdit={edit}
+          />
+          <span className="visually-hidden" role="status">
+            {playback &&
+              (completed
+                ? "Your Reiki session is complete."
+                : session.mode === "paused"
+                  ? "Timer paused."
+                  : session.mode === "running"
+                    ? "Timer running."
+                    : "")}
+          </span>
+        </section>
+      </Atmosphere>
+    </TimerContext>
   );
 }

@@ -27,7 +27,7 @@
       --button-size: 40px;
       --svg-as-icon-size: var(--spacing-24);
 
-      font-size: var(--font-body-lg);
+      font: var(--font-body-lg);
       border-radius: var(--radius-md);
       padding-inline: var(--spacing-16);
       gap: var(--spacing-16);
@@ -94,12 +94,22 @@
     &[data-mode="ghost"] {
       border-color: transparent;
       background-color: transparent;
-      color: var(--color-button);
+      color: var(--ghost-ink, var(--color-button));
+      min-block-size: 2.75rem;
+      font: var(--font-body-lg);
+      text-decoration: none;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          background-color: var(--color-button-container);
+          background-color: var(--ghost-feedback, var(--color-button-container));
         }
+      }
+      &:active:not(:disabled, [aria-disabled="true"]) {
+        background-color: var(--ghost-feedback, var(--color-button-container));
+      }
+      &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
       }
     }
 
@@ -207,10 +217,10 @@
 
 @layer components {
   [data-ui="button"][data-mode="frost"] {
-    height: var(--control-button-size, 3rem);
+    height: var(--frost-button-height, 2.75rem);
     padding: 0;
     border: 0;
-    border-radius: var(--radius-rounded);
+    border-radius: var(--frost-word-radius, 0.3rem);
     color: var(--color-ink);
     background: var(--well-fill);
     transition: none;
@@ -225,9 +235,36 @@
       font-size: 1rem;
       font-weight: 400;
     }
+    /* Keep the face lighting underneath the action's text and glyphs. */
+    [data-frost][data-lettering] {
+      isolation: isolate;
+      &::before,
+      &::after {
+        z-index: -1;
+      }
+    }
+    &[data-as-icon="false"]:not([aria-pressed]) {
+      --frost-fill: var(--frost-word-fill);
+      --frost-fallback: var(--color-paper);
+      [data-ripple="release"] {
+        background: none;
+        box-shadow:
+          0 0 0 1px var(--ripple-light),
+          0 0 8px var(--ripple-diffusion);
+      }
+    }
+    &[data-as-icon="false"][data-size="lg"] {
+      min-width: 7rem;
+      height: 3.25rem;
+      [data-frost] {
+        font-size: 1.3125rem;
+      }
+    }
     &[data-as-icon="true"] {
       width: var(--control-button-size, 3rem);
-      border-radius: 50%;
+      height: var(--frost-button-height, var(--control-button-size, 3rem));
+      border-radius: var(--frost-icon-radius, 50%);
+      transition: border-radius 420ms ease-in-out;
       [data-frost] {
         padding: 0;
       }
@@ -238,7 +275,7 @@
     }
     &:focus-visible {
       outline: 2px solid var(--color-focus);
-      outline-offset: 5px;
+      outline-offset: var(--frost-focus-offset, 5px);
     }
     &:disabled {
       opacity: 0.55;
@@ -247,56 +284,112 @@
     &[data-hint] [data-frost]::before {
       animation: frost-button-hint 1.4s ease-in-out 3s 1;
     }
+    /* Inset the bell's moving face within a fixed well, like the switch thumb. */
+    &[aria-pressed] {
+      padding: calc(var(--control-button-size, 3rem) * 0.065);
+    }
+    &[aria-pressed="true"] {
+      --frost-fill: var(--frost-fill-selected);
+    }
+    &[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      scale: 1.04;
+      border-radius: inherit;
+      box-shadow: var(--pressure-ring);
+      pointer-events: none;
+    }
+    @media (forced-colors: active) {
+      &[aria-pressed="true"]::after {
+        border: 2px solid Highlight;
+      }
+    }
   }
-  /* Secondary atmosphere actions stay typographic, leaving the circle as the only surface. */
-  [data-ui="button"][data-mode="frost-ghost"] {
+  /* A shallow track behind the letters gives secondary actions a resting edge. */
+  [data-ui="button"][data-mode="etched"] {
     position: relative;
     min-height: 2.75rem;
     height: auto;
     padding: 0.75em;
     border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
+    border-radius: 0.25rem;
+    background: var(--well-checked);
+    box-shadow:
+      inset 0 3px 6px -3px var(--well-shade),
+      inset 0 1px 2px var(--well-shade),
+      inset 0 -1px 0 var(--well-light);
     color: var(--color-ink-on-atmosphere);
-    font-size: clamp(0.875rem, 3.5vw, 1rem);
+    font-size: 1rem;
     font-weight: 400;
-    opacity: 0.8;
     text-underline-offset: 0.3em;
     text-decoration-thickness: 1px;
-    transition:
-      opacity var(--transition-standard-default-effects),
-      translate var(--transition-expressive-fast-effects);
-    & + [data-ui="button"][data-mode="frost-ghost"]::before {
-      content: "";
-      position: absolute;
-      inset-inline-start: 0;
-      inset-block: 32%;
-      width: 1px;
-      background: var(--well-light);
-      pointer-events: none;
+    &[data-size="lg"] {
+      font-size: 1.125rem;
     }
+    transition: background-color var(--transition-standard-default-effects);
     @media (hover: hover) and (pointer: fine) {
-      &:hover:not(:disabled) {
-        opacity: 1;
-        text-decoration-line: underline;
+      &:hover:not(:disabled, [aria-disabled="true"]) {
+        background-color: var(--recess-action-hover);
+        text-decoration-line: var(--button-underline, underline);
       }
     }
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled="true"]) {
       scale: 1;
-      translate: 0 1px;
-      opacity: 1;
+      background-color: var(--recess-action-active);
+      box-shadow:
+        inset 0 2px 4px var(--well-shade),
+        inset 0 -1px 0 var(--well-light);
     }
     &:focus-visible {
       outline: 2px solid var(--color-focus);
       outline-offset: -4px;
       box-shadow: none;
-      opacity: 1;
     }
-    @media (prefers-reduced-motion: reduce) {
-      &:active {
-        translate: none;
-      }
+    &:is(:disabled, [aria-disabled="true"]) {
+      opacity: 0.55;
+      scale: 1;
+      box-shadow: none;
+    }
+    @media (forced-colors: active) {
+      border: 1px solid ButtonText;
+      color: ButtonText;
+    }
+  }
+  [data-ui="button"][data-mode="text"] {
+    min-height: 2.75rem;
+    height: auto;
+    padding: var(--button-text-padding, 0.5em 0.25em);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink-on-atmosphere);
+    font-size: 0.875rem;
+    font-weight: 400;
+    &[data-as-icon="true"] {
+      min-inline-size: 2.75rem;
+    }
+    text-decoration-line: var(--button-underline, underline);
+    text-decoration-color: var(--well-light);
+    text-underline-offset: 0.3em;
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: currentColor;
+      background-color: var(--button-text-hover-fill, transparent);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: -2px;
+    }
+    &:active {
+      scale: 1;
+      background-color: var(--button-text-pressed-fill, var(--button-text-hover-fill, transparent));
+    }
+    @media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+      color: var(--color-paper);
+    }
+    @media (forced-colors: active) {
+      color: ButtonText;
     }
   }
   @keyframes frost-button-hint {
@@ -309,6 +402,9 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    [data-ui="button"][data-mode="frost"][data-as-icon="true"] {
+      transition: none;
+    }
     [data-ui="button"][data-hint] [data-frost]::before {
       animation: none;
     }

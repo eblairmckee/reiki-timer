@@ -1,0 +1,34 @@
+@layer components {
+  .timer-summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: var(--timer-summary-align, center);
+    gap: 0.3em 0.9em;
+    list-style: none;
+    font-size: clamp(0.875rem, 2.8vw, 1rem);
+    line-height: 1.3;
+  }
+  .timer-summary[data-as-description] {
+    justify-content: flex-start;
+    font-size: inherit;
+  }
+  .timer-summary[data-blurred-background] {
+    --backdrop-fill: var(--well-checked);
+    --summary-ink: var(--color-ink-summary-glass);
+    box-shadow:
+      inset 0 1px 2px var(--well-shade),
+      inset 0 -1px 0 var(--well-light);
+  }
+  .timer-summary li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    white-space: nowrap;
+  }
+  .timer-summary svg {
+    width: 1.05em;
+    height: 1.05em;
+  }
+}

@@ -53,6 +53,34 @@ test("translucent text and placeholder retain contrast across any sRGB backgroun
   }
 });
 
+test("word-button ink retains small-text contrast at the shaded end of the frosted face", () => {
+  const fill = rgba("--frost-word-fill");
+  const shade = rgba("--frost-shade");
+  const ink = rgba("--color-ink");
+  // Bound the face on black and the dark lettering on white, including the face gradient.
+  const darkestFace = fill.rgb.map(
+    (channel, i) => channel * fill.alpha * (1 - shade.alpha) + shade.rgb[i] * shade.alpha,
+  );
+  const lightestInk = ink.rgb.map((channel) => channel * ink.alpha + 1 - ink.alpha);
+  expect((luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05)).toBeGreaterThanOrEqual(
+    4.5,
+  );
+});
+
+test("the muted timestamp stays legible on timeline glass", () => {
+  const glass = rgba("--summary-details-glass");
+  const time = rgba("--color-timeline-time");
+  const event = rgba("--color-timeline-event");
+  const brightestGlass = glass.rgb.map((channel) => channel * glass.alpha + 1 - glass.alpha);
+  const dimmestTime = time.rgb.map(
+    (channel, i) => channel * time.alpha + glass.rgb[i] * glass.alpha * (1 - time.alpha),
+  );
+  expect(time.alpha).toBeLessThan(event.alpha);
+  expect(
+    (luminance(dimmestTime) + 0.05) / (luminance(brightestGlass) + 0.05),
+  ).toBeGreaterThanOrEqual(4.5);
+});
+
 const palettes = chakraPalettes.map((names) =>
   names.map((name) => {
     const value = token(`--chakra-${name}`);
@@ -66,6 +94,8 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   let minimumSmall = Infinity;
   let minimumLarge = Infinity;
   let minimumControl = Infinity;
+  let minimumSummary = Infinity;
+  const glass = rgba("--well-checked");
   for (let phase = 0; phase < palettes.length; phase++) {
     const next = palettes[(phase + 1) % palettes.length];
     for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
@@ -75,6 +105,8 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
       });
       for (const dim of [0, 0.2, 0.5, 0.85, 1]) {
         const ink = inkStrengths(colors, atmosphereSettings.grainOverlay, dim);
+        expect(ink.summary).toBeLessThan(ink.text);
+        expect(ink["summary-glass"]).toBeLessThan(ink.text);
         // Exercise actual shader color mixtures, independently of the interval solver.
         const samples = [
           ...colors,
@@ -85,14 +117,19 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
             const bg = color.map(
               (c) => (c * (1 - Math.abs(grain)) + Math.max(0, grain)) * (1 - dim),
             );
-            function contrast(alpha: number, frost = 0) {
-              const surface = bg.map((c) => c * (1 - frost) + frost);
+            function contrast(alpha: number, overlay = 0, pigment = [1, 1, 1]) {
+              const surface = bg.map((c, i) => c * (1 - overlay) + pigment[i] * overlay);
               const glyph = surface.map((c) => alpha + c * (1 - alpha));
               return (luminance(glyph) + 0.05) / (luminance(surface) + 0.05);
             }
             minimumSmall = Math.min(minimumSmall, contrast(ink.text));
             minimumLarge = Math.min(minimumLarge, contrast(ink.display));
             minimumControl = Math.min(minimumControl, contrast(ink.control, 0.24));
+            minimumSummary = Math.min(
+              minimumSummary,
+              contrast(ink.summary),
+              contrast(ink["summary-glass"], glass.alpha, glass.rgb),
+            );
           }
         }
       }
@@ -101,6 +138,7 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   expect(minimumSmall).toBeGreaterThanOrEqual(4.5);
   expect(minimumLarge).toBeGreaterThanOrEqual(3);
   expect(minimumControl).toBeGreaterThanOrEqual(3);
+  expect(minimumSummary).toBeGreaterThanOrEqual(4.5);
 });
 
 test("darkening the scene softens the foreground instead of retaining bright white ink", () => {

@@ -1,8 +1,20 @@
 @layer utilities {
-  /* Neutral light inherits local pigment through alpha compositing.
-     Atmosphere supplies adaptive base strengths; field ink has a softer visual treatment. */
   [data-ink] {
     color: var(--color-ink-on-atmosphere);
+  }
+  [data-ink="label"] {
+    color: var(--color-ink-label);
+  }
+  [data-ink="label"],
+  [data-ink="display"] {
+    font-family: var(--font-heading);
+  }
+  [data-ink="detail"],
+  [data-ink="summary"] {
+    font-family: var(--font-reading);
+  }
+  [data-ink="summary"] {
+    color: var(--summary-ink, var(--color-ink-summary));
   }
   [data-ink="display"] {
     color: var(--color-ink-display);
@@ -10,28 +22,64 @@
   [data-ink="control"] {
     color: var(--color-ink-on-frost);
   }
-  [data-ink="label"] {
-    color: var(--color-ink-label);
+  [data-ink="on-light-frost"] {
+    color: var(--color-ink);
   }
-  [data-ink="detail"] {
-    color: var(--color-ink-detail);
+
+  /* Opposing edges sit outside the solid letter. Scale the cut down on small labels. */
+  [data-lettering="etched"] {
+    --cut-depth: clamp(0.5px, 0.035em, 1.2px);
+    text-shadow:
+      0 calc(-1 * var(--cut-depth)) 0 var(--letterpress-shade),
+      0 var(--cut-depth) 0 var(--letterpress-rim);
   }
-  @media (prefers-contrast: more) {
-    [data-ink="label"] {
-      color: var(--color-ink-display);
+  [data-lettering="frosted"] {
+    text-shadow:
+      0 -0.5px 0 var(--frost-light),
+      0 1px 1px var(--frost-shadow);
+  }
+  /* Each line catches the same light. The dimmest gradient stop is the display ink. */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    :where([data-lettering="frosted"])[data-ink="display"] {
+      background-image: linear-gradient(
+        var(--letter-frost-crest) 20%,
+        var(--color-ink-display) 82%
+      );
+      background-size: 100% 1lh;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
     }
-    [data-ink="detail"] {
-      color: var(--color-ink-on-atmosphere);
-    }
   }
-  @media (prefers-reduced-transparency: reduce) {
-    [data-ink] {
+  @media (prefers-contrast: more), (prefers-reduced-transparency: reduce), (forced-colors: active),
+    print {
+    [data-lettering] {
+      background-image: none;
+      text-shadow: none;
+    }
+    [data-ink],
+    [data-lettering="etched"] {
       color: var(--color-paper);
+    }
+    [data-ink="on-light-frost"] {
+      color: var(--color-ink);
     }
   }
   @media (forced-colors: active) {
-    [data-ink] {
+    [data-ink],
+    [data-lettering="etched"] {
       color: CanvasText;
+    }
+    [data-ink="control"],
+    [data-ink="on-light-frost"] {
+      color: ButtonText;
+    }
+  }
+  @media print {
+    [data-ink],
+    [data-lettering="etched"] {
+      color: var(--color-shade);
     }
   }
 }

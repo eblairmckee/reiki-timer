@@ -29,10 +29,18 @@ type Drag = {
 };
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-const tickMarks = Array.from({ length: 60 }, (_, index) => ({
-  angle: index * 6,
-  major: index % 5 === 0,
-}));
+
+function dialMarks(min: number, max: number) {
+  const stride = Math.max(1, Math.ceil((max - min + 1) / 12));
+  const marks = [];
+  for (let minutes = max; minutes >= min; minutes -= stride) {
+    marks.push({
+      angle: (minutes / max) * 360,
+      major: minutes === max || minutes % (stride === 1 ? 5 : stride * 3) === 0,
+    });
+  }
+  return marks;
+}
 
 export function TimePicker({
   value,
@@ -52,11 +60,11 @@ export function TimePicker({
   const angle = useMotionValue((value / max) * 360);
   const valueLeft = useTransform(angle, (degrees) => {
     const radial = Math.sin((degrees * Math.PI) / 180);
-    return `calc(${50 + radial * 50}% + ${radial * 1.5}rem)`;
+    return `calc(${50 + radial * 50}% + ${radial} * var(--time-picker-value-gap, 1.5rem))`;
   });
   const valueTop = useTransform(angle, (degrees) => {
     const radial = Math.cos((degrees * Math.PI) / 180);
-    return `calc(${50 - radial * 50}% - ${radial * 1.5}rem)`;
+    return `calc(${50 - radial * 50}% - ${radial} * var(--time-picker-value-gap, 1.5rem))`;
   });
   const animation = useRef<AnimationPlaybackControls | null>(null);
   const reduced = useReducedMotion();
@@ -212,7 +220,7 @@ export function TimePicker({
         <span data-ripple="pressure" aria-hidden="true" />
         <span data-ripple="release" aria-hidden="true" />
         <svg className="time-picker-ticks" viewBox="0 0 300 300" aria-hidden="true">
-          {tickMarks.map(({ angle: tickAngle, major }) => (
+          {dialMarks(min, max).map(({ angle: tickAngle, major }) => (
             <g key={tickAngle} transform={`rotate(${tickAngle} 150 150)`}>
               <path d={`M150.5 11.5v${major ? 16 : 8}`} className="tick-light" />
               <path

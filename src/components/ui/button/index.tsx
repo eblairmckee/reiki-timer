@@ -9,7 +9,7 @@ import { useFrostMotion } from "../shared/use-frost-motion";
 type Props = React.ComponentProps<typeof ButtonPrimitive> &
   Partial<{
     variant: "primary" | "neutral" | "error" | "link";
-    mode: "filled" | "lighter" | "ghost" | "stroke" | "frost" | "frost-ghost";
+    mode: "filled" | "lighter" | "ghost" | "stroke" | "frost" | "etched" | "text";
     size: "lg" | "md" | "sm";
     asIcon: boolean;
     asRtl: boolean;
@@ -27,6 +27,8 @@ export function Button({
   ...rest
 }: Props) {
   const frosted = mode === "frost";
+  const frostedAction = frosted && rest["aria-pressed"] === undefined;
+  const actionInk = asIcon ? "control" : "on-light-frost";
   const feedback = useFrostMotion({ disabled: !frosted || rest.disabled });
   return (
     <ButtonPrimitive
@@ -45,8 +47,16 @@ export function Button({
         <>
           <span data-ripple="pressure" aria-hidden="true" />
           <span data-ripple="release" aria-hidden="true" />
-          <span data-frost="">{children}</span>
+          <span
+            data-frost=""
+            data-ink={frostedAction ? actionInk : undefined}
+            data-lettering={frostedAction ? "frosted" : undefined}
+          >
+            {children}
+          </span>
         </>
+      ) : mode === "etched" ? (
+        <span data-lettering="etched">{children}</span>
       ) : (
         children
       )}
