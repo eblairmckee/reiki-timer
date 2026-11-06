@@ -1,0 +1,149 @@
+@layer components {
+  .timer-screen {
+    min-block-size: 100svh;
+  }
+  .timer-settings {
+    --time-picker-size: min(78vw, 44svh, 30rem);
+    --field-row-gap: clamp(5rem, 12svh, 9rem);
+    --control-block-size: clamp(3.5rem, 8.5svh, 4.5rem);
+    width: 100%;
+    margin-inline: auto;
+    padding: 8rem max(1rem, env(safe-area-inset-right)) 18svh max(1rem, env(safe-area-inset-left));
+  }
+  .timer-header {
+    position: fixed;
+    top: max(1rem, env(safe-area-inset-top));
+    inset-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: none;
+  }
+  .timer-wordmark {
+    flex: none;
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    text-align: left;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+  }
+  .timer-wordmark-initial {
+    font-size: 1.6em;
+    line-height: 0.8;
+  }
+  .timer-foreground {
+    view-transition-name: foreground;
+  }
+  .timer-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+    margin-top: var(--field-row-gap);
+  }
+  .timer-field[data-first] {
+    margin-top: 0;
+  }
+  .timer-field[data-related] {
+    margin-top: calc(var(--field-row-gap) / 2);
+  }
+  .timer-field-copy {
+    text-align: center;
+  }
+  .timer-label {
+    display: block;
+    font-size: clamp(1.5rem, 6.25vw, 2.25rem);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 0.015em;
+  }
+  .timer-description {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-wrap: balance;
+  }
+  .timer-field-control {
+    display: grid;
+    justify-items: center;
+  }
+  .timer-progressive {
+    overflow: hidden;
+  }
+  .timer-hud {
+    --control-button-size: clamp(3.5rem, 14vw, 4.25rem);
+    --hud-action-gap: 0.65rem;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0;
+    margin: 0 0 0 auto;
+    border: 0;
+    min-inline-size: 0;
+  }
+  .timer-hud-primary {
+    position: relative;
+    z-index: 1;
+    flex: none;
+  }
+  .timer-hud-secondary {
+    overflow: hidden;
+    flex: none;
+    margin-inline-end: var(--hud-action-gap);
+  }
+  .timer-hud-actions {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    padding: 0;
+  }
+  .timer-session {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 5rem 1rem;
+  }
+  .timer-countdown {
+    font-size: clamp(4rem, 16vw, 9rem);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  @media (min-width: 760px) {
+    .timer-settings {
+      --time-picker-size: min(36vw, 54svh, 30rem);
+      width: min(calc(100% - 4rem), 64rem);
+      padding-inline: 0;
+      padding-top: 7rem;
+    }
+    .timer-field {
+      grid-template-columns: 18rem minmax(0, 1fr);
+      column-gap: 4rem;
+    }
+    .timer-field-copy {
+      text-align: left;
+    }
+    .timer-label {
+      font-size: 2.25rem;
+    }
+    .timer-description {
+      text-wrap: pretty;
+    }
+  }
+}

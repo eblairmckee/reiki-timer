@@ -8,24 +8,23 @@
     "format": "biome format --write",
     "lint": "biome lint",
     "dev": "vite",
-    "build": "bun run routes:generate && tsc --noEmit && vite build",
+    "build": "bun run check:tokens && bun run routes:generate && tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "bun run routes:generate && tsc --noEmit",
+    "typecheck": "bun run check:tokens && bun run routes:generate && tsc --noEmit",
     "routes:generate": "bun run --bun tsr generate",
     "test": "bun test",
     "skills:list": "intent list",
-    "skills:load": "intent load"
+    "skills:load": "intent load",
+    "check:tokens": "bun scripts/check-design-tokens.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
-    "@hugeicons/core-free-icons": "4.4.0",
-    "@hugeicons/react": "1.1.10",
-    "@tanstack/charts": "1.1.0",
+    "@paper-design/shaders": "0.0.82",
+    "@paper-design/shaders-react": "0.0.82",
     "@tanstack/react-router": "^1.170.46",
-    "@tanstack/react-table": "^9.3.1",
+    "motion": "14.9.1",
     "react": "19.3.1",
-    "react-dom": "19.3.1",
-    "vaul-base": "1.0.0"
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
@@ -46,10 +45,7 @@
   "intent": {
     "skills": [
       "@tanstack/react-router",
-      "@tanstack/router-core",
-      "@tanstack/react-table",
-      "@tanstack/table-core",
-      "@tanstack/charts"
+      "@tanstack/router-core"
     ]
   }
 }

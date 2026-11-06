@@ -1,0 +1,12 @@
+# Recessed wells and frosted touch surfaces
+
+The [composed reference](../../../../docs/concepts/mobile-timer-concepts/timer-config--amber-relief--rest--v01.png), [dial](../../../../docs/concepts/mobile-timer-concepts/dial--recessed-frost--rest-hover-press--v03.png), [switch](../../../../docs/concepts/mobile-timer-concepts/switch--recessed-frost--off-rest-hover-press--v01.png) and [HUD](../../../../docs/concepts/mobile-timer-concepts/hud-start--recessed-frost--rest-hover-press--v01.png) establish material and silhouette. Current [type](typography.md), [layout](layout-and-content.md) and [palette](atmosphere.md) rules supersede those images' lettering, large readout and pastel colors.
+
+Use neutral translucent pigments: dark inset shading for recessed wells, light fill and bevel for frosted touch surfaces, and restrained contact shadows. Static backdrop blur carries the actual local chakra color through the material, including cool and mixed backgrounds. Avoid warm-tinted frost, opaque cream fills, extra outline strokes and floating card containers. The switch track/thumb define the edge relationship.
+
+- **Dial:** fixed recessed ticks, frosted disk and one short etched radial index. No wedge, raised pointer, clock hands or numbered scale. Share the switch’s pressure halo while held and preserve the dial’s release wave. Follow the outside readout geometry in the layout rule.
+- **Switch:** fixed recessed track and moving frosted thumb; position communicates state. Pressure outlines the capsule track; the release splash is circular and follows the thumb as it settles.
+- **HUD:** keep the primary frosted circle with its pressure outline and release splash. Group ghost text actions beside it on one centerline, with a small clear gap and a subtle separator between multiple text actions. Use no backing tray or overlapping surfaces. Ghost actions brighten and underline on hover, depress slightly on press, and keep visible keyboard focus.
+- **Input/select:** style placeholder, value, icon, menu, options and selection as one material system, with a readable backing for the portal.
+
+Keep Olyx/Base UI semantics, cancellation, focus, dismissal and collision handling. Cover rest, hover, press, focus, selected/open, disabled/read-only and invalid states where applicable. Disabled controls stay still. Compare edges, clearances, etching and typography over warm and cool palettes; automated behavior checks cannot prove visual parity.

@@ -1,12 +1,12 @@
 ---
 name: ui-design
-description: Design, build, review, or refactor web interfaces and reusable React component APIs using composition and web interface quality rules.
+description: Design, restyle, build, or review this app's interfaces and React primitives using its theme, glass materials, interaction contracts, and composition rules.
 ---
 
-# UI design and composition
+# UI design
 
-Read the applicable guidance in [rules/](rules/) for the requested feature, component, or review. Use the selected UI library, maintained design references, and existing application conventions.
+For visual work, read [foreground components](rules/foreground-components.md), [styling ownership](rules/library-and-styling.md), [typography](rules/typography.md), [motion](rules/motion.md), and [atmosphere](rules/atmosphere.md). Read [layout](rules/layout-and-content.md) for composition; select other [rules/](rules/) by responsibility.
 
-Inspect representative consumers and identify the user task, interaction contract, component responsibility, and state owner. Choose the smallest composition that supports the required variations, then build the working behavior and verify its important states.
+Establish the applicable rules before building. Inspect the approved references, then compare browser captures at matching proportions within the user's requested viewport scope. Match silhouette, scale, placement, type and material before polishing motion. Check rest, hover and press over warm and cool backgrounds.
 
-For a review, inspect the requested flow and its relevant dependencies against the local rules. Report consequential findings with file locations, their effect on users, and a concrete correction. Distinguish source inspection from observed browser behavior. Explain material design or API tradeoffs and the checks performed.
+Run relevant code, token and behavior checks. Separate browser observations from source inspection and numerical evidence; tests cannot establish visual parity. Rewrite the owning rule when feedback or demonstrated failures change a decision. Evaluation documents record findings; these skills own reusable instructions.

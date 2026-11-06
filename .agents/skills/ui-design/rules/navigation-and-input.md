@@ -4,7 +4,7 @@ Keep shareable navigation state, such as meaningful filters, pagination, and sel
 
 Preserve ordinary link behavior, including modified clicks, opening a new tab, and back and forward navigation. 
 
-Provide visible hover and active feedback on ALL interactable elements (buttons, links, clickable cards, etc.). 
+Use the [foreground component states](foreground-components.md) and [motion contract](motion.md) for interactive feedback.
 
 ## Mobile web browsers
 Use touch-action deliberately on affected controls, preserving the page's expected pan and zoom behavior.

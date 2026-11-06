@@ -1,0 +1,113 @@
+@layer utilities {
+  [data-ripple] {
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      closest-side,
+      transparent 82%,
+      var(--ripple-light) 96%,
+      transparent
+    );
+  }
+  [data-ripple="pressure"] {
+    background: none;
+    box-shadow:
+      0 0 0 1px var(--ripple-light),
+      0 0 9px 3px var(--ripple-diffusion),
+      inset 0 0 5px 1px var(--ripple-diffusion);
+  }
+  [data-recess] {
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    background: var(--well-fill);
+    box-shadow:
+      inset 0 5px 12px -5px var(--well-shade),
+      inset 0 1px 2px var(--well-shade),
+      inset 0 -1px 1px var(--well-light);
+  }
+  [data-frost] {
+    position: relative;
+    display: block;
+    border-radius: inherit;
+    background:
+      linear-gradient(140deg, var(--frost-sheen), transparent 52%, var(--frost-shade)),
+      var(--frost-fill);
+    box-shadow:
+      inset 0 1px 1px var(--frost-light),
+      inset 1px 0 1px var(--well-light),
+      inset 0 -1px 1px var(--well-light),
+      0 5px 9px -4px var(--frost-shadow),
+      0 1px 3px var(--frost-contact);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  [data-frost]::before,
+  [data-frost]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-standard-default-effects);
+  }
+  [data-frost] > [data-ink] {
+    position: relative;
+    z-index: 1;
+  }
+  [data-frost]::before {
+    background: var(--frost-reveal);
+    box-shadow:
+      0 8px 14px -5px var(--frost-shadow),
+      inset 0 1px 1px var(--frost-light);
+  }
+  [data-frost]::after {
+    box-shadow: inset 0 3px 5px -2px var(--well-shade);
+  }
+  [data-pressed] [data-frost]::after {
+    opacity: 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-frost-control]:hover:not([data-disabled], [aria-readonly="true"], [data-pressed])
+      [data-frost]::before {
+      opacity: 1;
+    }
+  }
+  [data-frost-control]:focus-visible,
+  [data-frost-control]:has(:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 5px;
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    [data-frost] {
+      background: var(--frost-fallback);
+    }
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    [data-frost] {
+      background: var(--frost-fallback);
+    }
+  }
+  @media (forced-colors: active) {
+    [data-recess] {
+      background: Canvas;
+      border: 1px solid ButtonText;
+      box-shadow: none;
+    }
+    [data-frost] {
+      background: ButtonFace;
+      border: 1px solid ButtonText;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+    [data-frost-control]:focus-visible,
+    [data-frost-control]:has(:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
+}

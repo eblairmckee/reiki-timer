@@ -1,0 +1,37 @@
+@layer utilities {
+  /* Neutral light inherits local pigment through alpha compositing.
+     Atmosphere supplies adaptive base strengths; field ink has a softer visual treatment. */
+  [data-ink] {
+    color: var(--color-ink-on-atmosphere);
+  }
+  [data-ink="display"] {
+    color: var(--color-ink-display);
+  }
+  [data-ink="control"] {
+    color: var(--color-ink-on-frost);
+  }
+  [data-ink="label"] {
+    color: var(--color-ink-label);
+  }
+  [data-ink="detail"] {
+    color: var(--color-ink-detail);
+  }
+  @media (prefers-contrast: more) {
+    [data-ink="label"] {
+      color: var(--color-ink-display);
+    }
+    [data-ink="detail"] {
+      color: var(--color-ink-on-atmosphere);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    [data-ink] {
+      color: var(--color-paper);
+    }
+  }
+  @media (forced-colors: active) {
+    [data-ink] {
+      color: CanvasText;
+    }
+  }
+}

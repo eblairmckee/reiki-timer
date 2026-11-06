@@ -1,8 +1,13 @@
-/* Olyx Design Tokens */
-@import url("./components/ui/styles/_base/colors.css") layer(tokens);
-@import url("./components/ui/styles/_base/tokens.css") layer(tokens);
+@import url("./components/ui/styles/theme.css") layer(tokens);
+@import url("./components/ui/shared/ink.css");
 
-@layer reset, base, utilities, components, misc, tokens;
+@font-face {
+  font-family: "Bona Nova SC";
+  src: url("/fonts/bona-nova-sc-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 @layer reset {
   * {
@@ -11,11 +16,6 @@
     padding: 0;
     font-family: var(--font-family);
   }
-}
-
-:root {
-  --font-dm-sans: system-ui, sans-serif;
-  color-scheme: light;
 }
 
 body {
@@ -28,4 +28,55 @@ body {
 
 #root {
   min-height: 100svh;
+  isolation: isolate;
+}
+
+::selection {
+  background: var(--color-selection);
+  color: var(--color-on-selection);
+}
+
+.route-message {
+  view-transition-name: foreground;
+  padding: var(--spacing-32);
+  color: var(--color-ink);
+  background: var(--glass-fill-fallback);
+}
+
+/* Route snapshots animate foreground separately from the live atmosphere. */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(atmosphere),
+::view-transition-new(atmosphere) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root),
+::view-transition-old(atmosphere) {
+  opacity: 0;
+}
+::view-transition-old(foreground) {
+  animation: foreground-out 900ms ease-in-out both;
+}
+::view-transition-new(foreground) {
+  animation: foreground-in 1200ms ease-in-out 900ms both;
+}
+@keyframes foreground-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes foreground-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(foreground) {
+    animation: none;
+    opacity: 0;
+  }
+  ::view-transition-new(foreground) {
+    animation: none;
+  }
 }

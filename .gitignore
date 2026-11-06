@@ -9,3 +9,7 @@ test-results/
 .env.*
 !.env.example
 .DS_Store
+.netlify/
+.tanstack/
+*.log
+*.tsbuildinfo

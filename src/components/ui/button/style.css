@@ -60,7 +60,7 @@
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          background-color: color-mix(in srgb, var(--color-button), black 10%);
+          background-color: color-mix(in srgb, var(--color-button), var(--color-shade) 10%);
         }
       }
     }
@@ -161,12 +161,12 @@
     }
 
     /* Active */
-    &:active {
+    &:not([data-frost-control]):active {
       scale: 0.97;
     }
 
     /* Focus */
-    &:focus-visible {
+    &:not([data-frost-control]):focus-visible {
       box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-button-focus-ring) 35%, transparent);
     }
 
@@ -201,6 +201,116 @@
         width: var(--svg-as-icon-size);
         height: var(--svg-as-icon-size);
       }
+    }
+  }
+}
+
+@layer components {
+  [data-ui="button"][data-mode="frost"] {
+    height: var(--control-button-size, 3rem);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-rounded);
+    color: var(--color-ink);
+    background: var(--well-fill);
+    transition: none;
+    [data-frost] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6em;
+      width: 100%;
+      height: 100%;
+      padding-inline: 1.4em;
+      font-size: 1rem;
+      font-weight: 400;
+    }
+    &[data-as-icon="true"] {
+      width: var(--control-button-size, 3rem);
+      border-radius: 50%;
+      [data-frost] {
+        padding: 0;
+      }
+      svg {
+        width: 36%;
+        height: 36%;
+      }
+    }
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 5px;
+    }
+    &:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+    &[data-hint] [data-frost]::before {
+      animation: frost-button-hint 1.4s ease-in-out 3s 1;
+    }
+  }
+  /* Secondary atmosphere actions stay typographic, leaving the circle as the only surface. */
+  [data-ui="button"][data-mode="frost-ghost"] {
+    position: relative;
+    min-height: 2.75rem;
+    height: auto;
+    padding: 0.75em;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--color-ink-on-atmosphere);
+    font-size: clamp(0.875rem, 3.5vw, 1rem);
+    font-weight: 400;
+    opacity: 0.8;
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+    transition:
+      opacity var(--transition-standard-default-effects),
+      translate var(--transition-expressive-fast-effects);
+    & + [data-ui="button"][data-mode="frost-ghost"]::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0;
+      inset-block: 32%;
+      width: 1px;
+      background: var(--well-light);
+      pointer-events: none;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        opacity: 1;
+        text-decoration-line: underline;
+      }
+    }
+    &:active:not(:disabled) {
+      scale: 1;
+      translate: 0 1px;
+      opacity: 1;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: -4px;
+      box-shadow: none;
+      opacity: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      &:active {
+        translate: none;
+      }
+    }
+  }
+  @keyframes frost-button-hint {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-ui="button"][data-hint] [data-frost]::before {
+      animation: none;
     }
   }
 }
