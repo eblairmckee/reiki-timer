@@ -14,10 +14,10 @@ function ButtonGroup({
   return (
     // biome-ignore lint/a11y/useSemanticElements: Keep the Olyx div ref and group contract for non-form actions.
     <div
-      role="group"
-      data-ui="button-group"
-      data-orientation={orientation}
       data-material={material}
+      data-orientation={orientation}
+      data-ui="button-group"
+      role="group"
       {...props}
     />
   );

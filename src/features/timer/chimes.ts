@@ -1,21 +1,21 @@
 export const chimes = [
-  { id: "zen-deep", name: "Deep zen tone", file: "alex_jauk-zen-tone-deep-202555.mp3" },
-  { id: "zen-mid", name: "Mid zen tone", file: "alex_jauk-zen-tone-mid-202556.mp3" },
-  { id: "zen-high", name: "High zen tone", file: "alex_jauk-zen-tone-high-202554.mp3" },
+  { file: "alex_jauk-zen-tone-deep-202555.mp3", id: "zen-deep", name: "Deep zen tone" },
+  { file: "alex_jauk-zen-tone-mid-202556.mp3", id: "zen-mid", name: "Mid zen tone" },
+  { file: "alex_jauk-zen-tone-high-202554.mp3", id: "zen-high", name: "High zen tone" },
   {
+    file: "freesound_community-e-flat-tibetan-singing-bowl-struck-38746.mp3",
     id: "tibetan-bowl",
     name: "Tibetan singing bowl",
-    file: "freesound_community-e-flat-tibetan-singing-bowl-struck-38746.mp3",
   },
   {
+    file: "freesound_community-singing-bowl-hit-3-33366.mp3",
     id: "bowl-hit",
     name: "Singing bowl hit",
-    file: "freesound_community-singing-bowl-hit-3-33366.mp3",
   },
   {
+    file: "freesound_community-singing-bowl-strike-sound-84682.mp3",
     id: "bowl-strike",
     name: "Singing bowl strike",
-    file: "freesound_community-singing-bowl-strike-sound-84682.mp3",
   },
 ] as const;
 
@@ -29,22 +29,26 @@ export function isChimeId(value: unknown): value is ChimeId {
 /** One context and cached buffers per screen; constructing the player never starts audio. */
 export class ChimePlayer {
   private context: AudioContext | null = null;
-  private buffers = new Map<ChimeId, Promise<AudioBuffer>>();
+  private readonly buffers = new Map<ChimeId, Promise<AudioBuffer>>();
   private source: AudioBufferSourceNode | null = null;
   private generation = 0;
   private disposed = false;
-  private requests = new AbortController();
+  private readonly requests = new AbortController();
 
   private load(id: ChimeId, context: AudioContext) {
     let buffer = this.buffers.get(id);
     if (!buffer) {
       const chime = chimes.find((item) => item.id === id);
-      if (!chime) throw new Error("Unknown chime");
+      if (!chime) {
+        throw new Error("Unknown chime");
+      }
       buffer = fetch(`${import.meta.env?.BASE_URL ?? "/"}chime-sounds/${chime.file}`, {
         signal: this.requests.signal,
       })
         .then((response) => {
-          if (!response.ok) throw new Error("Chime could not be loaded");
+          if (!response.ok) {
+            throw new Error("Chime could not be loaded");
+          }
           return response.arrayBuffer();
         })
         .then((data) => context.decodeAudioData(data))
@@ -58,7 +62,10 @@ export class ChimePlayer {
   }
 
   async prepare(id: ChimeId) {
-    if (this.disposed) return;
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
+    if (this.disposed) {
+      return;
+    }
     this.context ??= new AudioContext();
     // Invoke resume synchronously from Enable / Preview / Start, before fetching.
     const ready = this.context.state === "running" ? Promise.resolve() : this.context.resume();
@@ -67,17 +74,22 @@ export class ChimePlayer {
 
   async play(id: ChimeId) {
     this.stop();
-    const generation = this.generation;
+    const { generation } = this;
     await this.prepare(id);
-    const context = this.context;
+    const { context } = this;
     const buffer = await this.buffers.get(id);
-    if (this.disposed || generation !== this.generation || !context || !buffer) return;
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
+    if (this.disposed || generation !== this.generation || !context || !buffer) {
+      return;
+    }
     const source = context.createBufferSource();
     source.buffer = buffer;
     source.connect(context.destination);
     source.onended = () => {
       source.disconnect();
-      if (this.source === source) this.source = null;
+      if (this.source === source) {
+        this.source = null;
+      }
     };
     this.source = source;
     source.start();
@@ -95,6 +107,8 @@ export class ChimePlayer {
     this.stop();
     this.requests.abort();
     this.buffers.clear();
-    void this.context?.close().catch(() => {});
+    this.context?.close().catch(() => {
+      // Audio context disposal is best effort.
+    });
   }
 }

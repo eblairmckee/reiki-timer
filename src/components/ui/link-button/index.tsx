@@ -20,11 +20,11 @@ function LinkButton({
   ...props
 }: LinkButtonProps) {
   const appearance = {
-    "data-ui": "link-button",
-    "data-variant": variant,
-    "data-size": size,
-    "data-underline": underline,
     "data-inline": inline || undefined,
+    "data-size": size,
+    "data-ui": "link-button",
+    "data-underline": underline,
+    "data-variant": variant,
   };
   if (props.as === "button") {
     const { as, ...button } = props;

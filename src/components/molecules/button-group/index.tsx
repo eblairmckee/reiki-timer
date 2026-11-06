@@ -12,27 +12,27 @@ type ButtonGroupProps = {
   | { variant: "summary"; summary: ReactNode; details?: SummaryDetails }
 );
 
-type ActionGroupProps = {
+interface ActionGroupProps {
+  actions?: ReactNode;
   label: string;
   primary: ReactElement;
-  actions?: ReactNode;
-};
+}
 
 export function ActionGroup({ label, primary, actions }: ActionGroupProps) {
   return (
     <OlyxButtonGroup
       aria-label={label}
       className="hud-action-group"
-      material="frost"
       data-expanded={!!actions || undefined}
+      material="frost"
     >
       <AnimatePresence initial={false}>
-        {actions && (
+        {Boolean(actions) && (
           <Disclosure
-            key="actions"
-            reveal="beside"
             className="hud-action-reveal"
             data-slot="button-group-reveal"
+            key="actions"
+            reveal="beside"
           >
             <div className="hud-action-items" data-slot="button-group-items">
               {actions}
@@ -52,14 +52,14 @@ export function ButtonGroup(props: ButtonGroupProps) {
       <div className="button-group-strip">
         <AnimatePresence initial={false}>
           {props.variant === "summary" && (
-            <Disclosure key="summary" reveal="fade" className="button-group-items">
+            <Disclosure className="button-group-items" key="summary" reveal="fade">
               <SummaryPanel details={props.details}>{props.summary}</SummaryPanel>
             </Disclosure>
           )}
         </AnimatePresence>
         <div className="button-group-primary">
           {props.variant === "actions" ? (
-            <ActionGroup label="Session actions" primary={props.primary} actions={props.actions} />
+            <ActionGroup actions={props.actions} label="Session actions" primary={props.primary} />
           ) : (
             props.primary
           )}

@@ -2,8 +2,8 @@
   [data-blurred-background] {
     min-inline-size: 0;
     padding: var(--backdrop-padding, 0.35em 0.75em);
-    border-radius: 0.5rem;
     background: var(--backdrop-fill, var(--well-fill));
+    border-radius: 0.5rem;
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }

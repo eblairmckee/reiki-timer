@@ -22,7 +22,7 @@ For React wrappers, follow the [component type contracts](../../react-best-pract
 
 ## Verify consumers
 
-For a shared component, check that a second realistic consumer composes cleanly. Trace state transitions, controlled updates, theme and layout variants, and the boundary between shared UI and feature logic. Follow the [behavior checks](../../accessible-testing/rules/behavior-tests.md) for consumer-visible contracts and explain any consequential boundary or tradeoff.
+For a shared component, check that a second realistic consumer composes cleanly. Trace state transitions, controlled updates, theme and layout variants, and the boundary between shared UI and feature logic. Follow the [behavior checks](../../testing/rules/behavior-tests.md) for consumer-visible contracts and explain any consequential boundary or tradeoff.
 
 Reference: [Atomic Design methodology](https://atomicdesign.bradfrost.com/chapter-2/).
 

@@ -9,17 +9,17 @@ import { inkStrengths } from "./ink-strength";
 import { PaperMesh } from "./paper-mesh";
 import "./style.css";
 
-type AtmosphereProps = {
-  phase?: number;
+interface AtmosphereProps {
+  blackout?: boolean;
+  children?: ReactNode;
   cycling?: boolean;
   dim?: number;
-  transitionSeconds?: number;
-  blackout?: boolean;
+  phase?: number;
   resetId?: number;
-  children?: ReactNode;
-};
+  transitionSeconds?: number;
+}
 
-export const Atmosphere = memo(function Atmosphere({
+export const Atmosphere = memo(function AtmosphereView({
   phase = 0,
   cycling = true,
   dim = 0,
@@ -41,7 +41,9 @@ export const Atmosphere = memo(function Atmosphere({
   const activePhase = cycling ? previewPhase : phase;
 
   const updateInk = useEffectEvent(() => {
-    if (!colorsRef.current.length || !scopeRef.current) return;
+    if (!(colorsRef.current.length && scopeRef.current)) {
+      return;
+    }
     const ink = inkStrengths(colorsRef.current, atmosphereSettings.grainOverlay, shade.get());
     for (const [name, alpha] of Object.entries(ink)) {
       scopeRef.current.style.setProperty(`--ink-${name}-alpha`, `${Math.ceil(alpha * 1000) / 10}%`);
@@ -50,6 +52,7 @@ export const Atmosphere = memo(function Atmosphere({
 
   const updatePalette = useEffectEvent((colors: number[][]) => {
     colorsRef.current = colors;
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
     shaderRef.current?.paperShaderMount?.setUniforms({ u_colors: colors });
     // The no-WebGL fallback uses the same interpolated theme pigments as the shader.
     if (!supported) {
@@ -59,7 +62,7 @@ export const Atmosphere = memo(function Atmosphere({
           `rgb(${color
             .slice(0, 3)
             .map((channel) => channel * 255)
-            .join(" ")})`,
+            .join(" ")})`
         );
       });
     }
@@ -67,7 +70,9 @@ export const Atmosphere = memo(function Atmosphere({
   });
 
   useEffect(() => {
-    if (!supported && colorsRef.current.length) updatePalette(colorsRef.current);
+    if (!supported && colorsRef.current.length) {
+      updatePalette(colorsRef.current);
+    }
   }, [supported]);
 
   useEffect(() => shade.on("change", updateInk), [shade]);
@@ -75,56 +80,75 @@ export const Atmosphere = memo(function Atmosphere({
   useEffect(() => {
     const style = getComputedStyle(document.documentElement);
     const resolved = chakraPalettes.map((names) =>
-      names.map((name) => style.getPropertyValue(`--chakra-${name}`).trim()),
+      names.map((name) => style.getPropertyValue(`--chakra-${name}`).trim())
     );
-    if (resolved.some((colors) => colors.some((color) => !color))) return;
+    if (resolved.some((colors) => colors.some((color) => !color))) {
+      return;
+    }
     setTheme(resolved);
     const probe = document.createElement("canvas");
     const gl = probe.getContext("webgl2");
-    if (!gl) return;
+    if (!gl) {
+      return;
+    }
     gl.getExtension("WEBGL_lose_context")?.loseContext();
     setSupported(true);
   }, []);
 
   useEffect(() => {
-    if (!cycling || reduced) return;
+    if (!cycling || reduced) {
+      return;
+    }
     const interval = window.setInterval(() => {
-      if (!document.hidden) setPreviewPhase((value) => (value + 1) % chakraPalettes.length);
+      if (!document.hidden) {
+        setPreviewPhase((value) => (value + 1) % chakraPalettes.length);
+      }
     }, 10_000);
     return () => window.clearInterval(interval);
   }, [cycling, reduced]);
 
   useEffect(() => {
-    if (!supported || !theme) return;
+    if (!(supported && theme)) {
+      return;
+    }
     const root = rootRef.current;
-    if (!root) return;
+    if (!root) {
+      return;
+    }
     // Paper initializes asynchronously. Wait for its mount, then update uniforms in place.
     // Width changes never remount the canvas or restart the current palette transition.
     let frame = 0;
     let observer: ResizeObserver | undefined;
     function resize(width: number) {
       const desktop = Math.max(0, Math.min(1, (width - 600) / 600));
+      // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
       shaderRef.current?.paperShaderMount?.setUniforms({
         u_grainMixer: atmosphereSettings.grainMixer - desktop * 0.05,
         u_scale: atmosphereSettings.scale - desktop * 0.42,
       });
     }
     function setSpeed() {
+      // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
       shaderRef.current?.paperShaderMount?.setSpeed(
-        reduced || document.hidden ? 0 : atmosphereSettings.speed,
+        reduced || document.hidden ? 0 : atmosphereSettings.speed
       );
     }
     function initialize() {
+      // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
       const mount = shaderRef.current?.paperShaderMount;
       if (!mount) {
         frame = requestAnimationFrame(initialize);
         return;
       }
-      if (colorsRef.current.length) mount.setUniforms({ u_colors: colorsRef.current });
+      if (colorsRef.current.length) {
+        mount.setUniforms({ u_colors: colorsRef.current });
+      }
       setSpeed();
       resize(root?.clientWidth ?? 0);
       observer = new ResizeObserver(([entry]) => resize(entry.contentRect.width));
-      if (root) observer.observe(root);
+      if (root) {
+        observer.observe(root);
+      }
     }
     frame = requestAnimationFrame(initialize);
     document.addEventListener("visibilitychange", setSpeed);
@@ -136,7 +160,9 @@ export const Atmosphere = memo(function Atmosphere({
   }, [supported, theme, reduced]);
 
   useEffect(() => {
-    if (!theme || blackout) return;
+    if (!theme || blackout) {
+      return;
+    }
     const target = theme[activePhase].map(getShaderColorFromString);
     const from = colorsRef.current.length ? colorsRef.current : target;
     if (reduced || resetId !== previousReset.current) {
@@ -148,7 +174,9 @@ export const Atmosphere = memo(function Atmosphere({
       duration: transitionSeconds,
       ease: "linear",
       onUpdate(progress) {
-        if (document.hidden) return;
+        if (document.hidden) {
+          return;
+        }
         // Each color follows the previous one, keeping the transition continuous.
         const colors = target.map((color, i) => {
           const mix = Math.max(0, Math.min(1, progress * 2 - i / 3));
@@ -165,15 +193,9 @@ export const Atmosphere = memo(function Atmosphere({
       const animation = animate(shade, 1, reduced ? { duration: 0 } : sceneMotion.blackout);
       return () => animation.stop();
     }
-    const animation = animate(
-      shade,
-      dim,
-      reduced
-        ? { duration: 0 }
-        : shade.get() === 1 && dim === 0
-          ? sceneMotion.reveal
-          : { duration: 0.24, ease: "easeInOut" },
-    );
+    const reveal = shade.get() === 1 && dim === 0;
+    const transition = reveal ? sceneMotion.reveal : { duration: 0.24, ease: "easeInOut" as const };
+    const animation = animate(shade, dim, reduced ? { duration: 0 } : transition);
     return () => animation.stop();
   }, [blackout, dim, reduced, shade]);
 
@@ -189,8 +211,8 @@ export const Atmosphere = memo(function Atmosphere({
 
   return (
     <div className="atmosphere-scope" ref={scopeRef}>
-      <div className="atmosphere" ref={rootRef} aria-hidden="true">
-        {supported && theme && <PaperMesh ref={shaderRef} colors={theme[0]} />}
+      <div aria-hidden="true" className="atmosphere" ref={rootRef}>
+        {supported === true && theme !== null && <PaperMesh colors={theme[0]} ref={shaderRef} />}
         <motion.div className="atmosphere-night" style={{ opacity: shade }} />
       </div>
       {children}

@@ -3,27 +3,27 @@
     --switch-height: var(--control-block-size, 3.5rem);
     --switch-inset: calc(var(--switch-height) * 0.065);
     display: flex;
-    align-items: center;
     flex-shrink: 0;
+    align-items: center;
     inline-size: calc(var(--switch-height) * 2);
     block-size: var(--switch-height);
     padding: var(--switch-inset);
-    border-radius: var(--radius-rounded);
-    cursor: pointer;
     touch-action: pan-y pinch-zoom;
-    user-select: none;
+    cursor: pointer;
     -webkit-user-select: none;
+    user-select: none;
+    border-radius: var(--radius-rounded);
     transition: background-color var(--transition-standard-default-effects);
 
     [data-ui="thumb"] {
       position: relative;
-      isolation: isolate;
       display: block;
+      flex-shrink: 0;
       inline-size: calc(var(--switch-height) - 2 * var(--switch-inset));
       block-size: calc(var(--switch-height) - 2 * var(--switch-inset));
-      flex-shrink: 0;
-      border-radius: var(--radius-circled);
       pointer-events: none;
+      border-radius: var(--radius-circled);
+      isolation: isolate;
     }
     [data-frost] {
       inline-size: 100%;

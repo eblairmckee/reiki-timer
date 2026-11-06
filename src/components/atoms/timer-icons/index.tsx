@@ -13,11 +13,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 export function PlayIcon() {
   return (
     <HugeiconsIcon
-      icon={PlayGlyph}
-      fill="currentColor"
-      strokeWidth={1.5}
       aria-hidden="true"
       data-ink="control"
+      fill="currentColor"
+      icon={PlayGlyph}
+      strokeWidth={1.5}
     />
   );
 }
@@ -25,55 +25,55 @@ export function PlayIcon() {
 export function PauseIcon() {
   return (
     <HugeiconsIcon
-      icon={PauseGlyph}
-      fill="currentColor"
-      strokeWidth={1.5}
       aria-hidden="true"
       data-ink="control"
+      fill="currentColor"
+      icon={PauseGlyph}
+      strokeWidth={1.5}
     />
   );
 }
 
 export function FinishIcon() {
   return (
-    <HugeiconsIcon icon={Logout05Icon} strokeWidth={1.5} aria-hidden="true" data-ink="control" />
+    <HugeiconsIcon aria-hidden="true" data-ink="control" icon={Logout05Icon} strokeWidth={1.5} />
   );
 }
 
 export function EditIcon() {
   return (
     <HugeiconsIcon
-      icon={Edit03Icon}
-      fill="currentColor"
-      fillOpacity={0.78}
-      strokeWidth={1.5}
       aria-hidden="true"
       data-ink="control"
+      fill="currentColor"
+      fillOpacity={0.78}
+      icon={Edit03Icon}
+      strokeWidth={1.5}
     />
   );
 }
 
 export function RestartIcon() {
   return (
-    <HugeiconsIcon icon={TimerResetIcon} strokeWidth={1.5} aria-hidden="true" data-ink="control" />
+    <HugeiconsIcon aria-hidden="true" data-ink="control" icon={TimerResetIcon} strokeWidth={1.5} />
   );
 }
 
 export function BellIcon({ onFrost = false }: { onFrost?: boolean }) {
   return (
     <HugeiconsIcon
-      icon={Notification02Icon}
-      strokeWidth={1.5}
       aria-hidden="true"
       data-ink={onFrost ? "control" : undefined}
+      icon={Notification02Icon}
+      strokeWidth={1.5}
     />
   );
 }
 
 export function ClockIcon() {
-  return <HugeiconsIcon icon={Clock01Icon} strokeWidth={1.5} aria-hidden="true" />;
+  return <HugeiconsIcon aria-hidden="true" icon={Clock01Icon} strokeWidth={1.5} />;
 }
 
 export function RepeatIcon() {
-  return <HugeiconsIcon icon={RepeatGlyph} strokeWidth={1.5} aria-hidden="true" />;
+  return <HugeiconsIcon aria-hidden="true" icon={RepeatGlyph} strokeWidth={1.5} />;
 }

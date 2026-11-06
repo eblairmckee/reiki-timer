@@ -2,16 +2,16 @@
   [data-ripple] {
     position: absolute;
     inset: -2px;
-    border-radius: inherit;
     z-index: -1;
     pointer-events: none;
-    opacity: 0;
     background: radial-gradient(
       closest-side,
       transparent 82%,
       var(--ripple-light) 96%,
       transparent
     );
+    border-radius: inherit;
+    opacity: 0;
   }
   [data-ripple="pressure"] {
     background: none;
@@ -19,21 +19,26 @@
   }
   [data-recess] {
     position: relative;
-    isolation: isolate;
-    border: 0;
     background: var(--well-fill);
+    border: 0;
     box-shadow:
       inset 0 5px 12px -5px var(--well-shade),
       inset 0 1px 2px var(--well-shade),
       inset 0 -1px 1px var(--well-light);
+    isolation: isolate;
   }
   [data-frost] {
     position: relative;
     display: block;
-    border-radius: inherit;
     background:
-      linear-gradient(140deg, var(--frost-sheen), transparent 52%, var(--frost-shade)),
+      linear-gradient(
+        140deg,
+        var(--frost-sheen),
+        transparent 52%,
+        var(--frost-shade)
+      ),
       var(--frost-fill);
+    border-radius: inherit;
     box-shadow:
       inset 0 1px 1px var(--frost-light),
       inset 1px 0 1px var(--well-light),
@@ -45,11 +50,11 @@
   }
   [data-frost]::before,
   [data-frost]::after {
-    content: "";
     position: absolute;
     inset: 0;
-    border-radius: inherit;
     pointer-events: none;
+    content: "";
+    border-radius: inherit;
     opacity: 0;
     transition: opacity var(--transition-standard-default-effects);
   }
@@ -70,7 +75,11 @@
     opacity: 1;
   }
   @media (hover: hover) and (pointer: fine) {
-    [data-frost-control]:hover:not([data-disabled], [aria-readonly="true"], [data-pressed])
+    [data-frost-control]:hover:not(
+        [data-disabled],
+        [aria-readonly="true"],
+        [data-pressed]
+      )
       [data-frost]::before {
       opacity: 1;
     }
@@ -85,7 +94,10 @@
       background: var(--frost-fallback);
     }
   }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @supports not (
+      (backdrop-filter: blur(1px)) or
+      (-webkit-backdrop-filter: blur(1px))
+    ) {
     [data-frost] {
       background: var(--frost-fallback);
     }

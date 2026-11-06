@@ -30,23 +30,25 @@ export function Button({
   const frostedAction = frosted && rest["aria-pressed"] === undefined;
   const actionInk = asIcon ? "control" : "on-light-frost";
   const feedback = useFrostMotion({ disabled: !frosted || rest.disabled });
+  const unfrostedContent =
+    mode === "etched" ? <span data-lettering="etched">{children}</span> : children;
   return (
     <ButtonPrimitive
-      data-ui="button"
-      data-variant={variant}
-      data-mode={mode}
-      data-size={size}
       data-as-icon={asIcon}
       data-flip-icon-in-rtl={asRtl}
-      data-recess={frosted ? "" : undefined}
       data-frost-control={frosted ? "" : undefined}
       data-hint={hint ? "" : undefined}
+      data-mode={mode}
+      data-recess={frosted ? "" : undefined}
+      data-size={size}
+      data-ui="button"
+      data-variant={variant}
       {...mergeProps(feedback, rest)}
     >
       {frosted ? (
         <>
-          <span data-ripple="pressure" aria-hidden="true" />
-          <span data-ripple="release" aria-hidden="true" />
+          <span aria-hidden="true" data-ripple="pressure" />
+          <span aria-hidden="true" data-ripple="release" />
           <span
             data-frost=""
             data-ink={frostedAction ? actionInk : undefined}
@@ -55,10 +57,8 @@ export function Button({
             {children}
           </span>
         </>
-      ) : mode === "etched" ? (
-        <span data-lettering="etched">{children}</span>
       ) : (
-        children
+        unfrostedContent
       )}
     </ButtonPrimitive>
   );

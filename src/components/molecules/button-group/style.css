@@ -4,11 +4,11 @@
     --button-group-corner: 0.4rem;
     --summary-overlap: 0.75rem;
     --hud-controls-width: var(--button-group-height);
-    container-type: inline-size;
     display: flex;
     justify-content: flex-end;
     inline-size: 100%;
     min-inline-size: 0;
+    container-type: inline-size;
     pointer-events: none;
   }
   .button-group-strip {
@@ -21,16 +21,21 @@
   .button-group-items {
     display: flex;
     min-inline-size: 0;
-    max-inline-size: calc(100cqi - var(--hud-controls-width) + var(--summary-overlap));
+    max-inline-size: calc(
+      100cqi -
+      var(--hud-controls-width) +
+      var(--summary-overlap)
+    );
     margin-inline-end: calc(-1 * var(--summary-overlap));
   }
-  .button-group[data-variant="summary"] .button-group-strip:has(.hud-action-group) {
+  .button-group[data-variant="summary"]
+    .button-group-strip:has(.hud-action-group) {
     --hud-controls-width: calc(2 * var(--button-group-height));
   }
   .button-group-primary {
-    display: flex;
     position: relative;
     z-index: 1;
+    display: flex;
     pointer-events: auto;
   }
   @container (inline-size < 40rem) {

@@ -38,10 +38,10 @@
     }
 
     &[data-variant="content"] {
-      width: 100%;
       display: flex;
       gap: var(--spacing-10);
       align-items: center;
+      width: 100%;
       font: var(--font-label-sm);
       color: var(--color-on-surface-variant);
       white-space: nowrap;

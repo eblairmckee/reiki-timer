@@ -2,25 +2,25 @@
   .button-group-summary {
     --summary-padding-inline: clamp(1.5rem, 4vw, 2.5rem);
     --timeline-width: min(23rem, 100cqi);
-    margin: 0;
-    padding: 0;
-    border: 0;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    max-inline-size: 100%;
     min-inline-size: 0;
+    max-inline-size: 100%;
+    padding: 0;
+    margin: 0;
     pointer-events: auto;
     cursor: default;
+    border: 0;
   }
   .button-group-summary-trigger {
     --summary-ink: var(--color-ink-summary-glass);
     position: relative;
-    isolation: isolate;
     display: grid;
     align-content: center;
-    padding: 0.3em calc(var(--summary-padding-inline) + var(--summary-overlap)) 0.3em
-      var(--summary-padding-inline);
+    padding: 0.3em calc(var(--summary-padding-inline) + var(--summary-overlap))
+      0.3em var(--summary-padding-inline);
+    isolation: isolate;
   }
   .button-group-summary:focus-visible {
     outline: 2px solid var(--color-focus);
@@ -29,14 +29,14 @@
   }
   .button-group-summary-surface {
     position: absolute;
-    z-index: -1;
     inset-block: 0;
     inset-inline-end: 0;
+    z-index: -1;
     inline-size: 100%;
     min-inline-size: 100%;
     padding: 0;
-    border-radius: var(--button-group-corner) 0 0 var(--button-group-corner);
     background-color: var(--well-checked);
+    border-radius: var(--button-group-corner) 0 0 var(--button-group-corner);
     box-shadow:
       inset 0 1px 2px var(--well-shade),
       inset 0 -1px 0 var(--well-light);
@@ -47,9 +47,9 @@
   }
   .button-group-summary[data-open] .button-group-summary-surface {
     min-inline-size: max(100%, var(--timeline-width));
+    pointer-events: auto;
     background-color: var(--summary-details-glass);
     border-radius: var(--button-group-corner) 0 0 0;
-    pointer-events: auto;
   }
   .button-group-summary-fold {
     position: absolute;
@@ -68,7 +68,10 @@
       --summary-padding-inline: 1rem;
     }
     .button-group-summary-fold {
-      inset-inline-end: calc(var(--summary-overlap) - var(--hud-controls-width));
+      inset-inline-end: calc(
+        var(--summary-overlap) -
+        var(--hud-controls-width)
+      );
       inline-size: var(--timeline-width);
     }
     .button-group-summary[data-open] .button-group-summary-surface {
@@ -90,7 +93,8 @@
   }
   @media (forced-colors: active) {
     .button-group-summary[data-open] .button-group-summary-surface,
-    .button-group-summary-surface,
+    /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
+      .button-group-summary-surface,
     .button-group-summary-fold {
       background: Canvas;
       border: 1px solid CanvasText;

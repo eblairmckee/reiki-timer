@@ -13,10 +13,10 @@ export function Separator({
 }) {
   return (
     <SeparatorPrimititve
+      data-orientation={orientation}
       data-ui="separator"
       data-variant={variant}
       orientation={orientation}
-      data-orientation={orientation}
       {...props}
     />
   );

@@ -1,3 +1,7 @@
 {
-  "recommendations": ["biomejs.biome", "typescriptteam.native-preview", "oven.bun-vscode"]
+  "recommendations": [
+    "biomejs.biome",
+    "typescriptteam.native-preview",
+    "oven.bun-vscode"
+  ]
 }

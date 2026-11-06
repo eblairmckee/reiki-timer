@@ -1,16 +1,20 @@
-import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
+import { afterEach, beforeEach, expect, type MockInstance, test, vi } from "vitest";
 import { ChimePlayer } from "./chimes";
 
 const originalContext = Object.getOwnPropertyDescriptor(globalThis, "AudioContext");
 const sources: {
-  start: ReturnType<typeof mock>;
-  stop: ReturnType<typeof mock>;
-  disconnect: ReturnType<typeof mock>;
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
 }[] = [];
-const resume = mock(async () => {});
-const close = mock(async () => {});
-const decode = mock(async () => ({ duration: 3 }));
-let fetchSound: ReturnType<typeof spyOn<typeof globalThis, "fetch">>;
+const resume = vi.fn(async () => {
+  /* Successful audio stub. */
+});
+const close = vi.fn(async () => {
+  /* Successful audio stub. */
+});
+const decode = vi.fn(async () => ({ duration: 3 }));
+let fetchSound: MockInstance<typeof fetch>;
 let player: ChimePlayer;
 
 beforeEach(() => {
@@ -26,33 +30,35 @@ beforeEach(() => {
       resume = resume;
       close = close;
       decodeAudioData = decode;
+      // biome-ignore lint/style/useThisInClassMethods: AudioContext mock must expose the native instance method.
       createBufferSource() {
         const source = {
-          connect: mock(),
-          disconnect: mock(),
-          start: mock(),
-          stop: mock(),
           buffer: null,
+          connect: vi.fn(),
+          disconnect: vi.fn(),
           onended: null,
+          start: vi.fn(),
+          stop: vi.fn(),
         };
         sources.push(source);
         return source;
       }
     },
   });
-  fetchSound = spyOn(globalThis, "fetch").mockImplementation(
-    Object.assign(async () => new Response(new Uint8Array([1, 2, 3])), {
-      preconnect: globalThis.fetch.preconnect,
-    }),
-  );
+  fetchSound = vi
+    .spyOn(globalThis, "fetch")
+    .mockImplementation(async () => new Response(new Uint8Array([1, 2, 3])));
   player = new ChimePlayer();
 });
 
 afterEach(() => {
   player.dispose();
   fetchSound.mockRestore();
-  if (originalContext) Object.defineProperty(globalThis, "AudioContext", originalContext);
-  else Reflect.deleteProperty(globalThis, "AudioContext");
+  if (originalContext) {
+    Object.defineProperty(globalThis, "AudioContext", originalContext);
+  } else {
+    Reflect.deleteProperty(globalThis, "AudioContext");
+  }
 });
 
 test("audio stays lazy, resumes on preparation, and reuses decoded sounds", async () => {
@@ -71,11 +77,13 @@ test("audio stays lazy, resumes on preparation, and reuses decoded sounds", asyn
 });
 
 test("a slower earlier preview cannot play over the latest selection", async () => {
-  let resolveFirst: (response: Response) => void = () => {};
+  let resolveFirst: (response: Response) => void = () => {
+    /* Assigned by the deferred fetch below before use. */
+  };
   fetchSound.mockReturnValueOnce(
     new Promise((resolve) => {
       resolveFirst = resolve;
-    }),
+    })
   );
   const first = player.play("zen-deep");
   await player.play("zen-high");

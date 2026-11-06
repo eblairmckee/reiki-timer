@@ -18,8 +18,8 @@
 @layer reset {
   * {
     box-sizing: border-box;
-    margin: 0;
     padding: 0;
+    margin: 0;
   }
   :where(button, [role="button"], [data-ui="button-group"]) {
     font-family: var(--font-family);
@@ -40,19 +40,19 @@
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
+    clip-path: inset(50%);
   }
 }
 
 body {
-  margin: 0;
   min-width: 320px;
+  margin: 0;
   font-family: var(--font-family);
   font-variant-numeric: lining-nums tabular-nums;
-  background: var(--color-surface);
   color: var(--color-on-surface);
+  background: var(--color-surface);
 }
 
 #root {
@@ -61,15 +61,15 @@ body {
 }
 
 ::selection {
-  background: var(--color-selection);
   color: var(--color-on-selection);
+  background: var(--color-selection);
 }
 
 .route-message {
-  view-transition-name: foreground;
   padding: var(--spacing-32);
   color: var(--color-ink);
   background: var(--glass-fill-fallback);
+  view-transition-name: foreground;
 }
 
 /* Route snapshots animate foreground separately from the live atmosphere. */
@@ -77,8 +77,8 @@ body {
 ::view-transition-new(root),
 ::view-transition-old(atmosphere),
 ::view-transition-new(atmosphere) {
-  animation: none;
   mix-blend-mode: normal;
+  animation: none;
 }
 ::view-transition-old(root),
 ::view-transition-old(atmosphere) {
@@ -102,8 +102,8 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(foreground) {
-    animation: none;
     opacity: 0;
+    animation: none;
   }
   ::view-transition-new(foreground) {
     animation: none;

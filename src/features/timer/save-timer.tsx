@@ -10,10 +10,10 @@ export function SaveTimer() {
   }, []);
   return (
     <div className="timer-session timer-save">
-      <h1 data-ink="display" data-lettering="frosted" tabIndex={-1} ref={title}>
+      <h1 data-ink="display" data-lettering="frosted" ref={title} tabIndex={-1}>
         Timer saved
       </h1>
-      <Button mode="frost" size="lg" onClick={onDone}>
+      <Button mode="frost" onClick={onDone} size="lg">
         Done
       </Button>
     </div>

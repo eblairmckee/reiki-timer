@@ -4,12 +4,11 @@
     min-height: 100svh;
   }
   .atmosphere {
-    view-transition-name: atmosphere;
     position: fixed;
     inset: 0;
     z-index: -1;
-    pointer-events: none;
     overflow: hidden;
+    pointer-events: none;
     background:
       radial-gradient(
         ellipse at 85% 25%,
@@ -26,6 +25,7 @@
         var(--atmosphere-color-0, var(--color-atmosphere-mist)),
         var(--atmosphere-color-1, var(--color-atmosphere-blue))
       );
+    view-transition-name: atmosphere;
   }
   .atmosphere-night {
     position: absolute;

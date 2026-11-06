@@ -28,37 +28,35 @@
   },
   "linter": {
     "rules": {
-      "preset": "recommended",
-      "complexity": {
-        "preset": "none"
-      },
-      "performance": {
-        "preset": "none"
-      },
       "style": {
-        "preset": "none",
-        "useConst": "warn",
-        "useImportType": "warn",
-        "noNonNullAssertion": "warn"
-      },
-      "correctness": {
-        "noUnusedImports": "warn",
-        "noUnusedVariables": "warn",
-        "useExhaustiveDependencies": "warn"
+        "noHexColors": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
-      },
-      "a11y": {
-        "useSemanticElements": "warn",
-        "noAutofocus": "off"
-      }
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
+        "useBaseline": {
+          "level": "error",
+          "options": {
+            "allowProperties": [
+              "backdrop-filter",
+              "mask",
+              "mask-composite",
+              "overflow-anchor",
+              "overflow-clip-margin",
+              "scrollbar-width",
+              "text-wrap",
+              "user-select",
+              "view-transition-name"
+            ],
+            "allowMediaConditions": ["prefers-reduced-transparency"],
+            "allowSelectors": [
+              "active-view-transition",
+              "selection",
+              "view-transition"
+            ],
+            "allowPropertyValues": {
+              "display": ["contents"]
+            }
+          }
+        }
       }
     }
   },
@@ -66,5 +64,18 @@
     "parser": {
       "tailwindDirectives": true
     }
-  }
+  },
+  "extends": ["ultracite/biome/core", "ultracite/biome/react"],
+  "overrides": [
+    {
+      "includes": ["src/components/ui/styles/theme.css"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noHexColors": "off"
+          }
+        }
+      }
+    }
+  ]
 }

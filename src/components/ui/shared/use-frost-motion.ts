@@ -18,37 +18,46 @@ export function useFrostMotion({ disabled = false }: { disabled?: boolean } = {}
       ripple.current?.stop();
       pressure.current?.stop();
     },
-    [],
+    []
   );
 
   useEffect(() => {
-    if (!disabled && !reduced) return;
+    if (!(disabled || reduced)) {
+      return;
+    }
     animation.current?.stop();
     ripple.current?.stop();
     pressure.current?.stop();
     current.current?.querySelector<HTMLElement>("[data-frost]")?.style.removeProperty("transform");
-    current.current?.querySelectorAll<HTMLElement>("[data-ripple]").forEach((ring) => {
+    for (const ring of current.current?.querySelectorAll<HTMLElement>("[data-ripple]") ?? []) {
       ring.style.opacity = "0";
-    });
+    }
     current.current?.removeAttribute("data-pressed");
   }, [disabled, reduced]);
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Keep the covered pressure, cancellation and release ordering intact in this tooling-only pass.
   function respond(root: HTMLElement, pressed: boolean, wave = false) {
     current.current = root;
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
     const wasPressed = root.hasAttribute("data-pressed");
     root.toggleAttribute("data-pressed", pressed);
+    const activePress = pressed && !reduced;
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: Hover is updated by event handlers after this hook initializes.
+    const hoverY = hovered.current ? -1 : 0;
+    const idleY = reduced ? 0 : hoverY;
     const face = root.querySelector<HTMLElement>("[data-frost]");
     if (face) {
       animation.current?.stop();
       animation.current = animate(
         face,
         {
-          y: reduced ? 0 : pressed ? 1.5 : hovered.current ? -1 : 0,
-          scaleX: reduced ? 1 : pressed ? 0.99 : 1,
-          scaleY: reduced ? 1 : pressed ? 0.97 : 1,
+          scaleX: activePress ? 0.99 : 1,
+          scaleY: activePress ? 0.97 : 1,
+          y: activePress ? 1.5 : idleY,
         },
-        reduced ? { duration: 0 } : controlSpring,
+        reduced ? { duration: 0 } : controlSpring
       );
     }
     const ring = root.querySelector<HTMLElement>('[data-ripple="release"]');
@@ -59,54 +68,66 @@ export function useFrostMotion({ disabled = false }: { disabled?: boolean } = {}
         ripple.current?.stop();
         ring.style.opacity = "0";
       }
+      const pressureDuration = pressed ? 0.38 : 0.12;
       pressure.current = animate(
         halo,
-        { scale: reduced ? 1 : pressed ? 1.04 : 1, opacity: pressed && !reduced ? 0.7 : 0 },
-        { duration: reduced ? 0 : pressed ? 0.38 : 0.12, ease: pressed ? "easeOut" : "easeIn" },
+        { opacity: activePress ? 0.7 : 0, scale: activePress ? 1.04 : 1 },
+        { duration: reduced ? 0 : pressureDuration, ease: pressed ? "easeOut" : "easeIn" }
       );
     }
     if (!pressed && wasPressed && wave && ring && !reduced) {
       ripple.current?.stop();
       ripple.current = animate(
         ring,
-        { scale: [0.96, 1.14], opacity: [0.35, 0] },
-        { duration: 0.65, ease: "easeOut" },
+        { opacity: [0.35, 0], scale: [0.96, 1.14] },
+        { duration: 0.65, ease: "easeOut" }
       );
     }
   }
 
   return {
+    onBlur(event) {
+      respond(event.currentTarget, false);
+    },
+    onKeyDown(event) {
+      if (event.key === "Escape") {
+        respond(event.currentTarget, false);
+      }
+      if (!event.repeat && (event.key === " " || event.key === "Enter")) {
+        respond(event.currentTarget, true, true);
+      }
+    },
+    onKeyUp(event) {
+      if (event.key === " " || event.key === "Enter") {
+        respond(event.currentTarget, false, true);
+      }
+    },
+    onLostPointerCapture(event) {
+      respond(event.currentTarget, false);
+    },
+    onPointerCancel(event) {
+      respond(event.currentTarget, false);
+    },
+    onPointerDown(event) {
+      if (event.button === 0 && event.isPrimary !== false) {
+        respond(event.currentTarget, true, true);
+      }
+    },
     onPointerEnter(event) {
-      if (event.pointerType === "touch") return;
+      if (event.pointerType === "touch") {
+        return;
+      }
       hovered.current = true;
       respond(event.currentTarget, event.currentTarget.hasAttribute("data-pressed"));
     },
     onPointerLeave(event) {
       hovered.current = false;
-      if (!event.currentTarget.hasAttribute("data-dragging")) respond(event.currentTarget, false);
-    },
-    onPointerDown(event) {
-      if (event.button === 0 && event.isPrimary !== false) respond(event.currentTarget, true, true);
+      if (!event.currentTarget.hasAttribute("data-dragging")) {
+        respond(event.currentTarget, false);
+      }
     },
     onPointerUp(event) {
       respond(event.currentTarget, false, true);
-    },
-    onPointerCancel(event) {
-      respond(event.currentTarget, false);
-    },
-    onLostPointerCapture(event) {
-      respond(event.currentTarget, false);
-    },
-    onKeyDown(event) {
-      if (event.key === "Escape") respond(event.currentTarget, false);
-      if (!event.repeat && (event.key === " " || event.key === "Enter"))
-        respond(event.currentTarget, true, true);
-    },
-    onKeyUp(event) {
-      if (event.key === " " || event.key === "Enter") respond(event.currentTarget, false, true);
-    },
-    onBlur(event) {
-      respond(event.currentTarget, false);
     },
   } satisfies HTMLAttributes<HTMLElement>;
 }

@@ -41,22 +41,22 @@
   /* Each line catches the same light. The dimmest gradient stop is the display ink. */
   @supports (background-clip: text) or (-webkit-background-clip: text) {
     :where([data-lettering="frosted"])[data-ink="display"] {
+      color: transparent;
+      text-shadow: none;
       background-image: linear-gradient(
         var(--letter-frost-crest) 20%,
         var(--color-ink-display) 82%
       );
-      background-size: 100% 1lh;
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent;
-      text-shadow: none;
+      background-size: 100% 1lh;
     }
   }
-  @media (prefers-contrast: more), (prefers-reduced-transparency: reduce), (forced-colors: active),
-    print {
+  @media (prefers-contrast: more), (prefers-reduced-transparency: reduce),
+    (forced-colors: active), print {
     [data-lettering] {
-      background-image: none;
       text-shadow: none;
+      background-image: none;
     }
     [data-ink],
     [data-lettering="etched"] {

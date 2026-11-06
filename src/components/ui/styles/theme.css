@@ -4,63 +4,44 @@
   /* Resolve derived colors where runtime strengths are assigned, before inheritance. */
   --color-ink-on-atmosphere: rgb(255 255 255 / var(--ink-text-alpha, 90%));
   --color-ink-summary: rgb(255 255 255 / var(--ink-summary-alpha, 90%));
-  --color-ink-summary-glass: rgb(255 255 255 / var(--ink-summary-glass-alpha, 76%));
+  --color-ink-summary-glass: rgb(
+    255 255 255 /
+    var(--ink-summary-glass-alpha, 76%)
+  );
   --color-ink-display: rgb(255 255 255 / var(--ink-display-alpha, 70%));
   --color-ink-on-frost: rgb(255 255 255 / var(--ink-control-alpha, 90%));
-  --color-ink-label: color-mix(in srgb, var(--color-ink-on-atmosphere) 65%, var(--color-paper));
-  --letter-frost-crest: color-mix(in srgb, var(--color-ink-display) 40%, var(--color-paper));
+  --color-ink-label: color-mix(
+    in srgb,
+    var(--color-ink-on-atmosphere) 65%,
+    var(--color-paper)
+  );
+  --letter-frost-crest: color-mix(
+    in srgb,
+    var(--color-ink-display) 40%,
+    var(--color-paper)
+  );
 }
 
 :root {
-  color-scheme: light;
   --color-atmosphere-mist: var(--chakra-bold-root-garnet);
   --color-atmosphere-blue: var(--chakra-bold-root-crimson);
   --color-atmosphere-tide: var(--chakra-bold-root-ruby);
   --color-atmosphere-sun: var(--chakra-bold-root-oxblood);
 
   --color-ink: rgb(18 12 7 / 98%);
-  --color-placeholder: var(--color-ink);
-  --color-ink-disabled: rgb(89 41 5 / 65%);
   --color-focus: var(--color-ink);
   --color-error: #9e2e43;
-  --color-success: #287859;
-  --color-info: #306c94;
-  --color-warning: #8d6420;
-  --color-neutral: #637881;
-  --color-rating-star: #f6b51e;
-  --color-rating-heart: #fb3748;
   --color-shade: #000;
   --color-paper: #fff;
 
   /* The minimum white backing and translucent ink are checked together in tests. */
   --glass-fill: rgb(255 255 255 / 70%);
   --glass-fill-hover: rgb(255 255 255 / 73%);
-  --glass-fill-pressed: rgb(255 255 255 / 78%);
   --glass-fill-disabled: rgb(255 255 255 / 72%);
   --glass-fill-fallback: rgb(255 255 255 / 94%);
-  --glass-edge: rgb(255 255 255 / 80%);
   --glass-edge-low: rgb(29 79 90 / 23%);
-  --glass-highlight: rgb(255 255 255 / 25%);
-  --glass-clear: rgb(255 255 255 / 0%);
-  --glass-thumb: rgb(255 255 255 / 84%);
-  --glass-switch-on: rgb(16 87 99 / 68%);
-  --glass-switch-off: rgb(7 38 47 / 70%);
-  --glass-option-highlight: rgb(255 255 255 / 47%);
-  --glass-option-selected: rgb(255 255 255 / 66%);
-  --glass-shadow-color: rgb(19 67 85 / 12%);
-  --glass-contact-shadow: rgb(19 67 85 / 9%);
   --color-selection: rgb(20 76 89 / 96%);
   --color-on-selection: rgb(255 255 255 / 98%);
-  --glass-sheen: linear-gradient(135deg, var(--glass-highlight), var(--glass-clear) 54%);
-  --glass-shadow:
-    0 18px 50px -20px var(--glass-shadow-color),
-    0 3px 9px -4px var(--glass-contact-shadow),
-    inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-edge-low);
-  --glass-shadow-raised:
-    0 28px 72px -24px var(--glass-shadow-color), 0 8px 20px -8px var(--glass-contact-shadow),
-    inset 0 1px 0 var(--glass-edge);
-  --glass-backdrop: blur(22px) saturate(1.15);
-  --focus-ring: 0 0 0 2px var(--glass-edge), 0 0 0 5px var(--color-focus);
 
   /* Recessed wells and frost share their lighting; geometry belongs to the control. */
   --well-fill: rgb(0 0 0 / 8%);
@@ -92,9 +73,8 @@
   --recess-action-hover: rgb(0 0 0 / 12%);
   --recess-action-active: rgb(0 0 0 / 23%);
   --color-night: #000;
-  --color-night-ink: rgb(255 255 255 / 70%);
 
-  /* Bold chakra concept. Retain the earlier pastel pigments below for comparison. */
+  /* Chakra pigments resolved into shader uniforms. */
   --chakra-bold-root-garnet: #641422;
   --chakra-bold-root-crimson: #8a1c2e;
   --chakra-bold-root-ruby: #771424;
@@ -124,77 +104,24 @@
   --chakra-bold-crown-purple: #542064;
   --chakra-bold-crown-plum: #361d47;
 
-  /* Earth pigments, grouped by chakra. Paper resolves these CSS tokens into uniforms. */
-  --chakra-root-clay: #c69b89;
-  --chakra-root-terracotta: #bf988a;
-  --chakra-root-sand: #d0a68a;
-  --chakra-root-rose: #c69a98;
-  --chakra-sacral-ochre: #c6a07c;
-  --chakra-sacral-copper: #d0a184;
-  --chakra-sacral-clay: #c79b8b;
-  --chakra-sacral-honey: #d3b382;
-  --chakra-solar-ochre: #b7ab80;
-  --chakra-solar-wheat: #cfb386;
-  --chakra-solar-sand: #c2b494;
-  --chakra-solar-olive: #b6b38a;
-  --chakra-heart-sage: #a3ad91;
-  --chakra-heart-eucalyptus: #9fb3a3;
-  --chakra-heart-lichen: #b3b99d;
-  --chakra-heart-moss: #9cae9c;
-  --chakra-throat-slate: #9cafb2;
-  --chakra-throat-stone: #9ca7b5;
-  --chakra-throat-seaglass: #a4b9b1;
-  --chakra-throat-mist: #aeb9bf;
-  --chakra-third-eye-indigo: #a3a2b9;
-  --chakra-third-eye-slate: #9d9eb3;
-  --chakra-third-eye-heather: #b1a8b9;
-  --chakra-third-eye-stone: #a5acba;
-  --chakra-crown-heather: #b0a0b7;
-  --chakra-crown-mauve: #a69db1;
-  --chakra-crown-rose: #bca7b5;
-  --chakra-crown-lilac: #b1a9ba;
-
   /* Existing Olyx role names remain available to the rest of the component library. */
   --color-primary: var(--color-focus);
-  --color-secondary: var(--color-info);
-  --color-tertiary: var(--color-success);
   --color-on-primary: var(--color-paper);
-  --color-on-secondary: var(--color-paper);
-  --color-on-tertiary: var(--color-paper);
   --color-on-error: var(--color-paper);
-  --color-on-success: var(--color-paper);
-  --color-on-info: var(--color-paper);
-  --color-on-warning: var(--color-paper);
   --color-primary-container: var(--glass-fill);
-  --color-secondary-container: var(--glass-fill);
-  --color-tertiary-container: var(--glass-fill);
   --color-error-container: var(--glass-fill);
-  --color-success-container: var(--glass-fill);
-  --color-info-container: var(--glass-fill);
-  --color-warning-container: var(--glass-fill);
-  --color-on-primary-container: var(--color-ink);
-  --color-on-secondary-container: var(--color-ink);
-  --color-on-tertiary-container: var(--color-ink);
-  --color-on-error-container: var(--color-error);
-  --color-on-success-container: var(--color-success);
-  --color-on-info-container: var(--color-info);
-  --color-on-warning-container: var(--color-warning);
   --color-surface: var(--color-atmosphere-mist);
   --color-on-surface: var(--color-ink);
   --color-on-surface-variant: var(--color-ink);
   --color-surface-container-lowest: var(--glass-fill);
   --color-surface-container-low: var(--glass-fill-hover);
   --color-surface-container: var(--glass-fill);
-  --color-surface-container-high: var(--glass-fill-pressed);
   --color-surface-container-highest: var(--glass-edge-low);
   --color-surface-variant: var(--glass-fill-disabled);
-  --shadow-1: var(--glass-shadow);
-  --shadow-2: var(--glass-shadow);
-  --shadow-3: var(--glass-shadow-raised);
-  --shadow-4: var(--glass-shadow-raised);
-  --shadow-5: var(--glass-shadow-raised);
+  color-scheme: light;
 }
 
+/* biome-ignore lint/suspicious/noDuplicateSelectors: Material rules are grouped by concern; this later block intentionally extends the existing selector without changing cascade order. */
 :root {
   --spacing-0: 0;
   --spacing-2: 2px;
@@ -207,46 +134,24 @@
   --spacing-16: 16px;
   --spacing-24: 24px;
   --spacing-32: 32px;
-  --spacing-48: 48px;
-  --spacing-64: 64px;
-  --radius-none: 0px;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-lg-inc: 20px;
-  --radius-xl: 28px;
-  --radius-xl-inc: 32px;
-  --radius-xxl: 48px;
   --radius-rounded: 999px;
   --radius-circled: 50%;
   --font-heading: "Bona Nova SC", Georgia, serif;
   --font-reading: Cabin, system-ui, sans-serif;
   --font-family: var(--font-reading);
-  --font-display-lg: 400 57px / 64px var(--font-heading);
-  --font-display-md: 400 45px / 52px var(--font-heading);
-  --font-display-sm: 400 36px / 44px var(--font-heading);
   --font-headline-lg: 400 32px / 40px var(--font-heading);
-  --font-headline-md: 400 28px / 36px var(--font-heading);
-  --font-headline-sm: 400 24px / 32px var(--font-heading);
-  --font-title-lg: 400 22px / 28px var(--font-family);
-  --font-title-md: 500 16px / 24px var(--font-family);
-  --font-title-sm: 500 14px / 20px var(--font-family);
   --font-body-lg: 400 16px / 24px var(--font-family);
   --font-body-md: 400 14px / 20px var(--font-family);
   --font-body-sm: 400 12px / 16px var(--font-family);
-  --font-label-lg: 400 14px / 20px var(--font-family);
   --font-label-md: 400 12px / 16px var(--font-family);
   --font-label-sm: 500 11px / 16px var(--font-family);
-  --transition-expressive-fast-spatial: 350ms cubic-bezier(0.42, 1.67, 0.21, 0.9);
-  --transition-expressive-default-spatial: 500ms cubic-bezier(0.38, 1.21, 0.22, 1);
-  --transition-expressive-slow-spatial: 650ms cubic-bezier(0.39, 1.29, 0.35, 0.98);
+  --transition-expressive-default-spatial: 500ms
+    cubic-bezier(0.38, 1.21, 0.22, 1);
   --transition-expressive-fast-effects: 150ms cubic-bezier(0.31, 0.94, 0.34, 1);
-  --transition-expressive-default-effects: 200ms cubic-bezier(0.34, 0.8, 0.34, 1);
-  --transition-expressive-slow-effects: 300ms cubic-bezier(0.34, 0.88, 0.34, 1);
-  --transition-standard-fast-spatial: 350ms cubic-bezier(0.27, 1.06, 0.18, 1);
-  --transition-standard-default-spatial: 500ms cubic-bezier(0.27, 1.06, 0.18, 1);
-  --transition-standard-slow-spatial: 750ms cubic-bezier(0.27, 1.06, 0.18, 1);
   --transition-standard-fast-effects: 150ms cubic-bezier(0.31, 0.94, 0.34, 1);
   --transition-standard-default-effects: 200ms cubic-bezier(0.34, 0.8, 0.34, 1);
   --transition-standard-slow-effects: 300ms cubic-bezier(0.34, 0.88, 0.34, 1);

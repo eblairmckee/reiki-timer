@@ -12,15 +12,18 @@ export function useChimes() {
       player.current?.dispose();
       player.current = null;
     },
-    [],
+    []
   );
 
   const run = useCallback((action: "prepare" | "play", id: ChimeId) => {
     player.current ??= new ChimePlayer();
-    const current = ++request.current;
+    request.current += 1;
+    const { current } = request;
     setError("");
-    void player.current[action](id).catch(() => {
-      if (current === request.current) setError("Sound couldn't play. Tap a bell to try again.");
+    player.current[action](id).catch(() => {
+      if (current === request.current) {
+        setError("Sound couldn't play. Tap a bell to try again.");
+      }
     });
   }, []);
   const prepare = useCallback((id: ChimeId) => run("prepare", id), [run]);
@@ -31,5 +34,5 @@ export function useChimes() {
     setError("");
   }, []);
 
-  return { prepare, play, stop, error };
+  return { error, play, prepare, stop };
 }

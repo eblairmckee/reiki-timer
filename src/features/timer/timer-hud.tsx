@@ -13,20 +13,20 @@ import { Button } from "../../components/ui/button";
 import { sceneMotion } from "../../components/ui/shared/motion";
 import { useReducedMotion } from "../../components/ui/shared/use-reduced-motion";
 
-type Props = {
-  summary?: { content: ReactNode; timeline: ReactNode };
-  mode: "setup" | "running" | "paused" | "save";
-  hidden: boolean;
-  editing: boolean;
+interface Props {
   canResume: boolean;
-  primaryRef: RefObject<HTMLButtonElement | null>;
+  editing: boolean;
   finishRef: RefObject<HTMLButtonElement | null>;
-  onStart: (restart: boolean) => void;
-  onPause: () => void;
-  onFinish: () => void;
+  hidden: boolean;
+  mode: "setup" | "running" | "paused" | "save";
   onEdit: () => void;
+  onFinish: () => void;
+  onPause: () => void;
   onSave: () => void;
-};
+  onStart: (restart: boolean) => void;
+  primaryRef: RefObject<HTMLButtonElement | null>;
+  summary?: { content: ReactNode; timeline: ReactNode };
+}
 export function TimerHud({
   summary,
   mode,
@@ -43,89 +43,90 @@ export function TimerHud({
 }: Props) {
   const reduced = useReducedMotion();
   const restart = {
-    label: "Restart timer",
-    content: <RestartIcon />,
     activate: () => onStart(true),
+    content: <RestartIcon />,
+    label: "Restart timer",
   };
   const actions = {
-    setup: { label: "Start timer", content: <PlayIcon />, activate: () => onStart(true) },
-    running: { label: "Pause timer", content: <PauseIcon />, activate: onPause },
     paused: canResume
-      ? { label: "Resume timer", content: <PlayIcon />, activate: () => onStart(false) }
+      ? { activate: () => onStart(false), content: <PlayIcon />, label: "Resume timer" }
       : restart,
-    save: { label: "Save timer", content: <PlayIcon />, activate: onSave },
+    running: { activate: onPause, content: <PauseIcon />, label: "Pause timer" },
+    save: { activate: onSave, content: <PlayIcon />, label: "Save timer" },
+    setup: { activate: () => onStart(true), content: <PlayIcon />, label: "Start timer" },
   };
   const action = actions[mode];
   const primary = (
     <Button
-      ref={primaryRef}
-      mode="frost"
-      asIcon
-      hint={mode === "setup"}
-      disabled={hidden}
       aria-label={action.label}
-      title={action.label}
+      asIcon
+      disabled={hidden}
+      hint={mode === "setup"}
+      mode="frost"
       onClick={action.activate}
+      ref={primaryRef}
+      title={action.label}
     >
       {action.content}
     </Button>
   );
   const group = summary
     ? {
-        variant: "summary" as const,
+        details: { content: summary.timeline, label: "Timer overview" },
         summary: summary.content,
-        details: { label: "Timer overview", content: summary.timeline },
+        variant: "summary" as const,
       }
     : {
-        variant: "actions" as const,
         actions: mode === "paused" && (
           <>
             <Button
-              ref={finishRef}
-              mode="frost"
-              asIcon
-              aria-label="Finish timer"
-              title="Finish timer"
               aria-haspopup="dialog"
+              aria-label="Finish timer"
+              asIcon
+              mode="frost"
               onClick={onFinish}
+              ref={finishRef}
+              title="Finish timer"
             >
               <FinishIcon />
             </Button>
             <ButtonGroupSeparator aria-hidden="true" />
-            <Button mode="frost" asIcon aria-label="Edit timer" title="Edit timer" onClick={onEdit}>
+            <Button aria-label="Edit timer" asIcon mode="frost" onClick={onEdit} title="Edit timer">
               <EditIcon />
             </Button>
           </>
         ),
+        variant: "actions" as const,
       };
+  const transition = hidden ? sceneMotion.exit : sceneMotion.enter;
   return (
     <motion.fieldset
-      className="timer-hud"
-      aria-label="Timer controls"
-      inert={hidden}
-      aria-hidden={hidden}
-      initial={false}
       animate={{ opacity: hidden ? 0 : 1 }}
-      transition={reduced ? { duration: 0 } : hidden ? sceneMotion.exit : sceneMotion.enter}
+      aria-hidden={hidden}
+      aria-label="Timer controls"
+      className="timer-hud"
+      inert={hidden}
+      initial={false}
+      transition={reduced ? { duration: 0 } : transition}
     >
       <ButtonGroup
         {...group}
         primary={
           editing && (mode === "save" || (mode === "paused" && canResume)) ? (
             <ActionGroup
-              label={mode === "save" ? "Timer actions" : "Playback actions"}
-              primary={primary}
               actions={
                 <Button
-                  mode="frost"
-                  asIcon
                   aria-label={restart.label}
-                  title={restart.label}
+                  asIcon
+                  mode="frost"
                   onClick={restart.activate}
+                  title={restart.label}
                 >
                   {restart.content}
                 </Button>
               }
+              label={mode === "save" ? "Timer actions" : "Playback actions"}
+              primary={primary}
             />
           ) : (
             primary

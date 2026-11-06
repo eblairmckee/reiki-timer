@@ -28,7 +28,7 @@ function InputAffix({
   inline?: boolean;
 }) {
   return (
-    <span {...props} data-ui="input-affix" data-inline={inline}>
+    <span {...props} data-inline={inline} data-ui="input-affix">
       {children}
     </span>
   );

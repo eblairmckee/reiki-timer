@@ -1,11 +1,11 @@
-import { expect, mock, test } from "bun:test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
+import { expect, test, vi } from "vitest";
 import { TimePicker } from ".";
 
 function Example() {
   const [value, setValue] = useState(20);
-  return <TimePicker label="How long" value={value} onValueChange={setValue} />;
+  return <TimePicker label="How long" onValueChange={setValue} value={value} />;
 }
 test("the time picker has native slider semantics and bounded keyboard input", () => {
   render(<Example />);
@@ -23,32 +23,34 @@ test("the time picker has native slider semantics and bounded keyboard input", (
 
 function geometry(input: HTMLElement) {
   const dial = input.parentElement;
-  if (!dial) throw new Error("Missing dial");
+  if (!dial) {
+    throw new Error("Missing dial");
+  }
   dial.getBoundingClientRect = () => ({
+    bottom: 300,
+    height: 300,
+    left: 0,
+    right: 300,
+    toJSON: () => ({}),
+    top: 0,
+    width: 300,
     x: 0,
     y: 0,
-    left: 0,
-    top: 0,
-    right: 300,
-    bottom: 300,
-    width: 300,
-    height: 300,
-    toJSON: () => ({}),
   });
   return dial;
 }
 function pointer(degrees: number) {
   return {
-    pointerId: 1,
     button: 0,
-    isPrimary: true,
     clientX: 150 + Math.sin((degrees * Math.PI) / 180) * 120,
     clientY: 150 - Math.cos((degrees * Math.PI) / 180) * 120,
+    isPrimary: true,
+    pointerId: 1,
   };
 }
 test("rotation previews detents, commits once on release, and cancellation restores the value", () => {
-  const change = mock();
-  render(<TimePicker label="Duration" value={20} onValueChange={change} />);
+  const change = vi.fn();
+  render(<TimePicker label="Duration" onValueChange={change} value={20} />);
   const input = screen.getByRole("slider", { name: "Duration" });
   const dial = geometry(input);
   fireEvent.pointerDown(dial, pointer(120));
@@ -77,9 +79,9 @@ test("tapping a tick selects a value without dragging", () => {
 test("independent pickers keep their labels and controlled values", () => {
   const view = render(
     <>
-      <TimePicker label="Warm-up time" min={1} max={10} value={2} onValueChange={() => {}} />
-      <TimePicker label="Cool-down time" min={1} max={10} value={3} onValueChange={() => {}} />
-    </>,
+      <TimePicker label="Warm-up time" max={10} min={1} onValueChange={ignoreValue} value={2} />
+      <TimePicker label="Cool-down time" max={10} min={1} onValueChange={ignoreValue} value={3} />
+    </>
   );
   const warm = screen.getByRole("slider", { name: "Warm-up time" });
   const cool = screen.getByRole("slider", { name: "Cool-down time" });
@@ -88,7 +90,7 @@ test("independent pickers keep their labels and controlled values", () => {
   expect(warm.getAttribute("aria-valuetext")).toBe("2 minutes");
   expect(cool.getAttribute("aria-valuetext")).toBe("3 minutes");
   view.rerender(
-    <TimePicker label="Warm-up time" min={1} max={10} value={8} onValueChange={() => {}} />,
+    <TimePicker label="Warm-up time" max={10} min={1} onValueChange={ignoreValue} value={8} />
   );
   expect(screen.getByRole("slider").getAttribute("aria-valuetext")).toBe("8 minutes");
 });
@@ -107,3 +109,7 @@ test("clock ticks retain their absolute positions and clamp values below the min
     expect(input.getAttribute("aria-valuetext")).toBe(`${expected} minutes`);
   }
 });
+
+function ignoreValue() {
+  /* Controlled fixture deliberately ignores changes. */
+}

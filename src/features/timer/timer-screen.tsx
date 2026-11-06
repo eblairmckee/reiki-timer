@@ -1,3 +1,4 @@
+// biome-ignore-all lint/performance/noJsxPropsBind: Event handlers intentionally close over current state; no memoized consumer requires stable callback identity.
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -24,19 +25,21 @@ import { TimerTimeline } from "./timer-timeline";
 import { useChimes } from "./use-chimes";
 import "./style.css";
 
-type Transition = {
+interface Transition {
   from: string;
-  to: "/" | "/reiki-on" | "/reiki-on/edit";
-  session: Session;
   restart: boolean;
-};
+  session: Session;
+  to: "/" | "/reiki-on" | "/reiki-on/edit";
+}
+
+const trailingSlash = /\/$/u;
 
 export function TimerLayout() {
   const pathname = useLocation({ select: (location) => location.pathname });
   const router = useRouter();
   const home = pathname === "/";
-  const editing = pathname.replace(/\/$/, "") === "/reiki-on/edit";
-  const playback = !home && !editing;
+  const editing = pathname.replace(trailingSlash, "") === "/reiki-on/edit";
+  const playback = !(home || editing);
   const [{ config, session }, setDraft] = useState(() => loadDraft(!home));
   const [now, setNow] = useState(Date.now);
   const [resetId, setResetId] = useState(0);
@@ -62,7 +65,9 @@ export function TimerLayout() {
   }, [home, config, session]);
 
   useEffect(() => {
-    if (transition || session.mode !== "running") return;
+    if (transition || session.mode !== "running") {
+      return;
+    }
     if (!playback) {
       // Back/Forward or a direct edit link can leave playback without using Pause.
       stopChime();
@@ -70,8 +75,8 @@ export function TimerLayout() {
       setDraft((draft) => ({
         ...draft,
         session: {
-          mode: pausedAt >= total ? "complete" : "paused",
           elapsed: pausedAt,
+          mode: pausedAt >= total ? "complete" : "paused",
           startedAt: 0,
         },
       }));
@@ -87,14 +92,19 @@ export function TimerLayout() {
   }, [playback, session, total, stopChime, transition]);
 
   useEffect(() => {
-    if (transition || !playback || session.mode !== "running") return;
-    if (crossedChimeBoundary(timeline, lastElapsed.current, elapsed)) play(config.chime);
+    if (transition || !playback || session.mode !== "running") {
+      return;
+    }
+    if (crossedChimeBoundary(timeline, lastElapsed.current, elapsed)) {
+      play(config.chime);
+    }
     lastElapsed.current = elapsed;
-    if (elapsed >= total)
+    if (elapsed >= total) {
       setDraft((draft) => ({
         ...draft,
-        session: { mode: "complete", elapsed: total, startedAt: 0 },
+        session: { elapsed: total, mode: "complete", startedAt: 0 },
       }));
+    }
   }, [playback, elapsed, total, session.mode, timeline, config.chime, play, transition]);
 
   useEffect(() => {
@@ -105,22 +115,28 @@ export function TimerLayout() {
 
   function go(to: Transition["to"], next: Session, restart = false) {
     setSaveError(false);
-    setTransition({ from: pathname, to, session: next, restart });
+    setTransition({ from: pathname, restart, session: next, to });
   }
 
   async function afterExit() {
-    if (!transition) return;
+    if (!transition) {
+      return;
+    }
     // A history navigation during the exit takes precedence over the pending action.
     try {
-      if (router.state.location.pathname !== transition.from) return;
+      if (router.state.location.pathname !== transition.from) {
+        return;
+      }
       // Motion owns this exit and entrance, including browsers without native view transitions.
       if (transition.to !== transition.from) {
         await router.navigate({
-          to: transition.to,
           replace: transition.to === "/",
+          to: transition.to,
           viewTransition: false,
         });
-        if (router.state.location.pathname !== transition.to) return;
+        if (router.state.location.pathname !== transition.to) {
+          return;
+        }
       }
       const next = transition.session;
       const startedAt = next.mode === "running" ? Date.now() : 0;
@@ -128,15 +144,18 @@ export function TimerLayout() {
         lastElapsed.current = next.elapsed;
         setNow(startedAt);
       }
-      if (transition.restart) setResetId((id) => id + 1);
+      if (transition.restart) {
+        setResetId((id) => id + 1);
+      }
       const homeConfig = transition.to === "/" ? loadConfig() : undefined;
       setDraft((draft) => ({
         config: homeConfig ?? draft.config,
         session: { ...next, startedAt },
       }));
-      window.scrollTo?.({ top: 0, behavior: "instant" });
-      if (transition.to === "/")
+      window.scrollTo?.({ behavior: "instant", top: 0 });
+      if (transition.to === "/") {
         requestAnimationFrame(() => hudRef.current?.focus({ preventScroll: true }));
+      }
     } finally {
       setTransition(null);
     }
@@ -144,8 +163,10 @@ export function TimerLayout() {
 
   function start(restart: boolean) {
     stopChime();
-    if (config.chimes) prepare(config.chime);
-    const next: Session = { mode: "running", elapsed: restart ? 0 : session.elapsed, startedAt: 0 };
+    if (config.chimes) {
+      prepare(config.chime);
+    }
+    const next: Session = { elapsed: restart ? 0 : session.elapsed, mode: "running", startedAt: 0 };
     if (!restart && playback) {
       const timestamp = Date.now();
       lastElapsed.current = next.elapsed;
@@ -158,10 +179,12 @@ export function TimerLayout() {
   function pause() {
     const position = Math.min(total, elapsedAt(session, Date.now()));
     stopChime();
-    if (crossedChimeBoundary(timeline, lastElapsed.current, position)) play(config.chime);
+    if (crossedChimeBoundary(timeline, lastElapsed.current, position)) {
+      play(config.chime);
+    }
     setDraft({
       config,
-      session: { mode: position >= total ? "complete" : "paused", elapsed: position, startedAt: 0 },
+      session: { elapsed: position, mode: position >= total ? "complete" : "paused", startedAt: 0 },
     });
   }
   function finish() {
@@ -170,8 +193,8 @@ export function TimerLayout() {
     setDraft({
       config,
       session: {
-        mode: "complete",
         elapsed: Math.min(total, elapsedAt(session, Date.now())),
+        mode: "complete",
         startedAt: 0,
       },
     });
@@ -187,8 +210,8 @@ export function TimerLayout() {
     stopChime();
     const position = Math.min(total, elapsedAt(session, Date.now()));
     go("/reiki-on/edit", {
-      mode: completed || position >= total ? "edit-before-save" : "paused",
       elapsed: position,
+      mode: completed || position >= total ? "edit-before-save" : "paused",
       startedAt: 0,
     });
   }
@@ -205,51 +228,85 @@ export function TimerLayout() {
     stopChime();
     const next: Session = { ...session, mode: "saved" };
     setDraft({ config, session: next });
-    if (editing) go("/reiki-on", next);
+    if (editing) {
+      go("/reiki-on", next);
+    }
   }
   function changeConfig(next: TimerConfig) {
-    if (next.chimes && !config.chimes) prepare(next.chime);
-    if (!next.chimes && config.chimes) stopChime();
+    if (next.chimes && !config.chimes) {
+      prepare(next.chime);
+    }
+    if (!next.chimes && config.chimes) {
+      stopChime();
+    }
     setSaveError(false);
-    setDraft({ session, config: next });
+    setDraft({ config: next, session });
   }
 
   function hudMode() {
-    if (saveFirst) return "save";
-    if (playback && completed) return "paused";
-    if (home || completed) return "setup";
-    return session.mode === "running" ? "running" : session.mode === "paused" ? "paused" : "setup";
+    if (saveFirst) {
+      return "save";
+    }
+    if (playback && completed) {
+      return "paused";
+    }
+    if (home || completed) {
+      return "setup";
+    }
+    if (session.mode === "running" || session.mode === "paused") {
+      return session.mode;
+    }
+    return "setup";
+  }
+
+  let status = "";
+  if (completed) {
+    status = "Your Reiki session is complete.";
+  } else if (session.mode === "paused") {
+    status = "Timer paused.";
+  } else if (session.mode === "running") {
+    status = "Timer running.";
   }
 
   return (
     <TimerContext
       value={{
+        audioError,
         config,
         elapsed,
+        onChange: changeConfig,
+        onDone: leave,
+        onPreviewChime: play,
         phase,
         saved,
-        audioError,
-        onChange: changeConfig,
-        onPreviewChime: play,
-        onDone: leave,
       }}
     >
       <Atmosphere
-        cycling={(!playback || saved) && !blackout}
-        phase={phase.index}
-        dim={playback && !completed ? phase.dim : 0}
         blackout={blackout}
+        cycling={(!playback || saved) && !blackout}
+        dim={playback && !completed ? phase.dim : 0}
+        phase={phase.index}
         resetId={resetId}
       >
-        <section className="timer-screen" aria-label="Reiki timer">
+        <section aria-label="Reiki timer" className="timer-screen">
           <div className="timer-foreground" inert={!!transition}>
             <header className="timer-header" data-playback={playback || undefined}>
               <TimerHud
-                mode={hudMode()}
+                canResume={session.elapsed < total}
+                editing={editing}
+                finishRef={finishRef}
                 hidden={!!transition || (playback && saved)}
+                mode={hudMode()}
+                onEdit={edit}
+                onFinish={finish}
+                onPause={pause}
+                onSave={save}
+                onStart={start}
+                primaryRef={hudRef}
                 summary={
-                  !playback
-                    ? {
+                  playback
+                    ? undefined
+                    : {
                         content: (
                           <TimerSummary
                             {...summarizeTimer(config)}
@@ -258,25 +315,15 @@ export function TimerLayout() {
                         ),
                         timeline: <TimerTimeline entries={timeline} />,
                       }
-                    : undefined
                 }
-                editing={editing}
-                canResume={session.elapsed < total}
-                primaryRef={hudRef}
-                finishRef={finishRef}
-                onStart={start}
-                onPause={pause}
-                onFinish={finish}
-                onEdit={edit}
-                onSave={save}
               />
-              {saveFirst && saveError && (
+              {Boolean(saveFirst && saveError) && (
                 <p className="timer-hud-error" data-ink="detail" role="alert">
                   Couldn’t save in this browser. Try again.
                 </p>
               )}
             </header>
-            <AnimatePresence mode="wait" initial={false} onExitComplete={afterExit}>
+            <AnimatePresence initial={false} mode="wait" onExitComplete={afterExit}>
               {!transition && (
                 <TimerScene key="route">
                   <Outlet />
@@ -285,24 +332,17 @@ export function TimerLayout() {
             </AnimatePresence>
           </div>
           <FinishTimerDialog
-            open={playback && completed && !saved && !transition}
             expired={session.elapsed >= total}
-            saveError={saveError}
             finishRef={finishRef}
             onDismiss={dismissFinish}
+            onEdit={edit}
             onLeave={leave}
             onSave={save}
-            onEdit={edit}
+            open={playback && completed && !saved && !transition}
+            saveError={saveError}
           />
           <span className="visually-hidden" role="status">
-            {playback &&
-              (completed
-                ? "Your Reiki session is complete."
-                : session.mode === "paused"
-                  ? "Timer paused."
-                  : session.mode === "running"
-                    ? "Timer running."
-                    : "")}
+            {playback && status}
           </span>
         </section>
       </Atmosphere>

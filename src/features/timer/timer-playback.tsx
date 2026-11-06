@@ -8,7 +8,7 @@ import { formatRemaining, summarizeTimer } from "./timer-state";
 export function TimerPlayback() {
   const { config, elapsed, phase, saved } = useTimer();
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence initial={false} mode="wait">
       {saved ? (
         <TimerScene key="saved">
           <SaveTimer />
@@ -16,14 +16,14 @@ export function TimerPlayback() {
       ) : (
         <TimerScene key="playback">
           <div className="timer-session">
-            {config.showTime && (
+            {Boolean(config.showTime) && (
               <>
                 <div
+                  aria-label="Time remaining"
                   className="timer-countdown"
                   data-ink="display"
                   data-lettering="frosted"
                   role="timer"
-                  aria-label="Time remaining"
                 >
                   {formatRemaining(phase.remaining)}
                 </div>

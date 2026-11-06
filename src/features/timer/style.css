@@ -4,12 +4,13 @@
   }
   .timer-header {
     position: fixed;
+    inset-inline: max(1rem, env(safe-area-inset-left))
+      max(1rem, env(safe-area-inset-right));
     top: max(1rem, env(safe-area-inset-top));
-    inset-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
     z-index: 10;
     display: flex;
-    align-items: center;
     gap: 1rem;
+    align-items: center;
     pointer-events: none;
   }
   .timer-foreground {
@@ -26,38 +27,39 @@
   .timer-hud {
     --control-button-size: clamp(3.5rem, 14vw, 4.25rem);
     --timer-summary-align: flex-end;
-    pointer-events: none;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     justify-items: end;
-    padding: 0;
-    margin: 0;
-    border: 0;
+    inline-size: 100%;
     min-inline-size: 0;
     max-inline-size: 100%;
-    inline-size: 100%;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;
+    border: 0;
   }
-  @media (width <= 40rem), (hover: none) and (pointer: coarse) and (height <= 30rem) {
+  @media (width <= 40rem),
+    (hover: none) and (pointer: coarse) and (height <= 30rem) {
     .timer-header[data-playback] {
       inset-block-start: auto;
       inset-block-end: max(1rem, env(safe-area-inset-bottom));
     }
   }
   .timer-session {
-    min-height: 100svh;
     display: grid;
+    gap: 1rem;
     place-items: center;
     align-content: center;
-    gap: 1rem;
+    min-height: 100svh;
     padding: 5rem 1rem;
   }
   .timer-save h1 {
     max-inline-size: 18ch;
-    text-align: center;
-    text-wrap: balance;
     font-size: clamp(2.5rem, 6.5vw, 4.5rem);
     font-weight: 400;
     line-height: 1.15;
+    text-align: center;
+    text-wrap: balance;
   }
   .timer-save {
     --frost-word-radius: var(--radius-md);
@@ -75,9 +77,9 @@
     position: absolute;
     inset-block-start: 100%;
     inset-inline-end: 0;
+    padding: 0.5rem 1rem;
     margin-block-start: 0.5rem;
     background: var(--frost-fallback);
-    padding: 0.5rem 1rem;
   }
   .timer-save h1:focus {
     outline: none;
@@ -87,13 +89,13 @@
     padding-inline: 0.08em;
     font-size: clamp(4rem, 16vw, 9rem);
     font-weight: 400;
+    line-height: 1;
     letter-spacing: normal;
     white-space: nowrap;
-    line-height: 1;
   }
 }
 
 :root:has(.timer-save)::view-transition-new(foreground) {
-  animation: none;
   opacity: 0;
+  animation: none;
 }

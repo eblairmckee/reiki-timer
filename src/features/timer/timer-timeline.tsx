@@ -2,9 +2,11 @@ import { BellIcon } from "@/components/atoms/timer-icons";
 import { formatClock, type TimelineEntry } from "./timer-state";
 import "./timer-timeline.css";
 
+const hasDigit = /\d/u;
+
 function emphasizeNumbers(text: string) {
-  return Array.from(text.matchAll(/\d+|\D+/g), (match) =>
-    /\d/.test(match[0]) ? <b key={match.index}>{match[0]}</b> : match[0],
+  return Array.from(text.matchAll(/\d+|\D+/gu), (match) =>
+    hasDigit.test(match[0]) ? <b key={match.index}>{match[0]}</b> : match[0]
   );
 }
 
@@ -24,12 +26,14 @@ export function TimerTimeline({ entries }: { entries: readonly TimelineEntry[] }
                   <span className="visually-hidden">Chime</span>
                 </span>
               ) : (
-                <span className="timeline-dot" aria-hidden="true" />
+                <span aria-hidden="true" className="timeline-dot" />
               )}
             </span>
             <span className="timeline-event">
               {entry.label}
-              {entry.detail && <small>{emphasizeNumbers(entry.detail)}</small>}
+              {entry.detail !== undefined && entry.detail !== "" && (
+                <small>{emphasizeNumbers(entry.detail)}</small>
+              )}
             </span>
           </li>
         ))}

@@ -6,15 +6,21 @@ export function useComposedRef<T>(externalRef: Ref<T> | undefined) {
     (node: T | null) => {
       localRef.current = node;
       const cleanup = typeof externalRef === "function" ? externalRef(node) : undefined;
-      if (externalRef && typeof externalRef !== "function") externalRef.current = node;
+      if (externalRef && typeof externalRef !== "function") {
+        externalRef.current = node;
+      }
       return () => {
         localRef.current = null;
-        if (typeof cleanup === "function") cleanup();
-        else if (typeof externalRef === "function") externalRef(null);
-        else if (externalRef) externalRef.current = null;
+        if (typeof cleanup === "function") {
+          cleanup();
+        } else if (typeof externalRef === "function") {
+          externalRef(null);
+        } else if (externalRef) {
+          externalRef.current = null;
+        }
       };
     },
-    [externalRef],
+    [externalRef]
   );
   return [localRef, ref] as const;
 }

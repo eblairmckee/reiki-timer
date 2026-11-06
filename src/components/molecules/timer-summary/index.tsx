@@ -1,43 +1,49 @@
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
-import { forwardRef, type ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 import { BellIcon, ClockIcon, RepeatIcon } from "../../atoms/timer-icons";
 import { controlSpring } from "../../ui/shared/motion";
 import { useReducedMotion } from "../../ui/shared/use-reduced-motion";
 import "./style.css";
 
-const SummaryItem = forwardRef<HTMLLIElement, { children: ReactNode; reduced: boolean }>(
-  function SummaryItem({ children, reduced }, ref) {
-    const present = useIsPresent();
-    return (
-      <motion.li
-        ref={ref}
-        layout={reduced ? false : "position"}
-        aria-hidden={!present}
-        initial={{ opacity: 0, scale: reduced ? 1 : 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: reduced ? 1 : 0.96 }}
-        transition={
-          reduced
-            ? { duration: 0 }
-            : { layout: controlSpring, scale: controlSpring, opacity: { duration: 0.22 } }
-        }
-      >
-        {children}
-      </motion.li>
-    );
-  },
-);
+function SummaryItem({
+  children,
+  reduced,
+  ref,
+}: {
+  children: ReactNode;
+  reduced: boolean;
+  ref?: Ref<HTMLLIElement>;
+}) {
+  const present = useIsPresent();
+  return (
+    <motion.li
+      animate={{ opacity: 1, scale: 1 }}
+      aria-hidden={!present}
+      exit={{ opacity: 0, scale: reduced ? 1 : 0.96 }}
+      initial={{ opacity: 0, scale: reduced ? 1 : 0.94 }}
+      layout={reduced ? false : "position"}
+      ref={ref}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { layout: controlSpring, opacity: { duration: 0.22 }, scale: controlSpring }
+      }
+    >
+      {children}
+    </motion.li>
+  );
+}
 
-type TimerSummaryProps = {
-  warmUpMinutes?: number;
-  sessionMinutes?: number;
+interface TimerSummaryProps {
+  asDescription?: boolean;
+  blurredBackground?: boolean;
+  chimes: boolean;
   coolDownMinutes?: number;
   repeat: boolean;
-  chimes: boolean;
+  sessionMinutes?: number;
   showTimerIcon?: boolean;
-  blurredBackground?: boolean;
-  asDescription?: boolean;
-};
+  warmUpMinutes?: number;
+}
 
 export function TimerSummary({
   warmUpMinutes,
@@ -52,11 +58,11 @@ export function TimerSummary({
   const reduced = useReducedMotion();
   return (
     <ul
-      className="timer-summary"
       aria-label={asDescription ? undefined : "Timer summary"}
-      data-ink="summary"
+      className="timer-summary"
       data-as-description={asDescription || undefined}
       data-blurred-background={blurredBackground || undefined}
+      data-ink="summary"
     >
       <AnimatePresence initial={false} mode="popLayout">
         {warmUpMinutes !== undefined && (
@@ -80,7 +86,7 @@ export function TimerSummary({
             </span>
           </SummaryItem>
         )}
-        {repeat && (
+        {Boolean(repeat) && (
           <SummaryItem key="repeat" reduced={reduced}>
             <RepeatIcon />
             <span aria-hidden="true">
@@ -89,13 +95,13 @@ export function TimerSummary({
             <span className="visually-hidden">Repeat chakras twice</span>
           </SummaryItem>
         )}
-        {chimes && (
+        {Boolean(chimes) && (
           <SummaryItem key="chimes" reduced={reduced}>
             <BellIcon />
             <span className="visually-hidden">Chimes enabled</span>
           </SummaryItem>
         )}
-        {showTimerIcon && (
+        {Boolean(showTimerIcon) && (
           <SummaryItem key="timer" reduced={reduced}>
             <ClockIcon />
             <span className="visually-hidden">Timer visible</span>

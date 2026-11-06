@@ -11,4 +11,4 @@ Use touch-action deliberately on affected controls, preserving the page's expect
 
 Contain scroll chaining in a scrollable overlay when appropriate. Keep page-level pull-to-refresh and native navigation usable unless the application requires a scoped change. Check hybrid pointer and touch devices when changing input-dependent styles.
 
-During a drag, scope text-selection suppression to the interaction and keep focus and alternate actions usable. Follow the [keyboard and gesture contract](../../accessible-testing/rules/accessibility.md) for custom interactions.
+During a drag, scope text-selection suppression to the interaction and keep focus and alternate actions usable. Follow the [keyboard and gesture contract](../../testing/rules/accessibility.md) for custom interactions.

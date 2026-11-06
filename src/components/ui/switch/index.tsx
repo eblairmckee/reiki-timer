@@ -1,3 +1,4 @@
+// biome-ignore-all lint/performance/noJsxPropsBind: Event handlers intentionally close over current state; no memoized consumer requires stable callback identity.
 "use client";
 import "../shared/recessed-frost.css";
 import "./style.css";
@@ -10,14 +11,14 @@ import { useComposedRef } from "../shared/use-composed-ref";
 import { useFrostMotion } from "../shared/use-frost-motion";
 import { useReducedMotion } from "../shared/use-reduced-motion";
 
-type Drag = {
+interface Drag {
+  direction: number;
+  initial: number;
+  moved: boolean;
   pointerId: number;
   x: number;
   y: number;
-  initial: number;
-  moved: boolean;
-  direction: number;
-};
+}
 
 function thumbTravel(root: HTMLElement, thumb: HTMLElement) {
   const style = getComputedStyle(root);
@@ -26,7 +27,7 @@ function thumbTravel(root: HTMLElement, thumb: HTMLElement) {
     root.clientWidth -
       (Number.parseFloat(style.paddingLeft) || 0) -
       (Number.parseFloat(style.paddingRight) || 0) -
-      thumb.offsetWidth,
+      thumb.offsetWidth
   );
 }
 
@@ -60,12 +61,16 @@ function Switch({
   useLayoutEffect(() => {
     const root = rootRef.current;
     const thumb = thumbRef.current;
-    if (!root || !thumb) return;
+    if (!(root && thumb)) {
+      return;
+    }
     const unsubscribe = position.on("change", (value) => {
       thumb.style.transform = `translateX(${value * direction.current}px)`;
     });
     function measure() {
-      if (!root || !thumb) return;
+      if (!(root && thumb)) {
+        return;
+      }
       const style = getComputedStyle(root);
       direction.current = style.direction === "rtl" ? -1 : 1;
       travel.current = thumbTravel(root, thumb);
@@ -87,19 +92,27 @@ function Switch({
   useEffect(() => {
     animation.current?.stop();
     const target = isChecked ? travel.current : 0;
-    if (reduced) position.jump(target);
-    else animation.current = animate(position, target, controlSpring);
+    if (reduced) {
+      position.jump(target);
+    } else {
+      animation.current = animate(position, target, controlSpring);
+    }
     return () => animation.current?.stop();
   }, [isChecked, position, reduced]);
 
   function settle() {
     animation.current?.stop();
     const target = committed.current ? travel.current : 0;
-    if (reduced) position.jump(target);
-    else animation.current = animate(position, target, controlSpring);
+    if (reduced) {
+      position.jump(target);
+    } else {
+      animation.current = animate(position, target, controlSpring);
+    }
   }
   function cancel() {
-    if (!drag.current) return;
+    if (!drag.current) {
+      return;
+    }
     suppressClick.current = drag.current.moved;
     drag.current = null;
     rootRef.current?.removeAttribute("data-dragging");
@@ -107,6 +120,20 @@ function Switch({
   }
 
   const interaction = {
+    onClick(event) {
+      // biome-ignore lint/suspicious/noUnnecessaryConditions: Refs, async audio and optional browser APIs can change outside this control-flow analysis; retain the runtime guard.
+      if (!suppressClick.current) {
+        return;
+      }
+      suppressClick.current = false;
+      event.preventBaseUIHandler();
+      event.preventDefault();
+    },
+    onKeyDown() {
+      suppressClick.current = false;
+    },
+    onLostPointerCapture: cancel,
+    onPointerCancel: cancel,
     onPointerDown(event) {
       suppressClick.current = false;
       if (
@@ -114,27 +141,34 @@ function Switch({
         event.isPrimary === false ||
         event.currentTarget.hasAttribute("data-disabled") ||
         props.readOnly
-      )
+      ) {
         return;
+      }
       animation.current?.stop();
-      if (thumbRef.current) travel.current = thumbTravel(event.currentTarget, thumbRef.current);
+      if (thumbRef.current) {
+        travel.current = thumbTravel(event.currentTarget, thumbRef.current);
+      }
       direction.current = getComputedStyle(event.currentTarget).direction === "rtl" ? -1 : 1;
       drag.current = {
+        direction: direction.current,
+        initial: position.get(),
+        moved: false,
         pointerId: event.pointerId,
         x: event.clientX,
         y: event.clientY,
-        initial: position.get(),
-        moved: false,
-        direction: direction.current,
       };
       event.currentTarget.setPointerCapture?.(event.pointerId);
     },
     onPointerMove(event) {
-      const current = drag.current;
-      if (!current || current.pointerId !== event.pointerId) return;
+      const { current } = drag;
+      if (!current || current.pointerId !== event.pointerId) {
+        return;
+      }
       const dx = event.clientX - current.x;
       const dy = event.clientY - current.y;
-      if (!current.moved && Math.abs(dx) <= 6) return;
+      if (!current.moved && Math.abs(dx) <= 6) {
+        return;
+      }
       if (!current.moved && Math.abs(dy) > Math.abs(dx)) {
         cancel();
         press.onPointerCancel(event);
@@ -145,29 +179,23 @@ function Switch({
       position.set(Math.max(0, Math.min(travel.current, current.initial + dx * current.direction)));
     },
     onPointerUp(event) {
-      const current = drag.current;
-      if (!current || current.pointerId !== event.pointerId) return;
+      const { current } = drag;
+      if (!current || current.pointerId !== event.pointerId) {
+        return;
+      }
       drag.current = null;
       event.currentTarget.removeAttribute("data-dragging");
       if (current.moved) {
         suppressClick.current = true;
         const next = position.get() >= travel.current / 2;
-        if (next !== committed.current) nativeInputRef.current?.click();
+        if (next !== committed.current) {
+          nativeInputRef.current?.click();
+        }
         settle();
       }
-      if (event.currentTarget.hasPointerCapture?.(event.pointerId))
+      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
-    },
-    onPointerCancel: cancel,
-    onLostPointerCapture: cancel,
-    onKeyDown() {
-      suppressClick.current = false;
-    },
-    onClick(event) {
-      if (!suppressClick.current) return;
-      suppressClick.current = false;
-      event.preventBaseUIHandler();
-      event.preventDefault();
+      }
     },
   } satisfies Pick<
     SwitchPrimitive.Root.Props,
@@ -182,21 +210,23 @@ function Switch({
 
   return (
     <SwitchPrimitive.Root
-      data-ui="switch"
-      data-recess=""
       data-frost-control=""
+      data-recess=""
+      data-ui="switch"
       {...mergeProps(press, interaction, props)}
-      ref={setRootRef}
-      inputRef={setInputRef}
       checked={isChecked}
+      inputRef={setInputRef}
       onCheckedChange={(next, details) => {
         onCheckedChange?.(next, details);
-        if (!details.isCanceled && checked === undefined) setInternalChecked(next);
+        if (!details.isCanceled && checked === undefined) {
+          setInternalChecked(next);
+        }
       }}
+      ref={setRootRef}
     >
-      <span data-ripple="pressure" aria-hidden="true" />
+      <span aria-hidden="true" data-ripple="pressure" />
       <SwitchPrimitive.Thumb data-ui="thumb" ref={thumbRef}>
-        <span data-ripple="release" aria-hidden="true" />
+        <span aria-hidden="true" data-ripple="release" />
         <span data-frost="" />
       </SwitchPrimitive.Thumb>
     </SwitchPrimitive.Root>

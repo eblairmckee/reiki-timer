@@ -1,11 +1,16 @@
 import { loadConfig, parseConfig, type Session, type TimerConfig } from "./timer-state";
 
 export const draftStorageKey = "reiki-timer.session";
-export const readySession: Session = { mode: "setup", elapsed: 0, startedAt: 0 };
-export type TimerDraft = { config: TimerConfig; session: Session };
+export const readySession: Session = { elapsed: 0, mode: "setup", startedAt: 0 };
+export interface TimerDraft {
+  config: TimerConfig;
+  session: Session;
+}
 
 function isSession(value: unknown): value is Session {
-  if (typeof value !== "object" || value === null) return false;
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
   const { mode, elapsed, startedAt } = value as Record<string, unknown>;
   return (
     (mode === "setup" ||
@@ -46,8 +51,11 @@ export function loadDraft(restore: boolean): TimerDraft {
 
 export function storeDraft(draft: TimerDraft | null) {
   try {
-    if (draft) window.sessionStorage.setItem(draftStorageKey, JSON.stringify(draft));
-    else window.sessionStorage.removeItem(draftStorageKey);
+    if (draft) {
+      window.sessionStorage.setItem(draftStorageKey, JSON.stringify(draft));
+    } else {
+      window.sessionStorage.removeItem(draftStorageKey);
+    }
   } catch {
     /* Keep the in-memory session usable when tab storage is unavailable. */
   }

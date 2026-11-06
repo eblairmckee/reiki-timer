@@ -3,105 +3,112 @@
     --svg-size: 18px;
 
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    height: var(--button-size);
-    flex-shrink: 0;
-    white-space: nowrap;
     width: fit-content;
+    height: var(--button-size);
     font: var(--font-body-md);
-    outline: none;
-    border: 1px solid;
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
+    user-select: none;
+    outline: none;
+    border: 1px solid;
     transition:
       background-color var(--transition-expressive-fast-effects),
       border-color var(--transition-expressive-fast-effects),
       box-shadow var(--transition-expressive-fast-effects),
       color var(--transition-expressive-fast-effects),
       scale var(--transition-expressive-fast-effects);
-    user-select: none;
 
     /* size */
     &[data-size="lg"] {
       --button-size: 40px;
       --svg-as-icon-size: var(--spacing-24);
+      gap: var(--spacing-16);
+      padding-inline: var(--spacing-16);
 
       font: var(--font-body-lg);
       border-radius: var(--radius-md);
-      padding-inline: var(--spacing-16);
-      gap: var(--spacing-16);
     }
 
     &[data-size="md"] {
       --button-size: 36px;
       --svg-as-icon-size: 18px;
+      gap: var(--spacing-12);
 
       padding-inline: var(--spacing-12);
       border-radius: var(--radius-md);
-      gap: var(--spacing-12);
     }
 
     &[data-size="sm"] {
       --button-size: 28px;
       --svg-as-icon-size: var(--spacing-14);
+      gap: var(--spacing-8);
+      padding-inline: var(--spacing-8);
 
       font: var(--font-body-sm);
       border-radius: var(--radius-sm);
-      padding-inline: var(--spacing-8);
-      gap: var(--spacing-8);
     }
 
     /* Mode */
     &[data-mode="filled"] {
-      border-color: transparent;
-      background-color: var(--color-button);
       color: var(--color-on-button);
+      background-color: var(--color-button);
+      border-color: transparent;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          background-color: color-mix(in srgb, var(--color-button), var(--color-shade) 10%);
+          background-color: color-mix(
+            in srgb,
+            var(--color-button),
+            var(--color-shade) 10%
+          );
         }
       }
     }
 
     &[data-mode="stroke"] {
-      border-color: var(--color-button-border);
-      background-color: var(--color-on-button);
       color: var(--color-button);
+      background-color: var(--color-on-button);
+      border-color: var(--color-button-border);
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          border-color: transparent;
           background-color: var(--color-button-container);
+          border-color: transparent;
         }
       }
     }
 
     &[data-mode="lighter"] {
-      border-color: transparent;
-      background-color: var(--color-button-container);
       color: var(--color-button);
+      background-color: var(--color-button-container);
+      border-color: transparent;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          border-color: var(--color-button-border);
           background-color: transparent;
+          border-color: var(--color-button-border);
         }
       }
     }
 
     &[data-mode="ghost"] {
-      border-color: transparent;
-      background-color: transparent;
-      color: var(--ghost-ink, var(--color-button));
       min-block-size: 2.75rem;
       font: var(--font-body-lg);
+      color: var(--ghost-ink, var(--color-button));
       text-decoration: none;
+      background-color: transparent;
+      border-color: transparent;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
-          background-color: var(--ghost-feedback, var(--color-button-container));
+          background-color: var(
+            --ghost-feedback,
+            var(--color-button-container)
+          );
         }
       }
       &:active:not(:disabled, [aria-disabled="true"]) {
@@ -131,8 +138,15 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      &[data-mode="filled"][data-variant="neutral"]:hover:not(:disabled, [aria-disabled="true"]) {
-        background-color: color-mix(in srgb, var(--color-button), var(--color-on-button) 10%);
+      &[data-mode="filled"][data-variant="neutral"]:hover:not(
+          :disabled,
+          [aria-disabled="true"]
+        ) {
+        background-color: color-mix(
+          in srgb,
+          var(--color-button),
+          var(--color-on-button) 10%
+        );
       }
     }
 
@@ -142,17 +156,17 @@
       --color-button-border: transparent;
       --color-button-container: transparent;
       --color-button-focus-ring: var(--color-primary);
-      border-radius: 0;
 
       background:
         linear-gradient(currentColor 0 0) 0 100%,
         linear-gradient(currentColor 0 0) 0 100%,
         linear-gradient(currentColor 0 0) 100% 0,
         linear-gradient(currentColor 0 0) 100% 0;
+      background-repeat: no-repeat;
       background-size:
         var(--d, 0) 1px,
         1px var(--d, 0);
-      background-repeat: no-repeat;
+      border-radius: 0;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover:not(:disabled, [aria-disabled="true"]) {
@@ -177,17 +191,18 @@
 
     /* Focus */
     &:not([data-frost-control]):focus-visible {
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-button-focus-ring) 35%, transparent);
+      box-shadow: 0 0 0 3px
+        color-mix(in oklab, var(--color-button-focus-ring) 35%, transparent);
     }
 
     /* Disabled */
     &:disabled,
     &[aria-disabled="true"] {
-      border-color: transparent;
-      background-color: var(--color-surface-container);
       color: color-mix(in srgb, var(--color-on-surface) 38%, transparent);
       pointer-events: none;
       user-select: none;
+      background-color: var(--color-surface-container);
+      border-color: transparent;
     }
 
     /* As Icon */
@@ -197,13 +212,14 @@
 
     &[data-as-icon="false"] {
       svg {
-        margin-inline: calc(var(--spacing-4) * -1);
         width: var(--svg-size);
         height: var(--svg-size);
+        margin-inline: calc(var(--spacing-4) * -1);
       }
     }
 
     /* Icon */
+    /* biome-ignore lint/suspicious/noDuplicateSelectors: Material rules are grouped by concern; this later block intentionally extends the existing selector without changing cascade order. */
     &[data-as-icon="true"] {
       padding-inline: var(--spacing-4);
 
@@ -219,16 +235,16 @@
   [data-ui="button"][data-mode="frost"] {
     height: var(--frost-button-height, 2.75rem);
     padding: 0;
-    border: 0;
-    border-radius: var(--frost-word-radius, 0.3rem);
     color: var(--color-ink);
     background: var(--well-fill);
+    border: 0;
+    border-radius: var(--frost-word-radius, 0.3rem);
     transition: none;
     [data-frost] {
       display: flex;
+      gap: 0.6em;
       align-items: center;
       justify-content: center;
-      gap: 0.6em;
       width: 100%;
       height: 100%;
       padding-inline: 1.4em;
@@ -265,6 +281,7 @@
       height: var(--frost-button-height, var(--control-button-size, 3rem));
       border-radius: var(--frost-icon-radius, 50%);
       transition: border-radius 420ms ease-in-out;
+      /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
       [data-frost] {
         padding: 0;
       }
@@ -278,8 +295,8 @@
       outline-offset: var(--frost-focus-offset, 5px);
     }
     &:disabled {
-      opacity: 0.55;
       cursor: default;
+      opacity: 0.55;
     }
     &[data-hint] [data-frost]::before {
       animation: frost-button-hint 1.4s ease-in-out 3s 1;
@@ -292,13 +309,13 @@
       --frost-fill: var(--frost-fill-selected);
     }
     &[aria-pressed="true"]::after {
-      content: "";
       position: absolute;
       inset: -2px;
-      scale: 1.04;
+      pointer-events: none;
+      content: "";
       border-radius: inherit;
       box-shadow: var(--pressure-ring);
-      pointer-events: none;
+      scale: 1.04;
     }
     @media (forced-colors: active) {
       &[aria-pressed="true"]::after {
@@ -309,37 +326,37 @@
   /* A shallow track behind the letters gives secondary actions a resting edge. */
   [data-ui="button"][data-mode="etched"] {
     position: relative;
-    min-height: 2.75rem;
     height: auto;
+    min-height: 2.75rem;
     padding: 0.75em;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-ink-on-atmosphere);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    background: var(--well-checked);
     border: 0;
     border-radius: 0.25rem;
-    background: var(--well-checked);
     box-shadow:
       inset 0 3px 6px -3px var(--well-shade),
       inset 0 1px 2px var(--well-shade),
       inset 0 -1px 0 var(--well-light);
-    color: var(--color-ink-on-atmosphere);
-    font-size: 1rem;
-    font-weight: 400;
-    text-underline-offset: 0.3em;
-    text-decoration-thickness: 1px;
+    transition: background-color var(--transition-standard-default-effects);
     &[data-size="lg"] {
       font-size: 1.125rem;
     }
-    transition: background-color var(--transition-standard-default-effects);
     @media (hover: hover) and (pointer: fine) {
       &:hover:not(:disabled, [aria-disabled="true"]) {
-        background-color: var(--recess-action-hover);
         text-decoration-line: var(--button-underline, underline);
+        background-color: var(--recess-action-hover);
       }
     }
     &:active:not(:disabled, [aria-disabled="true"]) {
-      scale: 1;
       background-color: var(--recess-action-active);
       box-shadow:
         inset 0 2px 4px var(--well-shade),
         inset 0 -1px 0 var(--well-light);
+      scale: 1;
     }
     &:focus-visible {
       outline: 2px solid var(--color-focus);
@@ -347,31 +364,31 @@
       box-shadow: none;
     }
     &:is(:disabled, [aria-disabled="true"]) {
+      box-shadow: none;
       opacity: 0.55;
       scale: 1;
-      box-shadow: none;
     }
     @media (forced-colors: active) {
-      border: 1px solid ButtonText;
       color: ButtonText;
+      border: 1px solid ButtonText;
     }
   }
   [data-ui="button"][data-mode="text"] {
-    min-height: 2.75rem;
     height: auto;
+    min-height: 2.75rem;
     padding: var(--button-text-padding, 0.5em 0.25em);
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: var(--color-ink-on-atmosphere);
     font-size: 0.875rem;
     font-weight: 400;
-    &[data-as-icon="true"] {
-      min-inline-size: 2.75rem;
-    }
+    color: var(--color-ink-on-atmosphere);
     text-decoration-line: var(--button-underline, underline);
     text-decoration-color: var(--well-light);
     text-underline-offset: 0.3em;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    &[data-as-icon="true"] {
+      min-inline-size: 2.75rem;
+    }
     &:hover,
     &:focus-visible {
       text-decoration-color: currentColor;
@@ -382,8 +399,11 @@
       outline-offset: -2px;
     }
     &:active {
+      background-color: var(
+        --button-text-pressed-fill,
+        var(--button-text-hover-fill, transparent)
+      );
       scale: 1;
-      background-color: var(--button-text-pressed-fill, var(--button-text-hover-fill, transparent));
     }
     @media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
       color: var(--color-paper);

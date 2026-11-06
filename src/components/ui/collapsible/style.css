@@ -2,39 +2,40 @@
   [data-ui="collapsible"] {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: var(--spacing-8);
-    border-radius: var(--radius-sm);
-    font: var(--font-body-md);
+    justify-content: center;
     width: 100%;
+    font: var(--font-body-md);
+    border-radius: var(--radius-sm);
     transition: var(--transition-standard-default-effects);
 
     [data-slot="collapsible-trigger"] {
-      outline: 0;
-      border: 0;
-      background-color: transparent;
-      cursor: pointer;
       display: flex;
+      gap: var(--spacing-12);
       align-items: center;
       justify-content: space-between;
-      gap: var(--spacing-12);
+      cursor: pointer;
+      outline: 0;
+      background-color: transparent;
+      border: 0;
 
       &:focus-visible {
-        outline: 2px solid color-mix(in oklab, var(--color-primary) 45%, transparent);
+        outline: 2px solid
+          color-mix(in oklab, var(--color-primary) 45%, transparent);
       }
 
       svg {
-        transition: var(--transition-expressive-default-spatial);
         width: var(--spacing-16);
         height: var(--spacing-16);
         color: inherit;
+        transition: var(--transition-expressive-default-spatial);
       }
     }
 
     [data-ui="collapsible-panel"] {
-      border-radius: var(--radius-sm);
       height: var(--collapsible-panel-height);
       overflow: hidden;
+      border-radius: var(--radius-sm);
 
       &[hidden]:not([hidden="until-found"]) {
         display: none;

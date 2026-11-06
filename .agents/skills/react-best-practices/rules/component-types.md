@@ -6,7 +6,7 @@ Reuse native prop and event types for wrappers, with intentional overrides. Pres
 
 Forward consumer props and refs to the semantic element promised by the API. Preserve field identity, accessible relationships, styling hooks, and event behavior through wrappers. Compose library and consumer handlers through the selected library's supported mechanism, preserving its cancellation semantics.
 
-When the library supports `asChild` or a slot primitive, use it to combine behaviors on the intended focusable element. The custom leaf must pass through the required props and ref. Follow the shared [interaction contract](../../accessible-testing/rules/accessibility.md) for the resulting control. Verify the actual rendered DOM and focus behavior when changing its element type.
+When the library supports `asChild` or a slot primitive, use it to combine behaviors on the intended focusable element. The custom leaf must pass through the required props and ref. Follow the shared [interaction contract](../../testing/rules/accessibility.md) for the resulting control. Verify the actual rendered DOM and focus behavior when changing its element type.
 
 ## React providers and compound components
 

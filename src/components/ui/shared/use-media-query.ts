@@ -7,11 +7,11 @@ export function useMediaQuery(query: string, serverValue = false) {
       media.addEventListener("change", onChange);
       return () => media.removeEventListener("change", onChange);
     },
-    [query],
+    [query]
   );
   return useSyncExternalStore(
     subscribe,
     () => window.matchMedia(query).matches,
-    () => serverValue,
+    () => serverValue
   );
 }

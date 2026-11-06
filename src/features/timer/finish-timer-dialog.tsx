@@ -1,19 +1,20 @@
+// biome-ignore-all lint/performance/noJsxPropsBind: Event handlers intentionally close over current state; no memoized consumer requires stable callback identity.
 import { Dialog } from "@base-ui/react/dialog";
 import { type RefObject, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import "./finish-timer-dialog.css";
 
-type Props = {
-  open: boolean;
+interface Props {
   expired: boolean;
-  saveError: boolean;
   finishRef: RefObject<HTMLButtonElement | null>;
   onDismiss: () => void;
+  onEdit: () => void;
   onLeave: () => void;
   onSave: () => void;
-  onEdit: () => void;
-};
+  open: boolean;
+  saveError: boolean;
+}
 
 export function FinishTimerDialog({
   open,
@@ -28,22 +29,27 @@ export function FinishTimerDialog({
   const title = useRef<HTMLHeadingElement>(null);
   return (
     <Dialog.Root
-      open={open}
       onOpenChange={(nextOpen, details) => {
-        if (nextOpen || !open) return;
-        if (details.reason === "close-press") onLeave();
-        else onDismiss();
+        if (nextOpen || !open) {
+          return;
+        }
+        if (details.reason === "close-press") {
+          onLeave();
+        } else {
+          onDismiss();
+        }
       }}
+      open={open}
     >
       <Dialog.Portal>
         <Dialog.Backdrop className="reiki-off-backdrop" />
         <Dialog.Popup
           className="reiki-off-dialog"
-          initialFocus={title}
           finalFocus={finishRef}
           inert={!open}
+          initialFocus={title}
         >
-          <Dialog.Title ref={title} tabIndex={-1} data-lettering="etched">
+          <Dialog.Title data-lettering="etched" ref={title} tabIndex={-1}>
             Reiki off
           </Dialog.Title>
           <Dialog.Description>
@@ -54,10 +60,12 @@ export function FinishTimerDialog({
             </LinkButton>{" "}
             for next time or{" "}
             <LinkButton
-              inline
               href="/reiki-on/edit"
+              inline
               onClick={(event) => {
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                  return;
+                }
                 event.preventDefault();
                 onEdit();
               }}
@@ -66,7 +74,7 @@ export function FinishTimerDialog({
             </LinkButton>{" "}
             to it first
           </Dialog.Description>
-          {saveError && <p role="alert">Couldn’t save in this browser. Try again</p>}
+          {Boolean(saveError) && <p role="alert">Couldn’t save in this browser. Try again</p>}
           <Dialog.Close render={<Button mode="frost" />}>Leave without saving</Dialog.Close>
         </Dialog.Popup>
       </Dialog.Portal>

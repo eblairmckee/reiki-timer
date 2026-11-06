@@ -1,69 +1,123 @@
-import { expect, test } from "bun:test";
+import { blend, converter, wcagContrast, wcagLuminance } from "culori";
+import { expect, test } from "vitest";
+import "./theme.css";
+import "../shared/ink.css";
 import { atmosphereSettings, chakraPalettes } from "../../atoms/atmosphere/atmosphere-config";
 import { inkStrengths } from "../../atoms/atmosphere/ink-strength";
 
-const theme = await Bun.file(new URL("./theme.css", import.meta.url)).text();
-
-function token(name: string): string {
-  const value = theme.match(new RegExp(`${name}:\\s*([^;]+);`))?.[1];
-  if (!value) throw new Error(`Missing theme token ${name}`);
-  const reference = value.match(/^var\(([^)]+)\)$/);
-  return reference ? token(reference[1]) : value;
-}
-
+// Resolve aliases, color-mix and runtime custom properties through Chromium's CSS engine.
 function rgba(name: string) {
-  const values = token(name).match(/^rgb\((\d+) (\d+) (\d+) \/ (\d+)%\)$/);
-  if (!values) throw new Error(`Expected an explicit sRGB material token: ${name}`);
-  return {
-    rgb: values
-      .slice(1, 4)
-      .map(Number)
-      .map((channel) => channel / 255),
-    alpha: Number(values[4]) / 100,
-  };
+  expect(getComputedStyle(document.documentElement).getPropertyValue(name).trim()).not.toBe("");
+  const probe = document.createElement("span");
+  probe.style.color = `var(${name})`;
+  document.body.append(probe);
+  const resolved = getComputedStyle(probe).color;
+  probe.remove();
+  const parsed = converter("rgb")(resolved);
+  // biome-ignore lint/suspicious/noUnnecessaryConditions: CSS token values are runtime input; typings assume parseable color strings.
+  if (!parsed) {
+    throw new Error(`Unparseable browser color ${name}: ${resolved}`);
+  }
+  return { alpha: parsed.alpha ?? 1, rgb: [parsed.r, parsed.g, parsed.b] };
+}
+function color(rgb: readonly number[], alpha = 1) {
+  return { alpha, b: rgb[2], g: rgb[1], mode: "rgb" as const, r: rgb[0] };
+}
+function composite(source: readonly number[], alpha: number, backdrop: readonly number[]) {
+  const result = blend([color(backdrop), color(source, alpha)]);
+  return [result.r, result.g, result.b];
+}
+function luminance(rgb: readonly number[]) {
+  return wcagLuminance(color(rgb));
+}
+function contrastRatio(foreground: readonly number[], background: readonly number[]) {
+  return wcagContrast(color(foreground), color(background));
 }
 
-function luminance(rgb: number[]) {
-  const linear = rgb.map((channel) =>
-    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
-  );
-  return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+// Mirror Atmosphere's production percentage mapping, then resolve the real ink selectors.
+function renderedInk(strengths: ReturnType<typeof inkStrengths>) {
+  const scope = document.createElement("div");
+  scope.className = "atmosphere-scope";
+  for (const [name, strength] of Object.entries(strengths)) {
+    scope.style.setProperty(`--ink-${name}-alpha`, `${Math.ceil(strength * 1000) / 10}%`);
+  }
+  document.body.append(scope);
+  function alpha(kind: string, glass = false) {
+    const text = document.createElement("span");
+    text.dataset.ink = kind;
+    if (glass) {
+      text.style.setProperty("--summary-ink", "var(--color-ink-summary-glass)");
+    }
+    scope.append(text);
+    const resolved = converter("rgb")(getComputedStyle(text).color);
+    text.remove();
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: guard runtime CSS values, which the converter signature assumes are parseable.
+    if (!resolved) {
+      throw new Error("Runtime ink CSS could not be parsed");
+    }
+    expect([resolved.r, resolved.g, resolved.b]).toEqual([1, 1, 1]);
+    return resolved.alpha ?? 1;
+  }
+  try {
+    return {
+      control: alpha("control"),
+      display: alpha("display"),
+      summary: alpha("summary"),
+      "summary-glass": alpha("summary", true),
+      text: alpha("detail"),
+    };
+  } finally {
+    scope.remove();
+  }
 }
 
-test("translucent text and placeholder retain contrast across any sRGB background", () => {
+function assertGlassContrast() {
+  const ink = rgba("--color-ink");
   for (const fillName of [
     "--glass-fill",
     "--glass-fill-hover",
-    "--glass-fill-pressed",
+    "--glass-fill-disabled",
     "--glass-fill-fallback",
   ]) {
     const fill = rgba(fillName);
     // Bound each backdrop channel independently across its entire possible [0, 1] range.
-    const darkestSurface = fill.rgb.map((channel) => channel * fill.alpha);
-    const lightestSurface = fill.rgb.map((channel) => channel * fill.alpha + 1 - fill.alpha);
-    for (const inkName of ["--color-ink", "--color-placeholder"]) {
-      const ink = rgba(inkName);
-      const lightestInk = ink.rgb.map(
-        (channel, i) => channel * ink.alpha + lightestSurface[i] * (1 - ink.alpha),
-      );
-      // A conservative bound: darkest possible surface / lightest possible composited ink.
-      const lowerBound = (luminance(darkestSurface) + 0.05) / (luminance(lightestInk) + 0.05);
-      expect(lowerBound).toBeGreaterThanOrEqual(4.5);
-    }
+    const darkestSurface = composite(fill.rgb, fill.alpha, [0, 0, 0]);
+    const lightestSurface = composite(fill.rgb, fill.alpha, [1, 1, 1]);
+    const lightestInk = composite(ink.rgb, ink.alpha, lightestSurface);
+    // A conservative bound: darkest possible surface / lightest possible composited ink.
+    const lowerBound = (luminance(darkestSurface) + 0.05) / (luminance(lightestInk) + 0.05);
+    expect(lowerBound).toBeGreaterThanOrEqual(4.5);
+    expect(luminance(darkestSurface)).toBeGreaterThan(luminance(lightestInk));
+    console.info(
+      JSON.stringify({
+        ink: "--color-ink",
+        material: fillName,
+        minimumContrast: lowerBound,
+        target: 4.5,
+      })
+    );
   }
-});
+}
+
+test("translucent text retains contrast on glass across any sRGB background", assertGlassContrast);
 
 test("word-button ink retains small-text contrast at the shaded end of the frosted face", () => {
   const fill = rgba("--frost-word-fill");
   const shade = rgba("--frost-shade");
   const ink = rgba("--color-ink");
   // Bound the face on black and the dark lettering on white, including the face gradient.
-  const darkestFace = fill.rgb.map(
-    (channel, i) => channel * fill.alpha * (1 - shade.alpha) + shade.rgb[i] * shade.alpha,
+  const darkestFace = composite(shade.rgb, shade.alpha, composite(fill.rgb, fill.alpha, [0, 0, 0]));
+  const lightestInk = composite(ink.rgb, ink.alpha, [1, 1, 1]);
+  console.info(
+    JSON.stringify({
+      material: "shaded word-button",
+      minimumContrast: (luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05),
+      target: 4.5,
+    })
   );
-  const lightestInk = ink.rgb.map((channel) => channel * ink.alpha + 1 - ink.alpha);
+  expect(luminance(darkestFace)).toBeGreaterThan(luminance(lightestInk));
   expect((luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05)).toBeGreaterThanOrEqual(
-    4.5,
+    4.5
   );
 });
 
@@ -71,32 +125,35 @@ test("the muted timestamp stays legible on timeline glass", () => {
   const glass = rgba("--summary-details-glass");
   const time = rgba("--color-timeline-time");
   const event = rgba("--color-timeline-event");
-  const brightestGlass = glass.rgb.map((channel) => channel * glass.alpha + 1 - glass.alpha);
-  const dimmestTime = time.rgb.map(
-    (channel, i) => channel * time.alpha + glass.rgb[i] * glass.alpha * (1 - time.alpha),
+  const brightestGlass = composite(glass.rgb, glass.alpha, [1, 1, 1]);
+  const dimmestTime = composite(time.rgb, time.alpha, composite(glass.rgb, glass.alpha, [0, 0, 0]));
+  console.info(
+    JSON.stringify({
+      eventAlpha: event.alpha,
+      material: "timeline timestamp",
+      minimumContrast: (luminance(dimmestTime) + 0.05) / (luminance(brightestGlass) + 0.05),
+      target: 4.5,
+      timeAlpha: time.alpha,
+    })
   );
   expect(time.alpha).toBeLessThan(event.alpha);
+  expect(luminance(dimmestTime)).toBeGreaterThan(luminance(brightestGlass));
   expect(
-    (luminance(dimmestTime) + 0.05) / (luminance(brightestGlass) + 0.05),
+    (luminance(dimmestTime) + 0.05) / (luminance(brightestGlass) + 0.05)
   ).toBeGreaterThanOrEqual(4.5);
 });
 
-const palettes = chakraPalettes.map((names) =>
-  names.map((name) => {
-    const value = token(`--chakra-${name}`);
-    if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`Unexpected chakra token: ${name}`);
-    return [1, 3, 5].map((start) => Number.parseInt(value.slice(start, start + 2), 16) / 255);
-  }),
-);
+const palettes = chakraPalettes.map((names) => names.map((name) => rgba(`--chakra-${name}`).rgb));
 
 test("adaptive light ink meets its targets through bold palette changes, grain and dimming", () => {
   const maximumGrain = 0.35 * atmosphereSettings.grainOverlay ** 0.8;
-  let minimumSmall = Infinity;
-  let minimumLarge = Infinity;
-  let minimumControl = Infinity;
-  let minimumSummary = Infinity;
+  let minimumSmall = Number.POSITIVE_INFINITY;
+  let minimumLarge = Number.POSITIVE_INFINITY;
+  let minimumControl = Number.POSITIVE_INFINITY;
+  let minimumSummary = Number.POSITIVE_INFINITY;
   const glass = rgba("--well-checked");
-  for (let phase = 0; phase < palettes.length; phase++) {
+  const control = rgba("--well-light");
+  for (let phase = 0; phase < palettes.length; phase += 1) {
     const next = palettes[(phase + 1) % palettes.length];
     for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
       const colors = palettes[phase].map((rgb, i) => {
@@ -104,37 +161,54 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
         return rgb.map((c, channel) => c + (next[i][channel] - c) * mix);
       });
       for (const dim of [0, 0.2, 0.5, 0.85, 1]) {
-        const ink = inkStrengths(colors, atmosphereSettings.grainOverlay, dim);
-        expect(ink.summary).toBeLessThan(ink.text);
-        expect(ink["summary-glass"]).toBeLessThan(ink.text);
+        const strengths = inkStrengths(colors, atmosphereSettings.grainOverlay, dim);
+        expect(strengths.summary).toBeLessThan(strengths.text);
+        expect(strengths["summary-glass"]).toBeLessThan(strengths.text);
+        const ink = renderedInk(strengths);
+        // Production percentage rounding may merge adjacent alpha values, never invert hierarchy.
+        expect(ink.summary).toBeLessThanOrEqual(ink.text);
+        expect(ink["summary-glass"]).toBeLessThanOrEqual(ink.text);
         // Exercise actual shader color mixtures, independently of the interval solver.
         const samples = [
           ...colors,
           [0, 1, 2].map((c) => colors.reduce((sum, rgb) => sum + rgb[c], 0) / colors.length),
         ];
-        for (const color of samples) {
+        for (const sample of samples) {
           for (const grain of [-maximumGrain, 0, maximumGrain]) {
-            const bg = color.map(
-              (c) => (c * (1 - Math.abs(grain)) + Math.max(0, grain)) * (1 - dim),
+            const bg = sample.map(
+              (c) => (c * (1 - Math.abs(grain)) + Math.max(0, grain)) * (1 - dim)
             );
             function contrast(alpha: number, overlay = 0, pigment = [1, 1, 1]) {
-              const surface = bg.map((c, i) => c * (1 - overlay) + pigment[i] * overlay);
-              const glyph = surface.map((c) => alpha + c * (1 - alpha));
-              return (luminance(glyph) + 0.05) / (luminance(surface) + 0.05);
+              const surface = composite(pigment, overlay, bg);
+              const glyph = composite([1, 1, 1], alpha, surface);
+              expect(luminance(glyph)).toBeGreaterThan(luminance(surface));
+              return contrastRatio(glyph, surface);
             }
             minimumSmall = Math.min(minimumSmall, contrast(ink.text));
             minimumLarge = Math.min(minimumLarge, contrast(ink.display));
-            minimumControl = Math.min(minimumControl, contrast(ink.control, 0.24));
+            minimumControl = Math.min(
+              minimumControl,
+              contrast(ink.control, control.alpha, control.rgb)
+            );
             minimumSummary = Math.min(
               minimumSummary,
               contrast(ink.summary),
-              contrast(ink["summary-glass"], glass.alpha, glass.rgb),
+              contrast(ink["summary-glass"], glass.alpha, glass.rgb)
             );
           }
         }
       }
     }
   }
+  console.info(
+    JSON.stringify({
+      minimumControl,
+      minimumLarge,
+      minimumSmall,
+      minimumSummary,
+      samples: 7 * 5 * 5 * 5 * 3,
+    })
+  );
   expect(minimumSmall).toBeGreaterThanOrEqual(4.5);
   expect(minimumLarge).toBeGreaterThanOrEqual(3);
   expect(minimumControl).toBeGreaterThanOrEqual(3);
@@ -142,10 +216,43 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
 });
 
 test("darkening the scene softens the foreground instead of retaining bright white ink", () => {
-  const lit = inkStrengths(palettes[0], atmosphereSettings.grainOverlay);
-  const black = inkStrengths(palettes[0], atmosphereSettings.grainOverlay, 1);
+  const lit = renderedInk(inkStrengths(palettes[0], atmosphereSettings.grainOverlay));
+  const black = renderedInk(inkStrengths(palettes[0], atmosphereSettings.grainOverlay, 1));
+  console.info(JSON.stringify({ dimmed: black, lit }));
   expect(black.text).toBeLessThan(lit.text);
   expect(black.display).toBeLessThan(lit.display);
   expect(black.text).toBeLessThan(0.5);
   expect(black.display).toBeLessThan(0.4);
 });
+
+test("a deliberate low-contrast theme mutation fails the same glass guarantee and restores it", () => {
+  const root = document.documentElement;
+  const original = root.style.getPropertyValue("--color-ink");
+  const priority = root.style.getPropertyPriority("--color-ink");
+  try {
+    root.style.setProperty("--color-ink", "var(--color-paper)");
+    expect(() => {
+      try {
+        assertGlassContrast();
+      } catch (error) {
+        console.info(JSON.stringify({ mutationFailure: String(error) }));
+        throw error;
+      }
+    }).toThrow(contrastThresholdFailure);
+    console.info(
+      JSON.stringify({
+        mutation: "low-contrast ink",
+        rejectedBy: "glass contrast threshold >= 4.5",
+      })
+    );
+  } finally {
+    if (original) {
+      root.style.setProperty("--color-ink", original, priority);
+    } else {
+      root.style.removeProperty("--color-ink");
+    }
+  }
+  assertGlassContrast();
+});
+
+const contrastThresholdFailure = /4\.5/u;

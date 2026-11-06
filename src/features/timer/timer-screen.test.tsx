@@ -1,7 +1,7 @@
-import { beforeEach, expect, spyOn, test } from "bun:test";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, expect, test, vi } from "vitest";
 import { routeTree } from "../../routeTree.gen";
 import { ChimePlayer } from "./chimes";
 import { draftStorageKey } from "./timer-draft";
@@ -15,9 +15,9 @@ beforeEach(() => {
 
 async function renderTimer(path = "/") {
   const router = createRouter({
-    routeTree,
     history: createMemoryHistory({ initialEntries: [path] }),
     isServer: false,
+    routeTree,
   });
   await router.load();
   const view = render(<RouterProvider router={router} />);
@@ -29,14 +29,14 @@ test("related fields reveal in place; sessions have no visible time by default",
   const user = userEvent.setup({ document });
   expect(
     screen
-      .getByRole("switch", { name: "Show timer", description: /Like: 20:00/ })
-      .getAttribute("aria-checked"),
+      .getByRole("switch", { description: defaultTimerPreview, name: "Show timer" })
+      .getAttribute("aria-checked")
   ).toBe("false");
   await user.click(screen.getByRole("switch", { name: "Warm up" }));
   const warmUpTime = screen.getByRole<HTMLInputElement>("slider", { name: "Warm up time" });
   expect(warmUpTime.labels?.length).toBe(0);
   expect(
-    screen.getByRole("switch", { name: "Show timer", description: /Like: 1:00/ }),
+    screen.getByRole("switch", { description: warmUpTimerPreview, name: "Show timer" })
   ).toBeTruthy();
   await user.click(screen.getByRole("switch", { name: "Repeat chakras" }));
   const summary = within(screen.getByRole("list", { name: "Timer summary" }));
@@ -67,14 +67,14 @@ test("related fields reveal in place; sessions have no visible time by default",
   expect(hud.getByRole("button", { name: "Resume timer" })).toBeTruthy();
   expect(hud.getByRole("button", { name: "Edit timer" }).textContent).toBe("");
   expect(hud.getByRole("button", { name: "Finish timer" }).getAttribute("aria-haspopup")).toBe(
-    "dialog",
+    "dialog"
   );
   await user.click(hud.getByRole("button", { name: "Finish timer" }));
   const choice = within(await screen.findByRole("dialog", { name: "Reiki off" }));
   await waitFor(() => expect(document.activeElement === choice.getByRole("heading")).toBe(true));
   expect(window.localStorage.getItem(configStorageKey)).toBeNull();
   const store = window.localStorage;
-  const setItem = store.setItem;
+  const { setItem } = store;
   Object.defineProperty(store, "setItem", {
     configurable: true,
     value: () => {
@@ -91,9 +91,9 @@ test("related fields reveal in place; sessions have no visible time by default",
   await user.click(choice.getByRole("button", { name: "save this timer" }));
   expect(await screen.findByRole("heading", { name: "Timer saved" })).toBeTruthy();
   expect(JSON.parse(window.localStorage.getItem(configStorageKey) ?? "null")).toMatchObject({
-    warmUp: true,
     repeat: true,
     showTime: false,
+    warmUp: true,
   });
   await user.click(screen.getByRole("button", { name: "Done" }));
   expect(await screen.findByRole("slider", { name: "Healing time" })).toBeTruthy();
@@ -106,17 +106,17 @@ test("the editor summary reflects changes; restarting and resuming do not save t
   expect(
     screen
       .getByRole("switch", {
+        description: defaultBreakdownDescription,
         name: "Show breakdown",
-        description: /Shown beneath the countdown.*Like: 20\s*m session$/,
       })
-      .getAttribute("aria-checked"),
+      .getAttribute("aria-checked")
   ).toBe("false");
   await user.click(screen.getByRole("button", { name: "Start timer" }));
   expect((await screen.findByRole("timer")).textContent).toBe("20:00");
   await user.click(await screen.findByRole("button", { name: "Pause timer" }));
   await user.click(screen.getByRole("button", { name: "Edit timer" }));
   expect(
-    screen.queryByRole("switch", { name: "Show breakdown", description: /Chimes enabled/ }),
+    screen.queryByRole("switch", { description: chimesEnabledDescription, name: "Show breakdown" })
   ).toBeNull();
   const slider = await screen.findByRole("slider", { name: "Healing time" });
   expect(screen.queryByRole("dialog")).toBeNull();
@@ -131,7 +131,7 @@ test("the editor summary reflects changes; restarting and resuming do not save t
   expect(choices.getByRole("button", { name: "Restart timer" })).toBeTruthy();
   fireEvent.keyDown(slider, { key: "Home" });
   expect(
-    screen.getByRole("switch", { name: "Show breakdown", description: /5\s*m session/ }),
+    screen.getByRole("switch", { description: shortSessionDescription, name: "Show breakdown" })
   ).toBeTruthy();
   const editorSummary = within(screen.getByRole("list", { name: "Timer summary" }));
   expect(editorSummary.getAllByRole("listitem")[0].textContent).toBe("5m session");
@@ -148,7 +148,7 @@ test("the editor summary reflects changes; restarting and resuming do not save t
 
 test("a completed timer can be edited, refreshed and saved for the next visit", async () => {
   let timestamp = 1_000_000;
-  const clock = spyOn(Date, "now").mockImplementation(() => timestamp);
+  const clock = vi.spyOn(Date, "now").mockImplementation(() => timestamp);
   try {
     const firstVisit = await renderTimer();
     const user = userEvent.setup({ document });
@@ -159,7 +159,7 @@ test("a completed timer can be edited, refreshed and saved for the next visit", 
     timestamp += 20 * 60_000 + 1;
     await act(async () => document.dispatchEvent(new window.Event("visibilitychange")));
     expect(await screen.findByRole("dialog", { name: "Reiki off" })).toBeTruthy();
-    expect(screen.getByText(/Your session is complete[.]/)).toBeTruthy();
+    expect(screen.getByText(sessionCompleteMessage)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Finish timer" })).toBeNull();
     await user.click(screen.getByRole("link", { name: "make changes" }));
     const slider = await screen.findByRole("slider", { name: "Healing time" });
@@ -191,8 +191,8 @@ test("restarting from a finished timer edit starts over without saving the draft
     draftStorageKey,
     JSON.stringify({
       config: { ...defaultConfig, minutes: 5, showTime: true },
-      session: { mode: "edit-before-save", elapsed: 120_000, startedAt: 0 },
-    }),
+      session: { elapsed: 120_000, mode: "edit-before-save", startedAt: 0 },
+    })
   );
   await renderTimer("/reiki-on/edit");
   const user = userEvent.setup({ document });
@@ -204,12 +204,12 @@ test("restarting from a finished timer edit starts over without saving the draft
 });
 
 test.each([null, 35])(
-  "only confirming the close action clears the finished draft and restores setup (%p)",
+  "only confirming the close action clears the finished draft and restores setup (%j)",
   async (savedMinutes) => {
     if (savedMinutes !== null) {
       window.localStorage.setItem(
         configStorageKey,
-        JSON.stringify({ ...defaultConfig, minutes: savedMinutes }),
+        JSON.stringify({ ...defaultConfig, minutes: savedMinutes })
       );
     }
     const stored = window.localStorage.getItem(configStorageKey);
@@ -217,20 +217,20 @@ test.each([null, 35])(
       draftStorageKey,
       JSON.stringify({
         config: { ...defaultConfig, minutes: 10, warmUp: true },
-        session: { mode: "complete", elapsed: 1000, startedAt: 0 },
-      }),
+        session: { elapsed: 1000, mode: "complete", startedAt: 0 },
+      })
     );
     const { router } = await renderTimer("/reiki-on");
     const user = userEvent.setup({ document });
     const dialog = () => within(screen.getByRole("dialog", { name: "Reiki off" }));
     await waitFor(() =>
-      expect(document.activeElement === dialog().getByRole("heading")).toBe(true),
+      expect(document.activeElement === dialog().getByRole("heading")).toBe(true)
     );
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     const finish = screen.getByRole("button", { name: "Finish timer" });
     await waitFor(() =>
-      expect(document.activeElement?.getAttribute("aria-label")).toBe("Finish timer"),
+      expect(document.activeElement?.getAttribute("aria-label")).toBe("Finish timer")
     );
     expect(router.state.location.pathname).toBe("/reiki-on");
     expect(window.sessionStorage.getItem(draftStorageKey)).toBeTruthy();
@@ -242,7 +242,7 @@ test.each([null, 35])(
     expect(slider.getAttribute("value")).toBe(String(savedMinutes ?? defaultConfig.minutes));
     expect(window.localStorage.getItem(configStorageKey)).toBe(stored);
     expect(window.sessionStorage.getItem(draftStorageKey)).toBeNull();
-  },
+  }
 );
 
 test.each(["running", "paused"] as const)(
@@ -254,8 +254,8 @@ test.each(["running", "paused"] as const)(
       draftStorageKey,
       JSON.stringify({
         config: { ...defaultConfig, minutes: 8 },
-        session: { mode, elapsed: 12_000, startedAt: mode === "running" ? Date.now() : 0 },
-      }),
+        session: { elapsed: 12_000, mode, startedAt: mode === "running" ? Date.now() : 0 },
+      })
     );
     const { router } = await renderTimer("/reiki-on");
     const user = userEvent.setup({ document });
@@ -278,22 +278,22 @@ test.each(["running", "paused"] as const)(
     await user.hover(document.body);
     await user.click(finish);
     expect(await screen.findByRole("dialog", { name: "Reiki off" })).toBeTruthy();
-    expect(screen.getByText(/Want to close out this session/)).toBeTruthy();
+    expect(screen.getByText(finishPromptMessage)).toBeTruthy();
     expect(router.state.location.pathname).toBe("/reiki-on");
     expect(window.localStorage.getItem(configStorageKey)).toBe(stored);
-  },
+  }
 );
 
 test("pausing before an edit freezes elapsed time until Resume", async () => {
   let now = 1_000_000;
-  const clock = spyOn(Date, "now").mockImplementation(() => now);
+  const clock = vi.spyOn(Date, "now").mockImplementation(() => now);
   try {
     window.sessionStorage.setItem(
       draftStorageKey,
       JSON.stringify({
         config: { ...defaultConfig, showTime: true },
-        session: { mode: "running", elapsed: 0, startedAt: now - 45_000 },
-      }),
+        session: { elapsed: 0, mode: "running", startedAt: now - 45_000 },
+      })
     );
     await renderTimer("/reiki-on");
     const user = userEvent.setup({ document });
@@ -310,10 +310,11 @@ test("pausing before an edit freezes elapsed time until Resume", async () => {
 
 test("a touch editor shows both playback choices and keeps Restart available after shortening", async () => {
   const media = window.matchMedia.bind(window);
-  const query = spyOn(window, "matchMedia").mockImplementation((value) => {
+  const query = vi.spyOn(window, "matchMedia").mockImplementation((value) => {
     const result = media(value);
-    if (value.includes("pointer: coarse"))
+    if (value.includes("pointer: coarse")) {
       Object.defineProperty(result, "matches", { value: true });
+    }
     return result;
   });
   try {
@@ -321,8 +322,8 @@ test("a touch editor shows both playback choices and keeps Restart available aft
       draftStorageKey,
       JSON.stringify({
         config: { ...defaultConfig, showTime: true },
-        session: { mode: "paused", elapsed: 6 * 60_000, startedAt: 0 },
-      }),
+        session: { elapsed: 6 * 60_000, mode: "paused", startedAt: 0 },
+      })
     );
     await renderTimer("/reiki-on/edit");
     const group = within(screen.getByRole("group", { name: "Playback actions" }));
@@ -349,13 +350,13 @@ test("a touch editor shows both playback choices and keeps Restart available aft
 test("a restored running timer counts down just the current phase with breakdown hidden", async () => {
   const start = 1_000_000;
   let timestamp = start + 45_000;
-  const clock = spyOn(Date, "now").mockImplementation(() => timestamp);
+  const clock = vi.spyOn(Date, "now").mockImplementation(() => timestamp);
   window.sessionStorage.setItem(
     draftStorageKey,
     JSON.stringify({
-      config: { ...defaultConfig, minutes: 5, showTime: true, warmUp: true, coolDown: true },
-      session: { mode: "running", elapsed: 0, startedAt: start },
-    }),
+      config: { ...defaultConfig, coolDown: true, minutes: 5, showTime: true, warmUp: true },
+      session: { elapsed: 0, mode: "running", startedAt: start },
+    })
   );
   try {
     await renderTimer("/reiki-on");
@@ -376,20 +377,20 @@ test("a restored running timer counts down just the current phase with breakdown
 });
 
 test("chimes reveal six selectable previews, preserve preferences, and follow the requested field order", async () => {
-  const prepare = spyOn(ChimePlayer.prototype, "prepare").mockResolvedValue();
-  const play = spyOn(ChimePlayer.prototype, "play").mockResolvedValue();
-  const stop = spyOn(ChimePlayer.prototype, "stop");
+  const prepare = vi.spyOn(ChimePlayer.prototype, "prepare").mockResolvedValue(undefined);
+  const play = vi.spyOn(ChimePlayer.prototype, "play").mockResolvedValue(undefined);
+  const stop = vi.spyOn(ChimePlayer.prototype, "stop");
   try {
     await renderTimer();
     const user = userEvent.setup({ document });
     expect(screen.getAllByRole("switch")).toEqual(
       ["Warm up", "Cool down", "Show timer", "Repeat chakras", "Chimes"].map((name) =>
-        screen.getByRole("switch", { name }),
-      ),
+        screen.getByRole("switch", { name })
+      )
     );
     const enabled = screen.getByRole("switch", {
-      name: "Chimes",
       description: "Cue when to change positions with a chime",
+      name: "Chimes",
     });
     expect(enabled.getAttribute("aria-checked")).toBe("false");
     expect(screen.queryByRole("group", { name: "Tone" })).toBeNull();
@@ -417,7 +418,7 @@ test("chimes reveal six selectable previews, preserve preferences, and follow th
     expect(document.querySelector(".timer-progressive")?.hasAttribute("inert")).toBe(true);
     await user.click(enabled);
     expect(screen.getByRole("button", { name: "High zen tone" }).getAttribute("aria-pressed")).toBe(
-      "true",
+      "true"
     );
     expect(changes().getAttribute("aria-checked")).toBe("false");
     expect(end().getAttribute("aria-checked")).toBe("true");
@@ -430,7 +431,7 @@ test("chimes reveal six selectable previews, preserve preferences, and follow th
     expect(changes().getAttribute("aria-checked")).toBe("true");
     expect(end().getAttribute("aria-checked")).toBe("false");
     expect(screen.getByRole("button", { name: "High zen tone" }).getAttribute("aria-pressed")).toBe(
-      "true",
+      "true"
     );
   } finally {
     prepare.mockRestore();
@@ -442,7 +443,7 @@ test("chimes reveal six selectable previews, preserve preferences, and follow th
 test("each phase reveals its own chime and only available cues keep Chimes enabled", async () => {
   window.localStorage.setItem(
     configStorageKey,
-    JSON.stringify({ ...defaultConfig, chimes: true, chimeOnChange: true }),
+    JSON.stringify({ ...defaultConfig, chimeOnChange: true, chimes: true })
   );
   await renderTimer("/reiki-on/edit");
   const user = userEvent.setup({ document });
@@ -484,7 +485,7 @@ test("the HUD summary unfolds on hover and closes on exit or Escape", async () =
   const overview = screen.getByRole("group", { name: "Timer overview" });
   const timeline = () => screen.queryByRole("list", { name: "Session timeline" });
   expect(timeline() === null).toBe(true);
-  await user.pointer({ target: overview, keys: "[TouchA]" });
+  await user.pointer({ keys: "[TouchA]", target: overview });
   expect(timeline() === null).toBe(true);
   await user.hover(overview);
   const list = await screen.findByRole("list", { name: "Session timeline" });
@@ -503,7 +504,7 @@ test("the HUD summary unfolds on hover and closes on exit or Escape", async () =
 });
 
 test("the timeline marks each sounding boundary, including when every change rings", () => {
-  const config = { ...defaultConfig, chimes: true, chimeOnSessionEnd: true };
+  const config = { ...defaultConfig, chimeOnSessionEnd: true, chimes: true };
   const { rerender } = render(<TimerTimeline entries={timerTimeline(config)} />);
   const markers = () => within(screen.getByRole("list", { name: "Session timeline" }));
   const rows = markers().getAllByRole("listitem");
@@ -523,24 +524,24 @@ test("the timeline marks each sounding boundary, including when every change rin
 
 test("automatic chimes fire once at boundaries, stay silent on pause/resume, and finish once", async () => {
   let timestamp = 1_000_000;
-  const clock = spyOn(Date, "now").mockImplementation(() => timestamp);
-  const prepare = spyOn(ChimePlayer.prototype, "prepare").mockResolvedValue();
-  const play = spyOn(ChimePlayer.prototype, "play").mockResolvedValue();
+  const clock = vi.spyOn(Date, "now").mockImplementation(() => timestamp);
+  const prepare = vi.spyOn(ChimePlayer.prototype, "prepare").mockResolvedValue(undefined);
+  const play = vi.spyOn(ChimePlayer.prototype, "play").mockResolvedValue(undefined);
   window.localStorage.setItem(
     configStorageKey,
     JSON.stringify({
       ...defaultConfig,
-      minutes: 7,
-      warmUp: true,
-      coolDown: true,
-      chimes: true,
-      chimeOnWarmUpEnd: true,
-      chimeOnSessionEnd: true,
       chimeOnChange: true,
       chimeOnCoolDownEnd: true,
-      showTime: true,
+      chimeOnSessionEnd: true,
+      chimeOnWarmUpEnd: true,
+      chimes: true,
+      coolDown: true,
+      minutes: 7,
       showBreakdown: true,
-    }),
+      showTime: true,
+      warmUp: true,
+    })
   );
   try {
     await renderTimer();
@@ -559,20 +560,20 @@ test("automatic chimes fire once at boundaries, stay silent on pause/resume, and
     expect(coolDownTime.labels?.length).toBe(0);
     expect(phaseItems()).toEqual(durations);
     expect(
-      within(screen.getByRole("group", { name: "Timer overview" })).getByText("Timer visible"),
+      within(screen.getByRole("group", { name: "Timer overview" })).getByText("Timer visible")
     ).toBeTruthy();
     expect(
       screen.getByRole("switch", {
+        description: phasedBreakdownDescription,
         name: "Show breakdown",
-        description: /1\s*m warm up.*7\s*m session.*1\s*m cooldown/,
-      }),
+      })
     ).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Start timer" }));
     await screen.findByRole("button", { name: "Pause timer" });
     expect((await screen.findByRole("timer")).textContent).toBe("1:00");
     expect(phaseItems()).toEqual(durations);
     expect(
-      within(screen.getByRole("list", { name: "Timer summary" })).queryByText("Timer visible"),
+      within(screen.getByRole("list", { name: "Timer summary" })).queryByText("Timer visible")
     ).toBeNull();
     expect(play).not.toHaveBeenCalled();
     await advance(60_000); // Warm-up ends.
@@ -608,3 +609,12 @@ test("automatic chimes fire once at boundaries, stay silent on pause/resume, and
     play.mockRestore();
   }
 });
+
+const defaultTimerPreview = /Like: 20:00/u;
+const warmUpTimerPreview = /Like: 1:00/u;
+const defaultBreakdownDescription = /Shown beneath the countdown.*Like: 20\s*m session$/u;
+const chimesEnabledDescription = /Chimes enabled/u;
+const shortSessionDescription = /5\s*m session/u;
+const sessionCompleteMessage = /Your session is complete[.]/u;
+const finishPromptMessage = /Want to close out this session/u;
+const phasedBreakdownDescription = /1\s*m warm up.*7\s*m session.*1\s*m cooldown/u;

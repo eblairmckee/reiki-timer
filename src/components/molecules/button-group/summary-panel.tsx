@@ -4,7 +4,10 @@ import { Disclosure } from "../../atoms/disclosure";
 import { useHoverDisclosure } from "./use-hover-disclosure";
 import "./summary-panel.css";
 
-export type SummaryDetails = { label: string; content: ReactNode };
+export interface SummaryDetails {
+  content: ReactNode;
+  label: string;
+}
 
 export function SummaryPanel({
   children,
@@ -17,12 +20,12 @@ export function SummaryPanel({
   const detailsId = useId();
   return (
     <fieldset
-      ref={region}
-      className="button-group-summary"
-      aria-label={details?.label}
-      tabIndex={details ? 0 : undefined}
       aria-details={open ? detailsId : undefined}
+      aria-label={details?.label}
+      className="button-group-summary"
       data-open={open || undefined}
+      ref={region}
+      tabIndex={details ? 0 : undefined}
       {...events}
     >
       <div className="button-group-summary-trigger">
@@ -34,8 +37,8 @@ export function SummaryPanel({
         {children}
       </div>
       <AnimatePresence initial={false}>
-        {details && open && (
-          <Disclosure reveal="overlay" id={detailsId} className="button-group-summary-fold">
+        {details !== undefined && open === true && (
+          <Disclosure className="button-group-summary-fold" id={detailsId} reveal="overlay">
             {details.content}
           </Disclosure>
         )}
