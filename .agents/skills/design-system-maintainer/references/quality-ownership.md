@@ -1,69 +1,56 @@
 # Code and UI quality ownership
 
-Apply the [maintainer principles](../SKILL.md#staff-design-systems-lead) before selecting a tool. This matrix guides code and UI quality decisions throughout the rearchitecture and evolves with observed results.
+Use this policy when choosing enforcement or changing guidance. Routine implementation starts with the affected source contract and [agent task skills](../../../../AGENTS.md#task-skills). This policy is agent guidance; human contributors use their separate documentation.
 
-## Choose the tool
+## Choose guidance, verification and judgment separately
 
-Start with a concrete requirement, caller and impact of failure. Search existing components, tokens, motion profiles, utilities and checks. Try reuse and composition before expanding a shared contract. First establish the coverage and valid-case acceptance the requirement needs. Among solutions that meet that bar, choose the lowest ongoing cost at the expected usage frequency. Split requirements when they need different kinds of evidence.
-
-### Decision matrix
-
-The conditions below route a requirement to a solution. The cost benefit is a hypothesis to verify with the measurements in the following sections.
-
-| Solution | Choose it when | Benefit that justifies its cost | If those conditions fail |
-| --- | --- | --- | --- |
-| Public API/default + TypeScript | Valid values, combinations or extension points can be encoded in the contract. | One shared definition prevents caller mistakes through the existing compile pass. Compatibility and migration effort are acceptable. | Use runtime validation and tests for runtime inputs or behavior. Use JSDoc for meaning. |
-| Built-in Biome rule | The normal configuration rejects the static violation and accepts valid usage. | Fast local/CI feedback replaces repeated agent corrections and human review with upstream-maintained enforcement. | Evaluate maintained extensions or a focused custom rule for an observed static gap. |
-| Custom lint rule | The invariant is repeatable, the supported analysis can express it, and existing tools miss it. | The frequency or impact of prevented mistakes justifies rule code, regression cases and upgrades. Diagnostics remain actionable and false positives acceptable. | Use types or runtime tests for their respective guarantees. Use human review for infrequent semantic decisions. Compare a standalone checker only when lint cannot access the required information. |
-| Standalone checker | An important cross-file/cross-format invariant needs analysis that the existing compiler or lint tooling cannot provide adequately. | Measured coverage gains justify an extra local/CI process, parser dependencies and a named maintainer. | Consolidate with an existing tool, narrow the invariant or retain an explicit review obligation. Reassess growing exceptions and duplicate scans. |
-| Public JSDoc/examples | The failure is misunderstanding prop purpose, slot content, interactivity, accessible naming or callback timing. | Colocated guidance improves caller tasks with bounded reading and authoring cost. | Strengthen types for invalid combinations or tests for behavior. Compare wording heuristics against caller outcomes. Editor-hover fixtures are retired. |
-| Unit/component test | A current observable behavior, interaction or compatibility requirement needs execution, and this environment reproduces it. | Focused regression detection justifies execution and assertion maintenance with lower setup cost than a browser. Reuse Vitest and installed libraries. | Choose Chromium if real browser behavior is essential to reproduce the failure. |
-| Chromium/browser test | The requirement depends on layout, resolved styles, focus, rendering or browser semantics that narrower tests cannot establish. | Preventing that concrete regression justifies browser setup, CI time and failure diagnosis. Scope the cases to the affected guarantees. | Move assertions reproducible in component tests there. Use human visual inspection for perceptual questions. |
-| Agent skill | A repeated decision or guidance selection failure survives stronger APIs, docs and diagnostics, and matched fresh-agent trials show a narrowly triggered instruction helps. | Measured improvement outweighs added context, inference cost, latency, evaluation upkeep and unintended invocations. | Improve the owning artifact or retain human judgment. Keep stable repo-wide routing in `AGENTS.md`. |
-| Human review/visual inspection | Meaning, design fit, promotion, architectural policy or perceived quality requires accountable judgment. | The importance and ambiguity justify reviewer effort. Automated evidence concentrates review on the remaining decisions. | Move repeatable mechanical judgments to types, lint or tests when trials demonstrate equivalent coverage at lower total cost. |
-
-For example, prop spelling starts with Biome, allowed prop combinations with TypeScript, and useful slot guidance with JSDoc plus a caller task. Start repeat-activation coverage with a component test and actual dialog Tab containment with a browser trial. The design-system lead judges whether a new appearance merits promotion. Each can have a different owner within the same component.
-
-## Compare candidate owners
-
-These are cost hypotheses. Measure the relevant alternatives at their expected frequency across local edits, CI revisions and agent calls.
-
-| Candidate | Local development time | CI time | Agent usage cost | Human review time | Maintenance, scalability and code bloat |
-| --- | --- | --- | --- | --- | --- |
-| Typed API/default | Compile feedback, migration | Compile pass | Contract discovery and fixes | Meaning and compatibility | Shared reach, type complexity |
-| Built-in Biome | Editor/lint feedback | Lint pass | Diagnostic-driven fixes | Configuration and exceptions | Upstream upkeep, version coverage |
-| Custom lint | Plugin startup and scan | Rule and regression execution | False-positive investigation | Scope and accepted cases | Rule code, parser upgrades, exceptions |
-| Standalone checker | Process and graph scan | Scan and repeated invocations | Separate-tool diagnosis | Analysis limits | Dependencies, graph logic, custom conventions |
-| JSDoc/examples | Authoring and reading | Relevant usage tests | Discovered context tokens | Meaning and responsibilities | Colocation benefit, duplication drift |
-| Unit/component tests | Focused execution and diagnosis | Suite execution | Selection and debugging | Assertions and coverage | Fixtures and helper upkeep |
-| Chromium tests | Browser startup and diagnosis | Setup, execution, retries | Browser failure analysis | Runtime assertions | Environment setup, flakiness, case growth |
-| Skill/agent evaluation | Agent latency and iteration | Any scheduled evaluation | Tokens, rates, tool calls, retries | Decision scoring | Trigger precision, context growth, repeatability |
-| Human/visual review | Preparation and wait | Any approval wait | Assisted preparation | Reviewer effort and re-review | Reviewer capacity and evidence quality |
-
-Separate migration costs from recurring costs. Compare developer/reviewer minutes and monetary spend in their own units, with explicit tradeoffs. Include false-positive repair and repeated scans. Consolidate overlapping checks when the chosen owner meets the required coverage.
-
-## Record the comparison
-
-Record each comparison in its owning phase's evaluation log, using source references and compact observations.
-
-| Dimension | Evidence to collect |
+| Responsibility | Choose an owner |
 | --- | --- |
-| Requirement and coverage | Hypothesis, candidates, bad/valid cases, detected/missed failures, false positives and diagnostics. |
-| Local and CI cost | Measure separately, including setup, feedback latency, retries, duplicate scans and frequency. |
-| Agent cost | Model/effort, calls, retries, reported input/cached/output tokens and actual usage cost. Give pricing source/date for estimates. |
-| Human cost | Author/reviewer minutes, review rounds, ambiguity and waiting time. |
-| Maintenance | Custom lines/rules/fixtures, dependencies, duplication, exception growth, consumer growth and maintainer. |
-| Decision and retirement | Selected owner, rejected alternatives, tradeoffs, residual judgment, replacement trigger and cleanup paths. |
+| Guidance: how to choose a state owner, API, composition or evidence | Public declarations/defaults/examples for a particular contract; AGENTS for agent commands and repository boundaries; a focused skill for recurring decisions across contracts. Human docs explain these contracts to contributors without becoming agent dependencies. |
+| Verification: which violations can be rejected | TypeScript, installed Biome, a justified focused checker, or behavior tests in an appropriate environment. |
+| Accountable judgment: which decisions remain | The feature/system maintainer owns meaning, compatibility and architecture; the user owns conflicting product intent, acceptance and release authority. |
 
-Label estimates and unknowns explicitly. Revise decisions when consumers, tools or measured costs change the tradeoffs.
+A concern can need all three. Hook lint cannot choose an Effect's purpose, import restrictions cannot choose a molecule, and a keyboard test cannot establish visual quality. A skill need not wait for automation to fail. Historical inclusion or successful discovery alone does not prove that instructions improve decisions. Keep one owner per rule and link to it rather than duplicating it.
 
-## Evaluate an ownership change
+## Select verification for the actual guarantee
 
-State the hypothesis before implementation. For deterministic checks, run the actual contributor command on a violating case and its nearest valid case. Record diagnostics and exit status. Keep behavior regressions with their component or feature. Reuse maintained testing libraries before writing helpers.
+| Mechanism | Guarantee and limit |
+| --- | --- |
+| Public API/default + TypeScript | Assignability, native/ref types, modes and expressible exhaustive handling. Runtime input and semantic ownership still need their own contracts. |
+| Installed Biome | Supported syntax, Hook rules and configured naming/import/test policy. Import strings do not establish transitive ownership; syntax does not establish meaning. |
+| Focused custom checker | An important observed static gap that maintained tooling cannot adequately express. State supported syntax, nearest valid cases, severity and upkeep; prefer an existing pass. |
+| Unit/component tests | Observable behavior and adverse ordering reproducible in that environment. Avoid grading a preferred implementation shape; DOM emulation cannot establish real Tab behavior or layout. |
+| Browser tests | Native focus/events, resolved CSS, layout and affected preferences. Include actual app styles and permitted cues; account for browser setup, timing and diagnosis. |
+| Rendered/human review | Brand, hierarchy, legibility, motion comfort and unresolved product/architecture choices. State inspected conditions and remaining devices/assistive technology; axe and numerical colors do not certify perception. |
 
-For agent decisions, use identical prompts in separate fresh GPT-6.1 Sol Medium chats, delegation off, with isolated snapshots and comparable inputs/tools. Record actual reads, words loaded, decisions and unnecessary invocations. Repeat failures and test held-out and unrelated tasks before retaining guidance. Checker fixtures establish implementation behavior. Fresh-agent evaluations establish how agents choose and use contracts.
+Use [declared checks](../../../../AGENTS.md#checks-and-frameworks), with focused work before complete verification. Separate failures, missing evidence, environment limits and accepted exceptions. Honor the user's execution constraints.
 
-Every phase logs results and next actions, marks untested proposals pending and updates this model when trials reveal missing distinctions. Prune superseded guidance and checks together. Manual visual inspection uses the running dev server for affected rendering or unresolved visual questions.
+## Current repository decisions
 
-End each handoff with temporary tests, fixtures, scripts, reports and docs by path, purpose, remaining consumer and retirement condition. After user verification, the next agent cleans up before starting its phase. Explicit cleanup authorization can advance retirement. Preserve current-contract regressions and transfer findings before deleting migration evidence.
+| Concern | Guidance and contract owner | Enforcement and remaining judgment |
+| --- | --- | --- |
+| State, Effects and async lifetime | [React lifetime](../../react-lifetime/SKILL.md); feature hooks/models/services. | Hook lint and types for their static scope; behavior evidence for cleanup, obsolete work, receivers and replacement identity. Source of truth, persistence and refresh semantics remain explicit decisions. |
+| Composition and promotion | [React composition](../../react-composition/SKILL.md); public APIs and the classification/promotion criteria in that skill. | Types, configured import restrictions and consumer/native/ref tests. Neutral API + current consumer + independent usage example; no two-shipping-feature prerequisite or Hook-count classifier. |
+| Public naming, documentation and styling | Declaration JSDoc/examples and supported extension contracts. | Installed syntax/type checks; maintainer judgment for meaning and compatibility. No word-count, business-word, private-selector or universal motion/blur heuristics. |
+| Types and runtime data | Public/domain declarations, validators and service contracts. | Strict TypeScript, explicit union cases and runtime validation/tests. Casts do not validate input. No extra general TypeScript syntax skill. |
+| Focus, forms and interaction | [Interaction evidence](../../interaction-evidence/SKILL.md); native/library and feature feedback contracts. | Relevant component/Chromium tests and supplementary axe. Names/ARIA alone do not prove operation; required announcements and uninspected assistive technology remain explicit. |
+| Brand, typography, layout and motion | [Visual design](../../visual-design/SKILL.md); system theme/materials and feature content. | Browser geometry/preferences/interruption evidence plus rendered review. Real stylesheet/cascade and color/pseudo-element cues matter. Human perception and exact product styling remain owned judgments. |
+| Static color ownership | [Theme declarations](../../../../src/components/design-system/styles/theme.css), semantic references and visual-design guidance. | Keep `scripts/check-colors.ts`, `color-policy.ts` and valid/invalid regressions. Computed/cross-module paints, numeric renderer channels and opaque aliases need review; contrast and token liveness are not certified. |
+| Unused tokens | Theme/consumer owner traces production reads, aliases and dynamic construction. | Advisory investigation. No blocking liveness checker or deletion from an unused-name search alone. |
+| Performance and resources | Affected workload/source owner and relevant lifetime/visual guidance. | Measure relevant loading/render/input cost while preserving behavior. `noJsxPropsBind` stays off; identity needs a real contract or measured case. No blanket memoization, barrel ban or recipe skill. |
+| Routing and frameworks | Installed declarations, scoped package guidance and navigation owner. | Route generation, typecheck/build and affected navigation behavior. Hosting fallback requires host evidence. No new optional dependency merely to fit an example. |
+| Conditional techniques | Owner of a real applicable feature. | Server/RSC/Next/SWR examples remain inapplicable as written. Client Activity, resource hints, script ordering and Intl remain conditional options. |
+| Guidance upkeep | Owning skill/source, maintainer role and AGENTS; human explanations are maintained separately. | Metadata, links, commands, applicability and attribution review. Fresh task comparisons answer a concrete efficacy/discovery question when authorized; they are not a gate on every edit. |
+| Check reliability | Configured rule/test/checker owner. | Keep `lint-policy.test.ts` and `color-policy.test.ts`, including the callback/dependency cases retained from the audit. Use nearby valid designs and plausible failures; preserve original failures when correcting a grader. |
 
+These decisions account for the removed design-contract, token and checker-fixture responsibilities. The [retained 104-concern mapping](../../../../.audit-evidence/021/integration/ownership-decisions.json) records each disposition and evidence limit. Assigned ownership is not a claim of complete automation or demonstrated skill efficacy.
+
+## Evidence, cost and revision
+
+Establish the required quality before optimizing cost. An enforcement change needs a violating and nearby valid case through the ordinary command when execution is authorized. Prefer installed tooling and existing tests over a new parser, scanner or process. Retain sound automation; remove or narrow an overlapping mechanism when its replacement meets the required cases at lower cost.
+
+For a concrete guidance question, compare the current baseline, equivalent documentation and a focused skill on matched fresh tasks. Separate normal discovery from forced invocation. A repeated quality claim needs unseen and nearby unrelated work. Record original decisions, reads, first failures and repairs. Ceiling or mixed results remain inconclusive; an authorized policy adoption is not experimental proof. No new evaluation is required merely to keep an accepted skill active.
+
+Account for input/cached/output usage, elapsed time, local/CI execution, setup, review, repair and maintenance. Cached tokens are part of input; unknown billing and human time are unknown, not zero. Include required references and repeated scans. Shorter stored text is not a measured saving in actual task cost.
+
+Keep current decisions at their source owner. Historical results belong in the phase record and retained evidence. The ignored `.audit-evidence/` directory is excluded from routine cleanup, even after review; its `.audit-evidence/021/retention-manifest.json` records locations and original paths. Do not stage, commit, publish or activate hosted reviews without authorization.

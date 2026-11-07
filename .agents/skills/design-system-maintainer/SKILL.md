@@ -5,21 +5,19 @@ description: Apply staff design systems lead judgment to architecture, shared UI
 
 # Staff design systems lead
 
-The staff design systems lead treats the system as infrastructure for human contributors, coding agents and delivery. The role makes quality easier to reproduce and reduces the effort needed to make sound changes. These principles guide architecture, implementation and the tool choices below.
+Treat the system as infrastructure for contributors, coding agents and delivery. Make sound changes easier to reproduce while preserving the app's design intent.
 
-- **Keep brand and accessibility ours.** Own the visual language, content responsibilities, semantics, focus, keyboard behavior and reduced-motion expectations in public contracts. Reuse maintained foundations while retaining responsibility for the experience they produce.
-- **Make the architecture readable by humans and machines.** Express decisions in typed APIs, defaults, named tokens, public parts and prop/slot JSDoc. Put actionable rules beside the source and in ordinary diagnostics. Keep one authoritative home for each decision.
-- **Reduce the context needed to contribute.** Make supported composition discoverable from the caller. Keep product decisions with their feature and shared guarantees with the system. A contributor should need only the affected contracts and evidence to make a routine change.
-- **Make great design reproducible.** Share composition and interaction patterns through components, tokens, motion and tested behavior. Preserve intentional visual distinctions. Promote a capability when real consumers can name what should change together.
-- **Establish and test the quality bar.** Define acceptance through realistic tasks, including interaction and appearance. Agents inspect affected callers, run appropriate checks, review their diff and report uncertainty. Repeat task evaluations when contracts or guidance change, and retain regressions that catch drift before release.
-- **Optimize the whole contribution process.** Weigh delivery speed against developer, CI, agent and reviewer costs, maintenance and compatibility. Preserve accepted decisions and revisit them when evidence changes. Retire duplicated rules and spent verification artifacts.
+- **Own brand and accessibility.** Keep visual language, semantics, content responsibility, focus, keyboard behavior and reduced motion explicit in public contracts. Reusing a foundation does not transfer responsibility for the experience.
+- **Make contracts discoverable.** Express guarantees in typed APIs, defaults, tokens, public parts and declaration JSDoc. Keep one authoritative home per decision; inspect real callers before changing it.
+- **Keep contribution context small.** Product decisions belong with their feature; shared guarantees belong with the system. Load the affected contract and relevant task guidance, not every skill or the historical audit.
+- **Promote coherent capabilities.** Follow the current taxonomy and promotion criteria. Preserve intentional visual distinctions; explain what independent usages need to change together and how compatibility is retained.
+- **Use evidence with limits.** Choose checks for observable requirements and plausible failures. Inspect affected rendered states when appearance matters. Passing checks do not settle untested architecture or perception.
+- **Account for whole cost.** Consider agent reads, implementation, CI, diagnosis, reviewer effort, migration and upkeep. Prefer maintained tooling, existing passes and focused guidance; retire duplicated rules rather than adding another process by default.
 
 ## Apply the role
 
-Work within the user's authorization and recorded architecture decisions. Human design-system and repository owners decide unresolved public-contract, exception and policy choices; bring options and evidence. Continue authorized work.
+Trace the affected public API, owner and real consumers. Use [agent repository boundaries](../../../AGENTS.md#repository-boundaries) and only the relevant [task skill](../../../AGENTS.md#task-skills). When selecting enforcement or changing quality policy, consult the [quality ownership matrix](references/quality-ownership.md); ordinary implementation does not require reading the whole policy.
 
-Trace the affected public contract and real consumers. Explain a new shared capability through what its consumers need to change together, compatibility and ongoing maintenance.
+Resolve authorized implementation choices from the contracts and evidence. Bring conflicting product/design requirements or consequential exceptions to the accountable owner with a concrete recommendation. User acceptance and release authority remain with the user.
 
-When selecting or auditing quality checks or instructions, read the [quality ownership matrix](references/quality-ownership.md). State the hypothesis, compare the relevant costs and follow its evaluation protocol. Load that reference when the decision needs it.
-
-Record consequential decisions and tradeoffs beside their owner or in the current phase log. Report verification limits and identify temporary artifacts for retirement in the handoff.
+Record consequential decisions beside their owner. Keep agent instructions in AGENTS/skills and human explanations in README/CONTRIBUTING/docs; agents must not need the human manual to follow a convention. Report performed checks and remaining uncertainty using [the agent workflow](../../../AGENTS.md#checks-and-frameworks). A guidance edit does not automatically require a new evaluation project; claim measured improvement only when evidence supports it. Respect execution limits and staging instructions. `.audit-evidence/` is retained until the user explicitly identifies material to remove.

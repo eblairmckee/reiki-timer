@@ -85,3 +85,40 @@ test("neutral hooks and utilities reject feature/UI imports and accept neutral d
     ).toBe(0);
   }
 });
+
+// These sources reproduce the Phase 021 ordinary-command probes. Keep native
+// handler styles available without weakening genuine Effect dependency checks.
+test.each([
+  {
+    name: "inline",
+    source:
+      'import { useState } from "react";\nexport function Probe() { const [count, setCount] = useState(0); return <button onClick={() => setCount(value => value + 1)} type="button">{count}</button>; }\n',
+  },
+  {
+    name: "ordinary local",
+    source:
+      'import { useState } from "react";\nexport function Probe() { const [count, setCount] = useState(0); function increment() { setCount(value => value + 1); } return <button onClick={increment} type="button">{count}</button>; }\n',
+  },
+  {
+    name: "memoized",
+    source:
+      'import { useCallback, useState } from "react";\nexport function Probe() { const [count, setCount] = useState(0); const increment = useCallback(() => setCount(value => value + 1), []); return <button onClick={increment} type="button">{count}</button>; }\n',
+  },
+])("$name native handlers remain valid", ({ source }) => {
+  const result = lint(source, "features");
+  expect(result.status, result.output).toBe(0);
+});
+
+test("Effect dependencies remain enforced without mandatory callback memoization", () => {
+  const bad = lint(
+    'import { useEffect } from "react";\nexport function Probe({value}: {value:number}) { useEffect(() => { document.title = String(value); }, []); return null; }\n',
+    "features"
+  );
+  expect(bad.status, bad.output).toBe(1);
+  expect(bad.output).toContain("useExhaustiveDependencies");
+  const valid = lint(
+    'import { useEffect } from "react";\nexport function Probe({value}: {value:number}) { useEffect(() => { document.title = String(value); }, [value]); return null; }\n',
+    "features"
+  );
+  expect(valid.status, valid.output).toBe(0);
+});

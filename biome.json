@@ -39,6 +39,9 @@
           }
         }
       },
+      "performance": {
+        "noJsxPropsBind": "off"
+      },
       "suspicious": {
         "noFocusedTests": "error",
         "noSkippedTests": "warn",

@@ -1,5 +1,7 @@
 # Tooling: establish the repository's quality operating model
 
+**Historical Phase 02 record.** [Phase 021](021-tooling.md) supersedes this phase’s no-skill-restoration inference and completes the active guidance/enforcement model. Use the [current contributor workflow](../../CONTRIBUTING.md) for ordinary work.
+
 Determine how development and verification should work across the repository, with useful guarantees, timely feedback and sustainable maintenance cost. Account for the concerns formerly carried by agent-run skills and removed scripts, automate applicable guarantees through justified tools, and make remaining judgment explicit. Support the contracts owned by design and product work, and establish the repository-wide conventions that make changes reliable.
 
 Apply the [shared purpose and session protocol](00-prerequisites.md), including the maintainer persona and decision matrix. Start from [conventions.md](../conventions.md), including its recovered concern IDs and complete historical source manifest. Use relevant contract decisions and baseline evidence; inspect current configuration and commands at their source. Legacy instructions are evidence to reconcile, not automatically active skills.

@@ -50,6 +50,8 @@ Use the in-app browser with the already running dev server for manual visual ver
 
 ## Targeted history recovery
 
+Phase 021 has completed this reconciliation and integrated its decisions. The inventory below records the original recovery scope; current work uses [conventions](../conventions.md) and [the completed handoff](021-tooling.md#phase-021-handoff--november-7-2026). Historical sources are retained evidence, not a prerequisite to routine changes.
+
 The reset removed the remaining React, TypeScript, testing, TanStack and skill-maintenance guidance as well as custom design/token checkers, their fixtures and command wiring; the UI skill had already been removed. Biome, TypeScript and existing tests remain. Deletion does not demonstrate replacement coverage. The [conventions inventory](../conventions.md#recovered-framework-ui-and-testing-concerns) records the recovered concerns and source manifest; [Phase 02](02-tooling.md#coverage-baseline-and-recovery) must reconcile every historical section and removed checker responsibility before claiming coverage. Previous completion claims and trial transcripts are historical evidence to verify, not present results.
 
 Use `git show <commit>:<path>` for a specific question. Treat recovered findings as hypotheses to verify against the current checkout.
@@ -68,6 +70,8 @@ These commits exclude later uncommitted guidance and trials. Ignored evidence di
 Append the handoff to the end of the current phase's plan; do not create a separate document. Keep it brief: the verified starting point, actionable unresolved findings and next plan. Separate decisions for the human reviewer from work owned by the next audit. Include the no-stage/no-commit constraint.
 
 Generated browser-test screenshots and reports are disposable debugging output. Keep them ignored by Git and remove them once their debugging purpose is complete, before handoff, without waiting for user review. This is standing cleanup authorization; retaining behavioral test source does not require retaining generated artifacts.
+
+**Retained evidence is excluded from routine cleanup.** The ignored `.audit-evidence/` directory is deliberately retained local evidence, not temporary output. Do not delete, prune or replace its contents merely because an audit or user review has finished. Removal requires an explicit user instruction identifying the evidence to retire. Follow the [evidence register](021-tooling.md#evidence-retention) for its contents and current locations. This retention rule takes precedence over older retirement notes for material moved there.
 
 End with any other temporary artifacts requiring follow-up, listing each path, purpose, remaining consumer and retirement condition; say "none" when applicable. After user verification or explicit cleanup authorization, the incoming session removes those spent artifacts. Preserve accepted decisions beside their durable owner.
 
