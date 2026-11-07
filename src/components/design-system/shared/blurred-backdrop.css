@@ -1,3 +1,9 @@
+/* Public surface utilities: data-blurred-background applies a frost backing; value "inset"
+   adds the emphasized well and summary ink. data-inset-shadow adds just the inset shadow.
+   Set --cmp-space-backdrop-padding and --cmp-color-backdrop-fill on a caller-owned surface;
+   use semantic theme colors for the fill. Keep the reduced-transparency fallback intact.
+   These utilities do not make control material attributes (data-frost/data-recess/data-ripple)
+   public composition hooks; use the control's declared props and CSS hooks instead. */
 @layer components {
   [data-blurred-background] {
     min-inline-size: 0;

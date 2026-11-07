@@ -4,9 +4,9 @@ import "./style.css";
 import type { AnimationPlaybackControls } from "motion";
 import { motion, useMotionValue, useTransform } from "motion/react";
 import { type KeyboardEvent, type PointerEvent, useEffect, useId, useRef, useState } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { settleMotionValue } from "../shared/settle-motion-value";
 import { useFrostMotion } from "../shared/use-frost-motion";
-import { useReducedMotion } from "../shared/use-reduced-motion";
 
 export interface DialProps {
   /** Disable pointer, keyboard and native range input. */
@@ -107,7 +107,13 @@ function dialMarks(range: ReturnType<typeof dialRange>, step: number) {
 }
 
 /** A controlled rotary slider for a stepped numeric range. Supply a label and update
- * the value on keyboard changes or pointer release. Dragging previews the next value. */
+ * the value on keyboard changes or pointer release. Dragging previews the next value.
+ *
+ * Public CSS hooks, inherited from a caller-owned wrapper: --cmp-size-dial-diameter
+ * sets the control diameter; --cmp-space-dial-value-gap sets the orbiting value's clearance.
+ * Reserve that clearance around the control in the caller's layout. Internal .dial-* classes
+ * and material attributes are implementation details, not caller styling hooks.
+ * The native range uses label as its accessible name and formatValueText for its value. */
 export function Dial({
   value,
   onValueChange,

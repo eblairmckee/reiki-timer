@@ -35,7 +35,7 @@ test("standalone action groups accept their own accessible group name", () => {
   expect(screen.getByRole("group", { name: "Playback actions" })).toBeTruthy();
 });
 
-test("summary slots render information and expose named details on focus", async () => {
+test("summary details expose an explicit keyboard toggle and return focus on Escape", async () => {
   render(
     <ButtonGroupSummary
       details={{ content: <p>Seven pages</p>, label: "Document overview" }}
@@ -46,12 +46,44 @@ test("summary slots render information and expose named details on focus", async
   );
   expect(screen.getByText("20 pages")).toBeTruthy();
   expect(screen.getAllByRole("group")).toHaveLength(1);
-  const summary = screen.getByRole("group", { name: "Document overview" });
+  const trigger = screen.getByRole("button", { name: "Document overview" });
   expect(screen.queryByText("Seven pages")).toBeNull();
   const user = userEvent.setup({ document });
   await user.tab();
-  expect(document.activeElement).toBe(summary);
+  expect(document.activeElement).toBe(trigger);
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  expect(screen.queryByText("Seven pages")).toBeNull();
+  await user.keyboard(" ");
+  expect(trigger.getAttribute("aria-expanded")).toBe("true");
   expect(screen.getByText("Seven pages")).toBeTruthy();
+  expect(document.querySelector(`[id="${trigger.getAttribute("aria-controls")}"]`)).toBeTruthy();
+  await user.keyboard("{Escape}");
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  expect(document.activeElement).toBe(trigger);
+  await user.keyboard("{Enter}");
+  expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  await user.keyboard("{Enter}");
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+});
+
+test("touch activation keeps details open until a second tap or outside action", async () => {
+  render(
+    <ButtonGroupSummary
+      details={{ content: "Seven pages", label: "Document overview" }}
+      summary="20 pages"
+    >
+      <button type="button">Print</button>
+    </ButtonGroupSummary>
+  );
+  const trigger = screen.getByRole("button", { name: "Document overview" });
+  const user = userEvent.setup({ document });
+  await user.pointer({ keys: "[TouchA]", target: trigger });
+  expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  await user.pointer({ keys: "[TouchA]", target: trigger });
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  await user.pointer({ keys: "[TouchA]", target: trigger });
+  await user.click(screen.getByRole("button", { name: "Print" }));
+  expect(trigger.getAttribute("aria-expanded")).toBe("false");
 });
 
 test("ordinary groups retain native props, refs, material and vertical layout", async () => {

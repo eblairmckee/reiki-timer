@@ -5,6 +5,7 @@
   "scripts": {
     "build": "bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit && vite build",
     "check": "biome check",
+    "check:colors": "bun scripts/check-colors.ts",
     "check:fix": "biome check --write",
     "dev": "vite",
     "format": "biome format --write",
@@ -13,8 +14,14 @@
     "routes:generate": "bun run --bun tsr generate",
     "skills:list": "intent list",
     "skills:load": "intent load",
+    "skills:validate": "intent validate",
     "test": "vitest run",
-    "typecheck": "bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit"
+    "test:browser": "vitest run --project chromium",
+    "test:install": "playwright install chromium",
+    "test:tools": "vitest run --project tooling",
+    "test:unit": "vitest run --project unit",
+    "typecheck": "bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit",
+    "verify": "bun run check && bun run check:colors && bun run build && bun run test"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -28,6 +35,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@babel/parser": "7.29.13",
     "@biomejs/biome": "2.6.3",
     "@tanstack/intent": "^0.5.6",
     "@tanstack/router-cli": "^1.167.46",
@@ -44,6 +52,7 @@
     "axe-core": "4.14.0",
     "culori": "4.0.2",
     "happy-dom": "^21.0.4",
+    "lightningcss": "1.33.0",
     "playwright": "1.65.0",
     "typescript": "7.0.2",
     "ultracite": "8.1.1",

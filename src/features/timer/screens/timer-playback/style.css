@@ -1,0 +1,15 @@
+@layer components {
+  .timer-phase-label {
+    font-size: clamp(0.875rem, 2.8vw, 1rem);
+    line-height: 1.3;
+  }
+  .timer-countdown {
+    /* The clipped frost gradient needs paint room beyond the last figure's advance. */
+    padding-inline: 0.08em;
+    font-size: clamp(4rem, 16vw, 9rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: normal;
+    white-space: nowrap;
+  }
+}

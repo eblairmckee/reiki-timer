@@ -1,0 +1,10 @@
+@layer components {
+  .timer-session {
+    display: grid;
+    gap: 1rem;
+    place-items: center;
+    align-content: center;
+    min-height: 100svh;
+    padding: 5rem 1rem;
+  }
+}

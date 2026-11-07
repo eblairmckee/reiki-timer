@@ -33,11 +33,19 @@
       0.3em var(--cmp-space-button-group-summary-inline);
     isolation: isolate;
   }
-  .button-group-summary-panel:focus-visible {
-    outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
-    outline-offset: -3px;
+  .button-group-summary-toggle {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
     border-radius: var(--cmp-radius-button-group) 0 0
       var(--cmp-radius-button-group);
+  }
+  .button-group-summary-toggle:focus-visible {
+    outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+    outline-offset: -3px;
   }
   .button-group-summary-panel-surface {
     position: absolute;

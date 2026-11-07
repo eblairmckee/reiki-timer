@@ -1,4 +1,10 @@
-/* The sole source of application color values. Components consume semantic variables. */
+/* Application color decisions live here; consumers reference semantic custom properties.
+   currentColor, transparent and forced-colors system keywords remain valid where they express
+   inheritance, compositing or user-selected colors. Atmosphere resolves these theme pigments
+   into shader channels and serializes interpolated RGB for its CSS fallback; those derived
+   renderer values are not a second palette. Registry aliases live in olyx-compat.css.
+   Unused-token findings are advisory: check compatibility, runtime/computed names and public
+   hooks before removing a token. A text search alone does not establish that it is unused. */
 :root,
 .atmosphere-scope {
   /* Resolve derived colors where runtime strengths are assigned, before inheritance. */
@@ -59,22 +65,37 @@
   /* Recessed wells and frost share their lighting; geometry belongs to the control. */
   --sys-filter-frost: blur(12px);
   --sys-ratio-frost-inset: 0.065;
-  --sys-color-well-fill: rgb(0 0 0 / 8%);
-  --sys-color-well-shade: rgb(0 0 0 / 36%);
+  --sys-opacity-well-fill: 0.08;
+  --sys-opacity-well-shade: 0.36;
+  --sys-color-well-fill: rgb(0 0 0 / var(--sys-opacity-well-fill));
+  --sys-color-well-shade: rgb(0 0 0 / var(--sys-opacity-well-shade));
   --cmp-color-summary-details-surface: rgb(21 22 24 / 94%);
   --sys-color-ink-on-dark-glass: rgb(255 255 255 / 90%);
+  --cmp-color-dialog-ink: rgb(255 255 255 / 94%);
   --cmp-color-timeline-time: rgb(255 255 255 / 62%);
   --sys-color-well-light: rgb(255 255 255 / 24%);
-  --sys-color-well-fill-emphasized: rgb(0 0 0 / 18%);
-  --sys-color-frost-fill: rgb(255 255 255 / 12%);
-  --sys-color-frost-fill-selected: rgb(255 255 255 / 26%);
+  /* Shared by the rendered layers and Atmosphere's contrast bounds. Unit interval. */
+  --sys-opacity-well-emphasized: 0.18;
+  --sys-opacity-frost-fill: 0.12;
+  --sys-opacity-frost-selected: 0.26;
+  --sys-opacity-frost-sheen: 0.1;
+  --sys-opacity-frost-reveal: 0.04;
+  --sys-color-well-fill-emphasized: rgb(
+    0 0 0 /
+    var(--sys-opacity-well-emphasized)
+  );
+  --sys-color-frost-fill: rgb(255 255 255 / var(--sys-opacity-frost-fill));
+  --sys-color-frost-fill-selected: rgb(
+    255 255 255 /
+    var(--sys-opacity-frost-selected)
+  );
   --cmp-color-button-word-fill: rgb(255 255 255 / 60%);
   --sys-color-frost-light: rgb(255 255 255 / 51%);
-  --sys-color-frost-sheen: rgb(255 255 255 / 10%);
+  --sys-color-frost-sheen: rgb(255 255 255 / var(--sys-opacity-frost-sheen));
   --sys-color-frost-shade: rgb(0 0 0 / 6%);
   --sys-color-frost-shadow: rgb(0 0 0 / 28%);
   --sys-color-frost-contact: rgb(0 0 0 / 22%);
-  --sys-color-frost-reveal: rgb(255 255 255 / 4%);
+  --sys-color-frost-reveal: rgb(255 255 255 / var(--sys-opacity-frost-reveal));
   --sys-color-frost-fallback: #34363c;
   --sys-color-etch-ink: rgb(0 0 0 / 46%);
   --sys-color-etch-light: rgb(255 255 255 / 44%);

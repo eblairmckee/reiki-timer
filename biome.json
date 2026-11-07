@@ -31,7 +31,17 @@
       "style": {
         "noHexColors": "error"
       },
+      "nursery": {
+        "useExhaustiveSwitchCases": {
+          "level": "error",
+          "options": {
+            "requireExplicitCase": true
+          }
+        }
+      },
       "suspicious": {
+        "noFocusedTests": "error",
+        "noSkippedTests": "warn",
         "useBaseline": {
           "level": "error",
           "options": {
@@ -82,6 +92,17 @@
       "linter": {
         "rules": {
           "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/features/**", "**/features/**"],
+                    "message": "Shared components must receive feature data and commands through their public contract."
+                  }
+                ]
+              }
+            },
             "useNamingConvention": {
               "level": "error",
               "options": {
@@ -98,6 +119,31 @@
                       "kind": "any"
                     },
                     "match": ".*"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/hooks/**/*.{ts,tsx}", "src/utils/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/features/**",
+                      "**/features/**",
+                      "@/components/**",
+                      "**/components/**"
+                    ],
+                    "message": "Neutral hooks and utilities must stay independent of feature and UI implementations."
                   }
                 ]
               }

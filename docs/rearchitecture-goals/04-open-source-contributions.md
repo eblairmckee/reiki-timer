@@ -1,6 +1,8 @@
-# Open-source contributions: document the accepted architecture
+# Open-source contributions: establish participation and accountability
 
-Start after the user accepts the design-system and product baseline. Use the [session protocol](00-prerequisites.md#session-protocol), [maintainer principles](../../.agents/skills/design-system-maintainer/SKILL.md) and [quality ownership matrix](../../.agents/skills/design-system-maintainer/references/quality-ownership.md). Prepare the Reiki application repository, including its supported system entrypoints, for outside contributions. A separately published UI package would require its own decision.
+Turn the accepted architecture and quality ownership into a contribution model that outside humans and agents can use. Resolve how changes are proposed, verified and reviewed, who can make each decision, and what is required for responsible publication.
+
+Start after the user accepts the integrated baseline. Apply the [shared purpose and session protocol](00-prerequisites.md), including the maintainer persona and matrix. This phase owns participation, accountability and distribution readiness. Earlier phases own the system, product and verification contracts it communicates. A separately published UI package would require its own decision.
 
 ```text
 /goal Execute the local preparation in docs/rearchitecture-goals/04-open-source-contributions.md. Follow the session protocol in docs/rearchitecture-goals/00-prerequisites.md with GPT-6.1 Sol at High effort as the session orchestrator. Write and verify a fresh contribution model from the accepted architecture, maintainer principles and quality matrix. Record local readiness separately from hosted enforcement and publication.
@@ -33,6 +35,8 @@ After baseline acceptance and explicit rollout authorization, configure the agre
 
 Publication requires a separate maintainer decision on the exact source snapshot/history, license/notices and outstanding issues. Keep local readiness, hosted enforcement and publication statuses distinct.
 
-## Handoff and cleanup
+## Completion, handoff and cleanup
+
+Local completion requires a contributor workflow that works from the intended public files, an accountable ownership/review model, and explicit dispositions for distribution questions. Hosted enforcement and publication can remain pending their separate authorizations.
 
 Provide contributor entrypoints, verified examples, owner contacts, evidence limits and outstanding release decisions. End with the [cleanup handoff](00-prerequisites.md#handoff-and-cleanup); retire exercises and migration plans once their decisions have durable homes and the user verifies completion. Do not stage or commit unless explicitly asked.

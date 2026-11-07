@@ -1,7 +1,7 @@
 import { motion, useIsPresent } from "motion/react";
 import type { ReactNode } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { motion as systemMotion } from "./motion";
-import { useReducedMotion } from "./use-reduced-motion";
 
 export interface RevealProps {
   /** Content nodes; caller owns readable text and names of any interactive descendants. */

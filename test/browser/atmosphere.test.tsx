@@ -1,9 +1,10 @@
+import "../../src/components/design-system/styles/index.css";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { Atmosphere, type AtmospherePalette } from "../../src/components/design-system/atmosphere";
 
 const preferences = vi.hoisted(() => ({ reduced: true }));
-vi.mock("../../src/components/design-system/shared/use-reduced-motion", () => ({
+vi.mock("@/hooks/use-reduced-motion", () => ({
   useReducedMotion: () => preferences.reduced,
 }));
 

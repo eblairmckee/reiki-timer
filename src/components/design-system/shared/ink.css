@@ -1,3 +1,9 @@
+/* Public text utilities: data-ink selects a semantic role (label, display, detail, summary,
+   control, on-light-frost); a bare attribute uses atmosphere ink. data-lettering="etched"
+   or "frosted" adds decorative lettering without replacing accessible text. Summary ink may
+   inherit --cmp-color-summary-ink from a caller surface. Keep contrast/forced-color fallbacks.
+   Control material attributes such as data-frost, data-recess and data-ripple are internal;
+   composing these text utilities does not expose control internals for feature styling. */
 @layer utilities {
   [data-ink] {
     color: var(--sys-color-ink-on-atmosphere);

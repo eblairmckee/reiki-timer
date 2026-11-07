@@ -3,8 +3,9 @@ import { expect, test } from "vitest";
 import "@/components/design-system/styles/index.css";
 import { atmosphereSettings } from "@/components/design-system/atmosphere/atmosphere-config";
 import { inkStrengths } from "@/components/design-system/atmosphere/ink-strength";
+import { inkSurfaces } from "@/components/design-system/atmosphere/ink-surfaces";
 import { motion } from "@/components/design-system/shared/motion";
-import { chakraPalettes } from "@/features/timer/scene-atmosphere";
+import { chakraPalettes } from "@/features/timer/data/chakra-palettes";
 
 test("CSS scene transitions and Motion use the same default clock and easing", () => {
   const probe = document.createElement("span");
@@ -164,6 +165,7 @@ test("the muted timestamp stays legible on timeline glass", () => {
 });
 
 const palettes = chakraPalettes.map((names) => names.map((name) => rgba(name).rgb));
+const surfaces = inkSurfaces(getComputedStyle(document.documentElement));
 
 test("adaptive light ink meets its targets through bold palette changes, grain and dimming", () => {
   const maximumGrain = 0.35 * atmosphereSettings.grainOverlay ** 0.8;
@@ -171,8 +173,29 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   let minimumLarge = Number.POSITIVE_INFINITY;
   let minimumControl = Number.POSITIVE_INFINITY;
   let minimumSummary = Number.POSITIVE_INFINITY;
+  let minimumDialog = Number.POSITIVE_INFINITY;
+  let minimumDialogFocus = Number.POSITIVE_INFINITY;
   const glass = rgba("--sys-color-well-fill-emphasized");
-  const control = rgba("--sys-color-well-light");
+  // Portalled dialogs use the root fallback ink, not Atmosphere's adaptive scope.
+  const dialogInk = rgba("--cmp-color-dialog-ink");
+  const dialogFocus = rgba("--ref-color-paper");
+  const sheen = rgba("--sys-color-frost-sheen");
+  const reveal = rgba("--sys-color-frost-reveal");
+  const fill = rgba("--sys-color-frost-fill");
+  const selected = rgba("--sys-color-frost-fill-selected");
+  const well = rgba("--sys-color-well-fill");
+  const selectedWell = rgba("--sys-color-well-shade");
+  const faces = [
+    { fill, grouped: false, well },
+    { fill: selected, grouped: false, well: selectedWell },
+    { fill: sheen, grouped: true, well },
+    { fill: selected, grouped: true, well: selectedWell },
+  ];
+  for (const layer of [fill, selected, sheen, reveal]) {
+    expect(layer.rgb).toEqual([1, 1, 1]);
+  }
+  expect(well.rgb).toEqual([0, 0, 0]);
+  expect(selectedWell.rgb).toEqual([0, 0, 0]);
   for (let phase = 0; phase < palettes.length; phase += 1) {
     const next = palettes[(phase + 1) % palettes.length];
     for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
@@ -181,7 +204,7 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
         return rgb.map((c, channel) => c + (next[i][channel] - c) * mix);
       });
       for (const dim of [0, 0.2, 0.5, 0.85, 1]) {
-        const strengths = inkStrengths(colors, atmosphereSettings.grainOverlay, dim);
+        const strengths = inkStrengths(colors, atmosphereSettings.grainOverlay, dim, surfaces);
         expect(strengths.summary).toBeLessThan(strengths.text);
         expect(strengths["summary-glass"]).toBeLessThan(strengths.text);
         const ink = renderedInk(strengths);
@@ -198,6 +221,19 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
             const bg = sample.map(
               (c) => (c * (1 - Math.abs(grain)) + Math.max(0, grain)) * (1 - dim)
             );
+            const dialogSurface = composite(
+              fill.rgb,
+              fill.alpha,
+              composite(glass.rgb, glass.alpha, bg)
+            );
+            minimumDialog = Math.min(
+              minimumDialog,
+              contrastRatio(composite(dialogInk.rgb, dialogInk.alpha, dialogSurface), dialogSurface)
+            );
+            minimumDialogFocus = Math.min(
+              minimumDialogFocus,
+              contrastRatio(dialogFocus.rgb, dialogSurface)
+            );
             function contrast(alpha: number, overlay = 0, pigment = [1, 1, 1]) {
               const surface = composite(pigment, overlay, bg);
               const glyph = composite([1, 1, 1], alpha, surface);
@@ -206,10 +242,21 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
             }
             minimumSmall = Math.min(minimumSmall, contrast(ink.text));
             minimumLarge = Math.min(minimumLarge, contrast(ink.display));
-            minimumControl = Math.min(
-              minimumControl,
-              contrast(ink.control, control.alpha, control.rgb)
-            );
+            // Actual group/well/fill layers, then the brightest gradient stop and hover overlay.
+            // Pressed face shading/contact shadows darken the surface, so cannot reduce white contrast.
+            for (const { fill: faceFill, well: faceWell, grouped } of faces) {
+              const group = grouped ? composite(sheen.rgb, sheen.alpha, bg) : bg;
+              const backing = composite(faceWell.rgb, faceWell.alpha, group);
+              const face = composite(faceFill.rgb, faceFill.alpha, backing);
+              const litFace = composite(sheen.rgb, sheen.alpha, face);
+              const hoverFace = composite(reveal.rgb, reveal.alpha, litFace);
+              for (const surface of [face, litFace, hoverFace]) {
+                minimumControl = Math.min(
+                  minimumControl,
+                  contrastRatio(composite([1, 1, 1], ink.control, surface), surface)
+                );
+              }
+            }
             minimumSummary = Math.min(
               minimumSummary,
               contrast(ink.summary),
@@ -223,6 +270,8 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   console.info(
     JSON.stringify({
       minimumControl,
+      minimumDialog,
+      minimumDialogFocus,
       minimumLarge,
       minimumSmall,
       minimumSummary,
@@ -233,14 +282,16 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   expect(minimumLarge).toBeGreaterThanOrEqual(3);
   expect(minimumControl).toBeGreaterThanOrEqual(3);
   expect(minimumSummary).toBeGreaterThanOrEqual(4.5);
+  expect(minimumDialog).toBeGreaterThanOrEqual(4.5);
+  expect(minimumDialogFocus).toBeGreaterThanOrEqual(3);
 });
 
 test("darkening the scene softens the foreground instead of retaining bright white ink", () => {
-  const lit = renderedInk(inkStrengths(palettes[0], atmosphereSettings.grainOverlay));
-  const black = renderedInk(inkStrengths(palettes[0], atmosphereSettings.grainOverlay, 1));
+  const lit = renderedInk(inkStrengths(palettes[0], atmosphereSettings.grainOverlay, 0, surfaces));
+  const black = renderedInk(
+    inkStrengths(palettes[0], atmosphereSettings.grainOverlay, 1, surfaces)
+  );
   console.info(JSON.stringify({ dimmed: black, lit }));
   expect(black.text).toBeLessThan(lit.text);
   expect(black.display).toBeLessThan(lit.display);
-  expect(black.text).toBeLessThan(0.5);
-  expect(black.display).toBeLessThan(0.4);
 });

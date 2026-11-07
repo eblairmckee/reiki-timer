@@ -106,7 +106,7 @@
       &:hover,
       &:active {
         color: var(--ref-color-paper);
-        background: var(--sys-color-frost-sheen);
+        background: var(--sys-color-well-fill);
       }
       &:focus-visible {
         outline: var(--sys-size-focus-ring) solid currentColor;

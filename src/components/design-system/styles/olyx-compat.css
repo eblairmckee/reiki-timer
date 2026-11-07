@@ -1,4 +1,7 @@
-/* Registry CSS installed by the Olyx CLI consumes these upstream spellings. */
+/* Compatibility boundary for registry CSS installed by the Olyx CLI: preserve upstream
+   spellings while mapping values to our theme. App-owned consumers use the semantic theme
+   names directly. Review installed/updating registry consumers before changing aliases;
+   an alias with no current text match may still be needed by a future registry merge. */
 :root {
   --color-error: var(--sys-color-error);
   --color-error-container: var(--sys-color-error-container);

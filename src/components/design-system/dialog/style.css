@@ -18,6 +18,7 @@
   }
   [data-ui="dialog-popup"] {
     --sys-color-focus: var(--ref-color-paper);
+    --sys-color-ink-on-dark-glass: var(--cmp-color-dialog-ink);
     --cmp-radius-button-word: var(--ref-radius-sm);
     position: fixed;
     inset: 50% auto auto 50%;
@@ -26,7 +27,7 @@
     max-block-size: calc(100dvh - 2rem);
     padding: clamp(1.5rem, 5vw, 2.25rem);
     overflow: auto;
-    color: var(--sys-color-ink-on-atmosphere);
+    color: var(--cmp-color-dialog-ink);
     background:
       linear-gradient(
         125deg,

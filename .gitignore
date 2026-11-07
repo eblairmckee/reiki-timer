@@ -3,6 +3,7 @@ dist/
 build/
 .next/
 coverage/
+.vitest/
 playwright-report/
 test-results/
 .env

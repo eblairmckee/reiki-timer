@@ -15,6 +15,8 @@ export type LinkButtonProps = {
   | ({
       /** Render a native anchor for navigation (default). */
       as?: "a";
+      /** Navigation destination. Use as="button" for commands. */
+      href: string;
     } & React.ComponentProps<"a">)
   | ({
       /** Render a native button for an action. */
@@ -23,7 +25,8 @@ export type LinkButtonProps = {
 );
 
 /** Interactive anchor by default, or native button with as="button". Supply named text children
- * or an ARIA name; native refs, handlers, navigation and repeat activation pass through unchanged.
+ * or an ARIA name; native refs, handlers, navigation and cancellation pass through unchanged.
+ * onClick runs for each supported activation, including repeated activation of the same value.
  */
 function LinkButton({
   size = "md",

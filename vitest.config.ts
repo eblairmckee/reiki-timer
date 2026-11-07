@@ -44,6 +44,14 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          environment: "node",
+          include: ["scripts/**/*.test.ts"],
+          name: "tooling",
+        },
+      },
+      {
+        extends: true,
+        test: {
           environment: "happy-dom",
           environmentOptions: { happyDOM: { url: "http://localhost:5173" } },
           include: ["src/**/*.test.{ts,tsx}"],

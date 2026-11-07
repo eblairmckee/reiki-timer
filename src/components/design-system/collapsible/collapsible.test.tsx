@@ -69,13 +69,16 @@ test("controlled panels honor external state, refs, native props and render func
   const renderPanel = vi.fn((props: ComponentPropsWithRef<"div">, _state: { open: boolean }) => (
     <section {...props} />
   ));
+  function renderPanelCallback(props: ComponentPropsWithRef<"div">, state: { open: boolean }) {
+    return renderPanel(props, state);
+  }
   const panel = (
     <CollapsiblePanel
       data-example="dependent-fields"
       id="dependent-panel"
       keepMounted
       ref={panelRef}
-      render={renderPanel}
+      render={renderPanelCallback}
     >
       <button type="button">Dependent action</button>
     </CollapsiblePanel>

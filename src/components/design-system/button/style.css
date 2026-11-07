@@ -239,12 +239,15 @@
 
 @layer components {
   [data-ui="button"]:is([data-appearance="frost"], [data-appearance="inset"]) {
+    /* Root well inset; callers never target the moving face. */
     --button-face-inset: var(--cmp-space-button-frost-inset, 0px);
+    /* Standard word height; large words intentionally use the fixed height below. */
     height: var(--cmp-size-button-frost-height, 2.75rem);
     padding: var(--button-face-inset);
     color: var(--sys-color-ink-on-glass);
     background: var(--sys-color-well-fill);
     border: 0;
+    /* Root radius also shapes the inherited face and its lighting. */
     border-radius: var(--cmp-radius-button-word, 0.3rem);
     transition: none;
     [data-frost] {
@@ -266,7 +269,7 @@
         z-index: -1;
       }
     }
-    &[data-icon-only="false"]:not([aria-pressed]) {
+    &[data-icon-only="false"] {
       --sys-color-frost-fill: var(--cmp-color-button-word-fill);
       --sys-color-frost-fallback: var(--ref-color-paper);
       [data-ripple="release"] {
@@ -284,6 +287,7 @@
       }
     }
     &[data-icon-only="true"] {
+      /* Icon dimensions are root hooks; data-size does not resize frost icons. */
       width: var(--cmp-size-button-icon, 3rem);
       height: var(
         --cmp-size-button-frost-height,
@@ -302,6 +306,7 @@
     }
     &:focus-visible {
       outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+      /* Groups inset the root focus ring without changing button internals. */
       outline-offset: var(--cmp-space-button-focus-offset, 5px);
     }
     &:disabled {
@@ -326,6 +331,11 @@
     }
     &[aria-pressed="true"] {
       --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+      /* Keep white glyphs legible as the selected face catches more light. */
+      background: var(--sys-color-well-shade);
+      &[data-icon-only="false"] {
+        --sys-color-frost-fill: var(--sys-color-glass-fill);
+      }
     }
     &[aria-pressed="true"]::after {
       position: absolute;
@@ -441,13 +451,29 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    /* Keep state colors/lighting immediate, without press scale or face travel.
+       Override an in-flight inline transform as soon as the preference changes. */
+    [data-ui="button"][data-appearance] {
+      transition-duration: 0s;
+    }
+    [data-ui="button"][data-appearance]:active {
+      scale: 1;
+    }
+    [data-ui="button"] [data-frost] {
+      transform: none !important;
+      &::before,
+      &::after {
+        transition: none;
+      }
+    }
     [data-ui="button"]:is(
         [data-appearance="frost"],
         [data-appearance="inset"]
       )[data-icon-only="true"] {
       transition: none;
     }
-    [data-ui="button"][data-activation-hint] [data-frost]::before {
+    [data-ui="button"][data-appearance][data-activation-hint]
+      [data-frost]::before {
       animation: none;
     }
   }

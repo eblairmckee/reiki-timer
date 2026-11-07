@@ -1,20 +1,21 @@
 import { AnimatePresence } from "motion/react";
 import { type ReactElement, type ReactNode, useId } from "react";
 import { Reveal } from "../shared/reveal";
-import { useHoverDetails } from "./use-hover-details";
+import { useSummaryDetails } from "./use-summary-details";
 import "./summary.css";
 
 export interface ButtonGroupSummaryDetails {
-  /** Noninteractive detail nodes; caller supplies meaningful readable text for accessibility. */
+  /** Informational content, including a named focusable scroll region. Do not put menus or commands here. */
   content: ReactNode;
-  /** Accessible name for the focusable summary fieldset. */
+  /** Accessible name for the details toggle and its informational group. */
   label: string;
 }
 
 export interface ButtonGroupSummaryProps {
   /** One Button or ButtonGroup; its controls retain native names and activation behavior. */
   children: ReactElement;
-  /** Optional named details shown on summary hover/focus and dismissed on exit/Escape. */
+  /** Details open on touch/click, Enter/Space, or pointer hover. Escape returns focus to the toggle;
+   * leaving the group or clicking outside dismisses it. Hover alone dismisses on pointer exit. */
   details?: ButtonGroupSummaryDetails;
   /** Optional noninteractive summary nodes; caller supplies meaningful readable text for accessibility. Omission removes the panel while preserving the action. */
   summary?: ReactNode;
@@ -46,16 +47,14 @@ function SummaryPanel({
   children: ReactNode;
   details?: ButtonGroupSummaryDetails;
 }) {
-  const { region, open, events } = useHoverDetails<HTMLFieldSetElement>(!!details);
+  const { region, open, events, toggle, trigger } = useSummaryDetails(!!details);
   const detailsId = useId();
   return (
     <fieldset
-      aria-details={open ? detailsId : undefined}
       aria-label={details?.label}
       className="button-group-summary-panel"
       data-open={open || undefined}
       ref={region}
-      tabIndex={details ? 0 : undefined}
       {...events}
     >
       <div className="button-group-summary-panel-trigger">
@@ -65,6 +64,17 @@ function SummaryPanel({
           data-inset-shadow=""
         />
         {children}
+        {details !== undefined && (
+          <button
+            aria-controls={open ? detailsId : undefined}
+            aria-expanded={open}
+            aria-label={details.label}
+            className="button-group-summary-toggle"
+            onClick={toggle}
+            ref={trigger}
+            type="button"
+          />
+        )}
       </div>
       <div>
         <AnimatePresence initial={false}>

@@ -2,10 +2,11 @@ import { getShaderColorFromString, type PaperShaderElement } from "@paper-design
 import { animate } from "motion";
 import { motion, useMotionValue } from "motion/react";
 import { memo, type ReactNode, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { motion as systemMotion } from "../shared/motion";
-import { useReducedMotion } from "../shared/use-reduced-motion";
 import { atmosphereSettings } from "./atmosphere-config";
 import { inkStrengths } from "./ink-strength";
+import { inkSurfaces } from "./ink-surfaces";
 import { AtmosphereMesh } from "./paper-mesh";
 import "./style.css";
 
@@ -49,15 +50,21 @@ export const Atmosphere = memo(function AtmosphereView({
   const rootRef = useRef<HTMLDivElement>(null);
   const shaderRef = useRef<PaperShaderElement>(null);
   const colorsRef = useRef<number[][]>([]);
+  const surfacesRef = useRef<ReturnType<typeof inkSurfaces> | null>(null);
   const [theme, setTheme] = useState<{ key: string; colors: string[] } | null>(null);
   const [initialColors, setInitialColors] = useState<string[] | null>(null);
   const [supported, setSupported] = useState(false);
 
   const updateInk = useEffectEvent(() => {
-    if (!(colorsRef.current.length && scopeRef.current)) {
+    if (!(colorsRef.current.length && scopeRef.current && surfacesRef.current)) {
       return;
     }
-    const ink = inkStrengths(colorsRef.current, atmosphereSettings.grainOverlay, shade.get());
+    const ink = inkStrengths(
+      colorsRef.current,
+      atmosphereSettings.grainOverlay,
+      shade.get(),
+      surfacesRef.current
+    );
     for (const [name, alpha] of Object.entries(ink)) {
       scopeRef.current.style.setProperty(
         `--sys-opacity-ink-${name}-alpha`,
@@ -70,7 +77,8 @@ export const Atmosphere = memo(function AtmosphereView({
     colorsRef.current = colors;
     // biome-ignore lint/suspicious/noUnnecessaryConditions: The shader ref is null before mount and after context loss; retain this runtime guard.
     shaderRef.current?.paperShaderMount?.setUniforms({ u_colors: colors });
-    // The no-WebGL fallback uses the same interpolated theme pigments as the shader.
+    // Renderer boundary: channels come from resolved theme tokens, never a second palette.
+    // The no-WebGL fallback serializes the same interpolated pigments as the shader.
     if (!supported) {
       colors.forEach((color, index) => {
         rootRef.current?.style.setProperty(
@@ -99,6 +107,7 @@ export const Atmosphere = memo(function AtmosphereView({
       return;
     }
     const style = getComputedStyle(scope);
+    surfacesRef.current = inkSurfaces(style);
     const palette = [first, second, third, fourth];
     const resolved = palette.map((token) => style.getPropertyValue(token).trim());
     if (resolved.some((color) => !color)) {

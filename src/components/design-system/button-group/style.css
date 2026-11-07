@@ -58,11 +58,15 @@
   [data-ui="button-group"][data-material="frost"] {
     --cmp-size-button-frost-height: var(--cmp-size-button-group-height);
     --cmp-space-button-focus-offset: -4px;
+    --sys-color-focus: var(--sys-color-ink-on-frost);
     align-items: stretch;
     block-size: var(--cmp-size-button-group-height);
     border-radius: var(--ref-radius-rounded);
     isolation: isolate;
     transition: background-color var(--sys-motion-group-feedback);
+    [data-icon-only="false"] {
+      --sys-color-focus: var(--sys-color-ink-on-glass);
+    }
   }
   [data-ui="button-group"][data-material="frost"]:has(
     [data-slot="button-group-reveal"]
@@ -75,7 +79,10 @@
     --cmp-radius-button-word: 0 var(--cmp-size-button-group-height)
       var(--cmp-size-button-group-height) 0;
     --cmp-radius-button-icon: var(--cmp-radius-button-word);
-    --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+    &[data-icon-only="true"] {
+      --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+      background: var(--sys-color-well-shade);
+    }
   }
   [data-slot="button-group-reveal"] {
     display: flex;
@@ -86,7 +93,6 @@
   [data-slot="button-group-items"] {
     --cmp-radius-button-word: 0;
     --cmp-radius-button-icon: 0;
-    --cmp-color-button-word-fill: var(--sys-color-frost-sheen);
     --sys-color-frost-fill: var(--sys-color-frost-sheen);
     display: flex;
     flex: none;
@@ -100,7 +106,6 @@
   }
   [data-slot="button-group-items"] [data-icon-only="false"] [data-frost] {
     padding-inline: clamp(0.875rem, 2.5vw, 1.375rem);
-    color: var(--sys-color-ink-on-frost);
   }
   [data-slot="button-group-items"] [data-slot="button-group-separator"] {
     --cmp-size-separator-height: 52%;

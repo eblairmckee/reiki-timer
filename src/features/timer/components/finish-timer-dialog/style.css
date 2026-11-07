@@ -1,0 +1,17 @@
+@layer components {
+  .reiki-off-dialog > .reiki-off-dialog-leave {
+    margin-block-start: 1.65rem;
+  }
+}
+
+/* On Back from the editor the live dialog owns the fade and receives the first tap. */
+:root:has(.reiki-off-dialog[data-open]) {
+  &::view-transition,
+  &::view-transition-group(*),
+  &::view-transition-image-pair(*),
+  &::view-transition-old(*),
+  &::view-transition-new(*) {
+    pointer-events: none;
+    animation: none;
+  }
+}

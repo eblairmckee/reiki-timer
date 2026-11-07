@@ -17,7 +17,5 @@
   "eslint.format.enable": false,
   "js/ts.experimental.useTsgo": true,
   "js/ts.tsdk.path": "./node_modules/typescript",
-  "bun.test.customScript": "bun test",
-  "bun.test.filePattern": "src/**/*.{test,spec}.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
   "extensions.ignoreRecommendations": false
 }

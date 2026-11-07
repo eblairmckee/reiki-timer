@@ -6,10 +6,10 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
 import { type AnimationPlaybackControls, motionValue } from "motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useComposedRef } from "@/hooks/use-composed-ref";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { settleMotionValue } from "../shared/settle-motion-value";
-import { useComposedRef } from "../shared/use-composed-ref";
 import { useFrostMotion } from "../shared/use-frost-motion";
-import { useReducedMotion } from "../shared/use-reduced-motion";
 
 interface Drag {
   direction: number;
@@ -32,9 +32,16 @@ function thumbTravel(root: HTMLElement, thumb: HTMLElement) {
 }
 
 /** Interactive Base UI switch; provide a visible associated label or an ARIA name.
+ * The root ref accepts HTMLElement and targets a span by default; custom render can replace it.
+ * inputRef targets the separate native HTMLInputElement.
  * Children are the internal thumb; native props and refs pass through. onCheckedChange fires
  * once per committed tap/key activation or drag release, never for drag previews; cancellation
- * and controlled updates retain Base UI semantics. Repeated activations toggle each time. */
+ * and controlled updates retain Base UI semantics. Repeated activations toggle each time.
+ *
+ * Public CSS hook: --cmp-size-switch-block sets the root's block size (inline size is twice
+ * that value); set it on the root or a caller-owned ancestor. Thumb geometry, material attributes
+ * and drag state are internal. For a switch-controlled disclosure, see Collapsible's example:
+ * the caller owns shared state, ARIA relationships and focus before externally hiding content. */
 function Switch({
   checked,
   defaultChecked = false,

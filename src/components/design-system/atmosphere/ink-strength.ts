@@ -1,3 +1,5 @@
+import type { inkSurfaces } from "./ink-surfaces";
+
 type RGB = readonly number[];
 const luminanceWeights = [0.2126, 0.7152, 0.0722];
 
@@ -10,7 +12,12 @@ export function luminance(rgb: RGB) {
 }
 
 /** Conservative RGB intervals cover every mesh mix and black/white grain extreme. */
-export function inkStrengths(colors: readonly RGB[], grainOverlay: number, dim = 0) {
+export function inkStrengths(
+  colors: readonly RGB[],
+  grainOverlay: number,
+  dim: number,
+  surfaces: ReturnType<typeof inkSurfaces>
+) {
   const grain = 0.35 * grainOverlay ** 0.8;
   const low = [0, 1, 2].map(
     (c) => Math.min(...colors.map((rgb) => rgb[c])) * (1 - grain) * (1 - dim)
@@ -51,10 +58,10 @@ export function inkStrengths(colors: readonly RGB[], grainOverlay: number, dim =
     return max;
   }
   return {
-    control: strength(3.05, { frostAlpha: 0.24 }),
+    control: Math.max(...surfaces.control.map((surface) => strength(3.05, surface))),
     display: strength(3.05),
     summary: strength(4.5, { divisions: 12 }),
-    "summary-glass": strength(4.5, { divisions: 12, shadeAlpha: 0.18 }),
+    "summary-glass": strength(4.5, { divisions: 12, shadeAlpha: surfaces.summaryShade }),
     text: strength(4.55),
   };
 }

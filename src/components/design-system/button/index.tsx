@@ -6,37 +6,67 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useFrostMotion } from "../shared/use-frost-motion";
 
+type TraditionalAppearance = "solid" | "tonal" | "ghost" | "outline" | "link";
+type ButtonIntent = "primary" | "neutral" | "error";
+type ButtonSize = "lg" | "md" | "sm";
+
+/** Only traditional surfaces use semantic pigments. Frost, text and etched keep brand ink. */
+type ButtonAppearanceProps =
+  | {
+      /** Intent-colored surface. Omit appearance for the brand frost default. */
+      appearance: TraditionalAppearance;
+      /** Semantic pigment for this surface. Defaults to primary. */
+      intent?: ButtonIntent;
+      /** Legacy dimensions, spacing and icon sizing. Defaults to md. */
+      size?: ButtonSize;
+      iconOnly?: boolean;
+    }
+  | {
+      /** Fixed-ink word treatments: plain text or a recessed letter track. */
+      appearance: "text" | "etched";
+      /** Fixed brand ink; primary is retained for compatibility. */
+      intent?: "primary";
+      /** Legacy dimensions, spacing and icon sizing. Defaults to md. */
+      size?: ButtonSize;
+      iconOnly?: boolean;
+    }
+  | ({
+      /** Default frost; inset exposes a stationary well around the moving face.
+       * Button owns face lighting and press/release feedback. See
+       * docs/concepts/controls/button-frost-states.png for the material study. */
+      appearance?: "frost" | "inset";
+      /** Fixed brand ink; primary is retained for compatibility. */
+      intent?: "primary";
+    } & (
+      | {
+          /** Icon dimensions use root CSS properties, independently of size. */
+          iconOnly: true;
+          size?: "md";
+        }
+      | {
+          iconOnly?: false;
+          /** Word controls support standard and large dimensions. Defaults to md. */
+          size?: "md" | "lg";
+        }
+    ));
+
 /** Interactive Base UI button. Supply text children or an accessible name for icon-only content.
- * Native/Base UI handlers, refs, disabled behavior and cancellation pass through; onClick runs
- * once for every supported activation, including repeated previews of the same content.
+ * Native/Base UI handlers, refs, disabled behavior and cancellation pass through.
+ * onClick runs for each supported activation, including repeated activation of the same value.
+ * Root styling hooks for frost/inset (also inherited by grouped controls):
+ * --cmp-size-button-icon sets icon width and default height;
+ * --cmp-size-button-frost-height overrides standard word/icon height (large words stay 3.25rem);
+ * --cmp-space-button-frost-inset sets the stationary well inset;
+ * --cmp-radius-button-word / --cmp-radius-button-icon set the corresponding root radius;
+ * --cmp-space-button-focus-offset sets the focus outline offset.
  */
-export type ButtonProps = React.ComponentProps<typeof ButtonPrimitive> & {
-  /** Semantic emphasis; independent of surface appearance. Defaults to primary. */
-  intent?: "primary" | "neutral" | "error";
-  /** Surface treatment, default frost. Inset exposes a stationary well around the same moving face.
-   * Button owns the face lighting and press/release feedback; callers configure the public root.
-   * See docs/concepts/controls/button-frost-states.png for the rest, hover and press study.
-   * Set `--cmp-space-button-frost-inset` on the button root to expose more of its stationary well.
-   */
-  appearance?:
-    | "solid"
-    | "tonal"
-    | "ghost"
-    | "outline"
-    | "frost"
-    | "inset"
-    | "etched"
-    | "text"
-    | "link";
-  /** Control dimensions. Defaults to md. */
-  size?: "lg" | "md" | "sm";
-  /** Use square/circular icon sizing; caller supplies aria-label or aria-labelledby. */
-  iconOnly?: boolean;
-  /** Mark the icon as directional for consumer RTL styles. Defaults to false. */
-  hasDirectionalIcon?: boolean;
-  /** Play the one-shot frosted activation cue; respects reduced motion. */
-  showActivationHint?: boolean;
-};
+export type ButtonProps = React.ComponentProps<typeof ButtonPrimitive> &
+  ButtonAppearanceProps & {
+    /** Mark the icon as directional for consumer RTL styles. Defaults to false. */
+    hasDirectionalIcon?: boolean;
+    /** Play the one-shot frosted activation cue; respects reduced motion. */
+    showActivationHint?: boolean;
+  };
 
 /** A frosted action by default. Use text children to name it, or supply an accessible name
  * for an icon-only action. The inset appearance keeps the hit target and press feedback. */
@@ -51,7 +81,6 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const frosted = appearance === "frost" || appearance === "inset";
-  const frostedAction = frosted && rest["aria-pressed"] === undefined;
   const actionInk = iconOnly ? "control" : "on-light-frost";
   const feedback = useFrostMotion({ disabled: !frosted || rest.disabled });
   const unfrostedContent =
@@ -73,11 +102,7 @@ export function Button({
         <>
           <span aria-hidden="true" data-ripple="pressure" />
           <span aria-hidden="true" data-ripple="release" />
-          <span
-            data-frost=""
-            data-ink={frostedAction ? actionInk : undefined}
-            data-lettering={frostedAction ? "frosted" : undefined}
-          >
+          <span data-frost="" data-ink={actionInk} data-lettering="frosted">
             {children}
           </span>
         </>

@@ -1,7 +1,7 @@
 import { type AnimationPlaybackControls, animate } from "motion";
 import { type HTMLAttributes, useEffect, useRef } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { motion as systemMotion } from "./motion";
-import { useReducedMotion } from "./use-reduced-motion";
 
 /** The well and hit target stay fixed; only the frosted surface responds. */
 export function useFrostMotion({ disabled = false }: { disabled?: boolean } = {}) {
@@ -32,7 +32,9 @@ export function useFrostMotion({ disabled = false }: { disabled?: boolean } = {}
     for (const ring of current.current?.querySelectorAll<HTMLElement>("[data-ripple]") ?? []) {
       ring.style.opacity = "0";
     }
-    current.current?.removeAttribute("data-pressed");
+    if (disabled) {
+      current.current?.removeAttribute("data-pressed");
+    }
   }, [disabled, reduced]);
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Keep the covered pressure, cancellation and release ordering intact in this tooling-only pass.
