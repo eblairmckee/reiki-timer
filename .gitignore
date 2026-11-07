@@ -13,5 +13,3 @@ test-results/
 .tanstack/
 *.log
 *.tsbuildinfo
-docs/rearchitecture-goals/evidence/
-docs/rearchitecture-goals/ui-evidence/

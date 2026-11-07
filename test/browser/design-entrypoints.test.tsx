@@ -23,8 +23,7 @@ import {
 import "../../src/components/design-system/styles/index.css";
 import { Switch } from "../../src/components/design-system/switch";
 
-// Eager loading sends every installed public family through Vite's real module/CSS
-// graph, including future families that product screens do not yet consume.
+// Exercise the installed public families' module/CSS graph, including unconsumed entrypoints.
 const entrypoints = import.meta.glob("../../src/components/design-system/*/index.tsx", {
   eager: true,
 });

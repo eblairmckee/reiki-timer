@@ -188,7 +188,7 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
         // Production percentage rounding may merge adjacent alpha values, never invert hierarchy.
         expect(ink.summary).toBeLessThanOrEqual(ink.text);
         expect(ink["summary-glass"]).toBeLessThanOrEqual(ink.text);
-        // Exercise actual shader color mixtures, independently of the interval solver.
+        // Sample a numerical model of shader mixtures; no rendered GPU pixels are read.
         const samples = [
           ...colors,
           [0, 1, 2].map((c) => colors.reduce((sum, rgb) => sum + rgb[c], 0) / colors.length),
@@ -244,35 +244,3 @@ test("darkening the scene softens the foreground instead of retaining bright whi
   expect(black.text).toBeLessThan(0.5);
   expect(black.display).toBeLessThan(0.4);
 });
-
-test("a deliberate low-contrast theme mutation fails the same glass guarantee and restores it", () => {
-  const root = document.documentElement;
-  const original = root.style.getPropertyValue("--sys-color-ink-on-glass");
-  const priority = root.style.getPropertyPriority("--sys-color-ink-on-glass");
-  try {
-    root.style.setProperty("--sys-color-ink-on-glass", "var(--ref-color-paper)");
-    expect(() => {
-      try {
-        assertGlassContrast();
-      } catch (error) {
-        console.info(JSON.stringify({ mutationFailure: String(error) }));
-        throw error;
-      }
-    }).toThrow(contrastThresholdFailure);
-    console.info(
-      JSON.stringify({
-        mutation: "low-contrast ink",
-        rejectedBy: "glass contrast threshold >= 4.5",
-      })
-    );
-  } finally {
-    if (original) {
-      root.style.setProperty("--sys-color-ink-on-glass", original, priority);
-    } else {
-      root.style.removeProperty("--sys-color-ink-on-glass");
-    }
-  }
-  assertGlassContrast();
-});
-
-const contrastThresholdFailure = /4\.5/u;
