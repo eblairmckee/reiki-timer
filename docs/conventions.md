@@ -75,7 +75,3 @@ Follow [framework setup and commands](../CONTRIBUTING.md#framework-and-guidance-
 Optimize an observed workload while preserving behavior. Callback identity needs a real contract or measured case; `noJsxPropsBind` is disabled. Do not impose blanket memoization, subpath imports, barrel bans or optimization recipes. Measure relevant loading, render, input or GPU cost before architectural churn; caches need explicit lifetime and invalidation.
 
 Load resources according to their role, avoid unnecessary waterfalls and keep nonurgent work from delaying required feedback. Client Activity, resource hints, script ordering, locale formatting and other conditional techniques remain available when applicable. Historical examples are neither mandatory recipes nor prohibited techniques.
-
-## Recovered framework, UI and testing concerns
-
-Phase 021 reconciled 37 historical skill files, 104 concerns and all removed checker responsibilities. The [handoff and retained-evidence index](rearchitecture-goals/021-tooling.md#evidence-retention) locate the full source inventory, original conventions, clause dispositions and results. These remain audit evidence, outside routine context. Current owners are reflected in these conventions, the configured checks and the separate agent guidance; assigning an owner does not turn an untested concern into proven automated coverage.
