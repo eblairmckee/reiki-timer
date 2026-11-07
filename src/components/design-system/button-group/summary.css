@@ -1,0 +1,119 @@
+@layer tokens {
+  :root {
+    --cmp-motion-button-group-expand: 480ms cubic-bezier(0.22, 0.65, 0.28, 1);
+    --cmp-motion-button-group-surface: 400ms ease-in-out;
+  }
+}
+
+@layer components {
+  .button-group-summary-panel {
+    --cmp-space-button-group-summary-inline: clamp(1.5rem, 4vw, 2.5rem);
+    --cmp-size-button-group-details: min(23rem, 100cqi);
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto;
+    cursor: default;
+    border: 0;
+  }
+  .button-group-summary-panel-trigger {
+    --cmp-color-summary-ink: var(--sys-color-ink-summary-glass);
+    position: relative;
+    display: grid;
+    align-content: center;
+    padding: 0.3em
+      calc(
+        var(--cmp-space-button-group-summary-inline) +
+        var(--cmp-space-button-group-overlap)
+      )
+      0.3em var(--cmp-space-button-group-summary-inline);
+    isolation: isolate;
+  }
+  .button-group-summary-panel:focus-visible {
+    outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+    outline-offset: -3px;
+    border-radius: var(--cmp-radius-button-group) 0 0
+      var(--cmp-radius-button-group);
+  }
+  .button-group-summary-panel-surface {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: -1;
+    inline-size: 100%;
+    min-inline-size: 100%;
+    padding: 0;
+    background-color: var(--sys-color-well-fill-emphasized);
+    border-radius: var(--cmp-radius-button-group) 0 0
+      var(--cmp-radius-button-group);
+    -webkit-backdrop-filter: var(--sys-filter-frost);
+    backdrop-filter: var(--sys-filter-frost);
+    transition:
+      min-inline-size var(--cmp-motion-button-group-expand),
+      background-color var(--cmp-motion-button-group-surface),
+      border-radius var(--cmp-motion-button-group-surface);
+  }
+  .button-group-summary-panel[data-open] .button-group-summary-panel-surface {
+    min-inline-size: max(100%, var(--cmp-size-button-group-details));
+    pointer-events: auto;
+    background-color: var(--cmp-color-summary-details-surface);
+    border-radius: var(--cmp-radius-button-group) 0 0 0;
+  }
+  .button-group-summary-panel-fold {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    inline-size: max(100%, var(--cmp-size-button-group-details));
+    overflow: hidden;
+    pointer-events: auto;
+    background: var(--cmp-color-summary-details-surface);
+    border-radius: 0 0 var(--cmp-radius-button-group)
+      var(--cmp-radius-button-group);
+    -webkit-backdrop-filter: var(--sys-filter-frost);
+    backdrop-filter: var(--sys-filter-frost);
+  }
+  @container (inline-size < 30rem) {
+    .button-group-summary-panel {
+      position: static;
+    }
+    .button-group-track:has([data-ui="button-group"][data-expanded])
+      .button-group-summary-panel {
+      --cmp-space-button-group-summary-inline: 1rem;
+    }
+    .button-group-summary-panel-fold {
+      /* Keep the next row's block position, but align to the whole group's inline end. */
+      inset-block-start: auto;
+      inset-inline-end: 0;
+      inline-size: var(--cmp-size-button-group-details);
+    }
+    .button-group-summary-panel[data-open] .button-group-summary-panel-surface {
+      min-inline-size: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .button-group-summary-panel-surface {
+      transition: none;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .button-group-summary-panel-surface,
+    .button-group-summary-panel[data-open] .button-group-summary-panel-surface,
+    .button-group-summary-panel-fold {
+      background: var(--sys-color-frost-fallback);
+      backdrop-filter: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .button-group-summary-panel[data-open] .button-group-summary-panel-surface,
+    /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
+      .button-group-summary-panel-surface,
+    .button-group-summary-panel-fold {
+      background: Canvas;
+      border: 1px solid CanvasText;
+    }
+  }
+}

@@ -2,8 +2,8 @@
   .timer-timeline {
     padding-block: 1.125rem 1.25rem;
     margin-inline: clamp(1rem, 5cqi, 1.75rem);
-    color: var(--color-timeline-event);
-    border-block-start: 1px solid var(--well-light);
+    color: var(--sys-color-ink-on-dark-glass);
+    border-block-start: 1px solid var(--sys-color-well-light);
   }
   .timer-timeline h2 {
     margin-block-end: 0.875rem;
@@ -33,7 +33,7 @@
   }
   .timeline-time {
     font-size: 0.9375rem;
-    color: var(--color-timeline-time);
+    color: var(--cmp-color-timeline-time);
     text-align: end;
   }
   .timeline-event {
@@ -42,7 +42,7 @@
   .timeline-event small {
     display: block;
     font-size: 0.875rem;
-    color: var(--color-timeline-time);
+    color: var(--cmp-color-timeline-time);
   }
   .timeline-marker {
     display: grid;
@@ -55,7 +55,7 @@
   .timeline-marker::after {
     inline-size: 1px;
     content: "";
-    background: var(--well-light);
+    background: var(--sys-color-well-light);
   }
   .timer-timeline li:first-child .timeline-marker::before,
   .timer-timeline li:last-child .timeline-marker::after {
@@ -64,7 +64,7 @@
   .timeline-dot {
     inline-size: 0.3rem;
     block-size: 0.3rem;
-    color: var(--color-timeline-time);
+    color: var(--cmp-color-timeline-time);
     background: currentColor;
     border-radius: 50%;
   }

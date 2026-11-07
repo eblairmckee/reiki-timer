@@ -2,9 +2,9 @@
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { TimerSummary } from "@/components/molecules/timer-summary";
-import { Atmosphere } from "../../components/atoms/atmosphere";
+import { TimerSummary } from "@/features/timer/summary";
 import { FinishTimerDialog } from "./finish-timer-dialog";
+import { SceneAtmosphere } from "./scene-atmosphere";
 import { TimerContext } from "./timer-context";
 import { loadDraft, readySession, storeDraft } from "./timer-draft";
 import { TimerHud } from "./timer-hud";
@@ -281,7 +281,7 @@ export function TimerLayout() {
         saved,
       }}
     >
-      <Atmosphere
+      <SceneAtmosphere
         blackout={blackout}
         cycling={(!playback || saved) && !blackout}
         dim={playback && !completed ? phase.dim : 0}
@@ -345,7 +345,7 @@ export function TimerLayout() {
             {playback && status}
           </span>
         </section>
-      </Atmosphere>
+      </SceneAtmosphere>
     </TimerContext>
   );
 }

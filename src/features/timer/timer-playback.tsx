@@ -1,5 +1,5 @@
 import { AnimatePresence } from "motion/react";
-import { TimerSummary } from "@/components/molecules/timer-summary";
+import { TimerSummary } from "@/features/timer/summary";
 import { SaveTimer } from "./save-timer";
 import { useTimer } from "./timer-context";
 import { TimerScene } from "./timer-scene";

@@ -1,0 +1,81 @@
+@layer utilities {
+  [data-ui="input"],
+  [data-ui="input-group-wrapper"],
+  [data-ui="number-field-control-group"] {
+    --surface-low: var(--sys-color-surface-container-low);
+    height: 36px;
+    background-color: var(--sys-color-surface-container-lowest);
+    border: 1px solid var(--sys-color-surface-container-highest);
+    border-radius: var(--ref-radius-md);
+    box-shadow: 0 1px 2px 0 color-mix(in srgb, currentcolor 3%, transparent);
+    transition:
+      background-color var(--sys-motion-control-feedback),
+      border-color var(--sys-motion-control-feedback),
+      box-shadow var(--sys-motion-control-feedback),
+      color var(--sys-motion-control-feedback);
+  }
+
+  [data-ui="input"]:focus-within,
+  [data-ui="input-group-wrapper"]:focus-within,
+  [data-ui="number-field-control-group"]:has(input:focus-within) {
+    border-color: var(--sys-color-primary);
+    box-shadow: 0 0 0 var(--sys-size-focus-ring)
+      color-mix(in oklab, var(--sys-color-primary) 35%, transparent);
+  }
+
+  [data-ui="input"]:disabled,
+  [data-ui="input-group-wrapper"]:has(input:disabled),
+  [data-ui="number-field-control-group"][data-disabled] {
+    background-color: var(--surface-low);
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  [data-ui="input"],
+  [data-ui="input-group-wrapper"] {
+    --icon-size: 16px;
+    --inline-padding: var(--ref-space-10);
+    position: relative;
+    width: 100%;
+    font: var(--sys-font-body-md);
+    color: var(--sys-color-on-surface);
+    outline: 0;
+
+    /* Placeholder */
+    &::placeholder {
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+      transition: color var(--sys-motion-control-feedback);
+    }
+
+    /* hover */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:focus-within, :disabled) {
+        background-color: var(--surface-low);
+
+        &::placeholder {
+          color: var(--sys-color-on-surface-variant);
+        }
+      }
+    }
+
+    /* Disabled */
+    &:disabled,
+    &:has(input:disabled) {
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+    }
+
+    /* Invalid */
+    &[data-invalid] {
+      border-color: var(--sys-color-error);
+
+      &:focus-within {
+        box-shadow: 0 0 0 var(--sys-size-focus-ring)
+          color-mix(in oklab, var(--sys-color-error) 35%, transparent);
+      }
+    }
+  }
+
+  [data-ui="input"] {
+    padding-inline: var(--inline-padding);
+  }
+}

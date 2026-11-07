@@ -18,15 +18,16 @@
   }
   /* On history navigation, finish the outgoing snapshot before fading in live, clickable actions. */
   .timer-foreground:has(.timer-save) {
-    transition: opacity 1200ms ease-in-out;
+    transition: opacity var(--sys-motion-scene-enter)
+      var(--sys-motion-scene-easing);
   }
   :root:active-view-transition .timer-foreground:has(.timer-save) {
     opacity: 0;
     transition-duration: 0.6s;
   }
   .timer-hud {
-    --control-button-size: clamp(3.5rem, 14vw, 4.25rem);
-    --timer-summary-align: flex-end;
+    --cmp-size-button-icon: clamp(3.5rem, 14vw, 4.25rem);
+    --summary-align: flex-end;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     justify-items: end;
@@ -62,7 +63,7 @@
     text-wrap: balance;
   }
   .timer-save {
-    --frost-word-radius: var(--radius-md);
+    --cmp-radius-button-word: var(--ref-radius-md);
   }
   @media (prefers-reduced-motion: reduce) {
     .timer-foreground:has(.timer-save) {
@@ -79,7 +80,7 @@
     inset-inline-end: 0;
     padding: 0.5rem 1rem;
     margin-block-start: 0.5rem;
-    background: var(--frost-fallback);
+    background: var(--sys-color-frost-fallback);
   }
   .timer-save h1:focus {
     outline: none;

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Button } from "../../components/ui/button";
+import { Button } from "../../components/design-system/button";
 import { useTimer } from "./timer-context";
 
 export function SaveTimer() {
@@ -13,7 +13,7 @@ export function SaveTimer() {
       <h1 data-ink="display" data-lettering="frosted" ref={title} tabIndex={-1}>
         Timer saved
       </h1>
-      <Button mode="frost" onClick={onDone} size="lg">
+      <Button onClick={onDone} size="lg">
         Done
       </Button>
     </div>

@@ -1,0 +1,85 @@
+@layer utilities {
+  [data-ink] {
+    color: var(--sys-color-ink-on-atmosphere);
+  }
+  [data-ink="label"] {
+    color: var(--sys-color-ink-label);
+  }
+  [data-ink="label"],
+  [data-ink="display"] {
+    font-family: var(--sys-font-family-heading);
+  }
+  [data-ink="detail"],
+  [data-ink="summary"] {
+    font-family: var(--sys-font-family-reading);
+  }
+  [data-ink="summary"] {
+    color: var(--cmp-color-summary-ink, var(--sys-color-ink-summary));
+  }
+  [data-ink="display"] {
+    color: var(--sys-color-ink-display);
+  }
+  [data-ink="control"] {
+    color: var(--sys-color-ink-on-frost);
+  }
+  [data-ink="on-light-frost"] {
+    color: var(--sys-color-ink-on-glass);
+  }
+
+  /* Opposing edges sit outside the solid letter. Scale the cut down on small labels. */
+  [data-lettering="etched"] {
+    --cut-depth: clamp(0.5px, 0.035em, 1.2px);
+    text-shadow:
+      0 calc(-1 * var(--cut-depth)) 0 var(--sys-color-letterpress-shade),
+      0 var(--cut-depth) 0 var(--sys-color-letterpress-rim);
+  }
+  [data-lettering="frosted"] {
+    text-shadow:
+      0 -0.5px 0 var(--sys-color-frost-light),
+      0 1px 1px var(--sys-color-frost-shadow);
+  }
+  /* Each line catches the same light. The dimmest gradient stop is the display ink. */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    :where([data-lettering="frosted"])[data-ink="display"] {
+      color: transparent;
+      text-shadow: none;
+      background-image: linear-gradient(
+        var(--sys-color-lettering-frost-crest) 20%,
+        var(--sys-color-ink-display) 82%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-size: 100% 1lh;
+    }
+  }
+  @media (prefers-contrast: more), (prefers-reduced-transparency: reduce),
+    (forced-colors: active), print {
+    [data-lettering] {
+      text-shadow: none;
+      background-image: none;
+    }
+    [data-ink],
+    [data-lettering="etched"] {
+      color: var(--ref-color-paper);
+    }
+    [data-ink="on-light-frost"] {
+      color: var(--sys-color-ink-on-glass);
+    }
+  }
+  @media (forced-colors: active) {
+    [data-ink],
+    [data-lettering="etched"] {
+      color: CanvasText;
+    }
+    [data-ink="control"],
+    [data-ink="on-light-frost"] {
+      color: ButtonText;
+    }
+  }
+  @media print {
+    [data-ink],
+    [data-lettering="etched"] {
+      color: var(--ref-color-shade);
+    }
+  }
+}

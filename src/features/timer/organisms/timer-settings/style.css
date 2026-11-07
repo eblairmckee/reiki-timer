@@ -1,13 +1,13 @@
 @layer components {
   .timer-settings {
-    --time-picker-size: calc(45vw - 2.25rem);
-    --time-picker-value-gap: 1.125rem;
-    --dial-label-clearance: calc(var(--time-picker-value-gap) + 0.625rem);
+    --cmp-size-dial-diameter: calc(45vw - 2.25rem);
+    --cmp-space-dial-value-gap: 1.125rem;
+    --dial-label-clearance: calc(var(--cmp-space-dial-value-gap) + 0.625rem);
     --subfield-gap: clamp(0.75rem, 2.5svh, 1.5rem);
-    --control-block-size: clamp(3.5rem, 8.5svh, 4.5rem);
+    --cmp-size-switch-block: clamp(3.5rem, 8.5svh, 4.5rem);
     --field-content-height: 8rem;
     --field-row-height: max(
-      var(--time-picker-size),
+      var(--cmp-size-dial-diameter),
       var(--field-content-height)
     );
     --field-inset: calc(
@@ -25,7 +25,10 @@
   }
   /* Keep the parent's inset constant. Only the panel below its control expands. */
   .timer-field-group {
+    display: block;
     padding-block: var(--field-inset);
+    font: inherit;
+    border-radius: 0;
   }
   .timer-field-group > .timer-field {
     min-block-size: var(--field-content-height);
@@ -40,7 +43,7 @@
   .timer-field[data-related] {
     margin-block-start: var(--subfield-gap);
   }
-  .timer-field[data-related]:has(.time-picker) {
+  .timer-field[data-related]:has(.dial) {
     padding-block-end: var(--dial-label-clearance);
     margin-block-start: var(--dial-label-clearance);
   }
@@ -74,7 +77,7 @@
     align-items: baseline;
   }
   .timer-field-preview [data-lettering="frosted"] {
-    font-family: var(--font-heading);
+    font-family: var(--sys-font-family-heading);
   }
   .timer-breakdown-example {
     display: grid;
@@ -96,8 +99,9 @@
     justify-items: center;
     min-width: 0;
   }
-  .timer-progressive {
+  .timer-field-group .timer-progressive {
     overflow: hidden;
+    border-radius: 0;
   }
   .timer-progressive:has(.timer-chime-picker),
   .timer-cue-disclosure {
@@ -121,9 +125,9 @@
     container-type: inline-size;
   }
   .chime-picker {
-    --control-button-size: var(--control-block-size);
+    --cmp-size-button-icon: var(--cmp-size-switch-block);
     display: grid;
-    grid-template-columns: repeat(3, var(--control-button-size));
+    grid-template-columns: repeat(3, var(--cmp-size-button-icon));
     gap: clamp(0.5rem, 2.5vw, 0.875rem);
     justify-content: center;
     min-inline-size: 0;
@@ -133,7 +137,7 @@
   }
   @container (min-width: 31.5rem) {
     .chime-picker {
-      grid-template-columns: repeat(6, var(--control-button-size));
+      grid-template-columns: repeat(6, var(--cmp-size-button-icon));
     }
   }
   .timer-audio-error {
@@ -157,8 +161,8 @@
     .timer-settings {
       --settings-copy-width: clamp(20rem, 34vw, 22rem);
       --settings-column-gap: clamp(2rem, 5vw, 4rem);
-      --time-picker-size: min(27vw, 40.5svh, 22.5rem);
-      --time-picker-value-gap: 1.5rem;
+      --cmp-size-dial-diameter: min(27vw, 40.5svh, 22.5rem);
+      --cmp-space-dial-value-gap: 1.5rem;
       width: min(calc(100% - 4rem), 64rem);
       padding-inline: 0;
       padding-top: 7rem;

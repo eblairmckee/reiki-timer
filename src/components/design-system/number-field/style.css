@@ -1,0 +1,33 @@
+@layer components {
+  [data-ui="number-field-scrub-area"] {
+    cursor: ew-resize;
+  }
+
+  [data-ui="number-field-control-group"] {
+    display: flex;
+    gap: var(--ref-space-8);
+    align-items: center;
+    width: 120px;
+
+    padding: var(--ref-space-2) var(--ref-space-4);
+    [data-slot="number-field-input"] {
+      width: 100%;
+      height: 100%;
+      color: var(--sys-color-on-surface);
+      text-align: center;
+
+      -moz-appearance: textfield;
+      outline: 0;
+      background-color: transparent;
+      border-color: transparent;
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+      }
+
+      &[data-disabled] {
+        color: color-mix(in srgb, var(--sys-color-on-surface) 38%, transparent);
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { BellIcon } from "@/components/atoms/timer-icons";
+import { BellIcon } from "@/features/timer/icons";
 import { formatClock, type TimelineEntry } from "./timer-state";
 import "./timer-timeline.css";
 

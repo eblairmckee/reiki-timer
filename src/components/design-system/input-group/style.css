@@ -1,0 +1,77 @@
+@layer components {
+  [data-ui="input-group-wrapper"] {
+    display: flex;
+    place-items: center;
+
+    /* Input */
+    [data-ui="input"] {
+      flex: 1;
+      height: 100%;
+      outline: none;
+      background: transparent;
+      border: none;
+      border-radius: var(--ref-radius-none);
+      box-shadow: none;
+    }
+
+    /* Input-group specific: wrapper owns the inline padding,
+       so strip it from the input at the edges to prevent doubling. */
+    &:not([data-slot]) {
+      padding-inline: var(--inline-padding);
+
+      &:has(> [data-ui="button"]:first-child) {
+        padding-inline-start: var(--ref-space-4);
+      }
+
+      &:has(> [data-ui="button"]:last-child) {
+        padding-inline-end: var(--ref-space-4);
+      }
+
+      [data-ui="input"] {
+        &:first-child {
+          padding-inline-start: var(--ref-space-0);
+        }
+
+        &:last-child {
+          padding-inline-end: var(--ref-space-0);
+        }
+      }
+    }
+
+    /* Icon */
+    [data-ui="input-group-icon"] {
+      svg {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        color: color-mix(in oklab, currentcolor 100%, transparent);
+      }
+    }
+
+    /* Affix */
+    [data-ui="input-group-affix"] {
+      height: 100%;
+      font: var(--sys-font-body-md);
+      color: color-mix(in oklab, currentcolor 100%, transparent);
+      user-select: none;
+
+      &[data-inline="false"] {
+        &:first-child {
+          padding-right: var(--inline-padding);
+          border-right: 1px solid var(--sys-color-surface-container-highest);
+        }
+
+        &:last-child {
+          padding-left: var(--inline-padding);
+          border-left: 1px solid var(--sys-color-surface-container-highest);
+        }
+      }
+    }
+
+    [data-ui*="input-group-affix"],
+    [data-ui="input-group-icon"] {
+      display: flex;
+      place-items: center;
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+    }
+  }
+}

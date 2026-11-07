@@ -120,13 +120,13 @@ const probes: Probe[] = [
   },
   {
     bad: ".fixture { color: #123456; }\n",
-    good: ".fixture { color: var(--color-ink); }\n",
+    good: ".fixture { color: var(--sys-color-ink-on-glass); }\n",
     id: "theme-hex-css",
     note: "literal CSS hex outside the theme; valid near-match uses semantic token",
   },
   {
     bad: `export function Sample() { return <span style={{ color: "#123456" }}>Text</span>; }\n`,
-    good: `export function Sample() { return <span style={{ color: "var(--color-ink)" }}>Text</span>; }\n`,
+    good: `export function Sample() { return <span style={{ color: "var(--sys-color-ink-on-glass)" }}>Text</span>; }\n`,
     id: "theme-hex-jsx",
     note: "literal inline JSX paint; valid near-match resolves a semantic CSS token",
   },
@@ -394,11 +394,11 @@ lines.push(
   "## Source guidance links",
   "",
   "- React: `.agents/skills/react-best-practices/rules/{rerenders,effects-and-initialization,state,component-types,rendering,javascript}.md`.",
-  "- UI: `.agents/skills/ui-design/rules/{foreground-components,navigation-and-input,library-and-styling,typography}.md`.",
+  "- Historical UI rules at 31885f0: `.agents/skills/ui-design/rules/{foreground-components,navigation-and-input,library-and-styling,typography}.md`.",
   "- TypeScript contracts: `.agents/skills/typescript/rules/contracts.md`. Predicates and narrowing here are paired syntax probes, not runtime validation tests.",
-  "- Media delivery: `.agents/skills/ui-design/rules/media-and-fonts.md`.",
+  "- Historical media guidance at 31885f0: `.agents/skills/ui-design/rules/media-and-fonts.md`.",
   "- Selected installed presets: `node_modules/ultracite/config/biome/{core,react}/biome.jsonc`, extended by `biome.json`. Rule names were checked against these presets, then tested through ordinary lint.",
-  "- Theme color ownership: `.agents/skills/ui-design/rules/library-and-styling.md`.",
+  "- Current theme color ownership: `scripts/check-design-tokens.ts`.",
   "- Configured upstream a11y gaps: `noAutofocus` and `useUniqueElementIds` are disabled, so this matrix does not claim them as enforced.",
   ""
 );

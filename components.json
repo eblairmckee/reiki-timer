@@ -1,4 +1,4 @@
 {
   "$schema": "https://olyx.dev/schema.json",
-  "componentDir": "src/components/ui"
+  "componentDir": "src/components/design-system"
 }

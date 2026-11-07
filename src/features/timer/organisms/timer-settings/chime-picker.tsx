@@ -1,6 +1,7 @@
 // biome-ignore-all lint/performance/noJsxPropsBind: Event handlers intentionally close over current state; no memoized consumer requires stable callback identity.
-import { BellIcon } from "@/components/atoms/timer-icons";
-import { Button } from "@/components/ui/button";
+
+import { Button } from "@/components/design-system/button";
+import { BellIcon } from "@/features/timer/icons";
 import { type ChimeId, chimes } from "../../chimes";
 
 export function ChimePicker({
@@ -16,11 +17,11 @@ export function ChimePicker({
     <fieldset aria-labelledby={labelledBy} className="chime-picker">
       {chimes.map((chime) => (
         <Button
+          appearance="inset"
           aria-label={chime.name}
           aria-pressed={value === chime.id}
-          asIcon
+          iconOnly
           key={chime.id}
-          mode="frost"
           onClick={() => onSelect(chime.id)}
         >
           <BellIcon onFrost />

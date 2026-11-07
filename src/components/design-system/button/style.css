@@ -1,0 +1,454 @@
+@layer tokens {
+  :root {
+    --cmp-motion-button-reshape: 420ms ease-in-out;
+    --cmp-motion-button-hint: 1.4s ease-in-out 3s;
+  }
+}
+
+@layer components {
+  [data-ui="button"] {
+    --svg-size: 18px;
+
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: var(--button-size);
+    font: var(--sys-font-body-md);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    border: 1px solid;
+    transition:
+      background-color var(--sys-motion-control-feedback),
+      border-color var(--sys-motion-control-feedback),
+      box-shadow var(--sys-motion-control-feedback),
+      color var(--sys-motion-control-feedback),
+      scale var(--sys-motion-control-feedback);
+
+    /* size */
+    &[data-size="lg"] {
+      --button-size: 40px;
+      --svg-as-icon-size: var(--ref-space-24);
+      gap: var(--ref-space-16);
+      padding-inline: var(--ref-space-16);
+
+      font: var(--sys-font-body-lg);
+      border-radius: var(--ref-radius-md);
+    }
+
+    &[data-size="md"] {
+      --button-size: 36px;
+      --svg-as-icon-size: 18px;
+      gap: var(--ref-space-12);
+
+      padding-inline: var(--ref-space-12);
+      border-radius: var(--ref-radius-md);
+    }
+
+    &[data-size="sm"] {
+      --button-size: 28px;
+      --svg-as-icon-size: var(--ref-space-14);
+      gap: var(--ref-space-8);
+      padding-inline: var(--ref-space-8);
+
+      font: var(--sys-font-body-sm);
+      border-radius: var(--ref-radius-sm);
+    }
+
+    /* Appearance */
+    &[data-appearance="solid"] {
+      color: var(--color-on-button);
+      background-color: var(--color-button);
+      border-color: transparent;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled, [aria-disabled="true"]) {
+          background-color: color-mix(
+            in srgb,
+            var(--color-button),
+            var(--ref-color-shade) 10%
+          );
+        }
+      }
+    }
+
+    &[data-appearance="outline"] {
+      color: var(--color-button);
+      background-color: var(--color-on-button);
+      border-color: var(--color-button-border);
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled, [aria-disabled="true"]) {
+          background-color: var(--color-button-container);
+          border-color: transparent;
+        }
+      }
+    }
+
+    &[data-appearance="tonal"] {
+      color: var(--color-button);
+      background-color: var(--color-button-container);
+      border-color: transparent;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled, [aria-disabled="true"]) {
+          background-color: transparent;
+          border-color: var(--color-button-border);
+        }
+      }
+    }
+
+    &[data-appearance="ghost"] {
+      min-block-size: 2.75rem;
+      font: var(--sys-font-body-lg);
+      color: var(--cmp-color-button-ghost-ink, var(--color-button));
+      text-decoration: none;
+      background-color: transparent;
+      border-color: transparent;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled, [aria-disabled="true"]) {
+          background-color: var(
+            --cmp-color-button-ghost-fill-hover,
+            var(--color-button-container)
+          );
+        }
+      }
+      &:active:not(:disabled, [aria-disabled="true"]) {
+        background-color: var(
+          --cmp-color-button-ghost-fill-hover,
+          var(--color-button-container)
+        );
+      }
+      &:focus-visible {
+        outline: var(--sys-size-focus-ring) solid currentColor;
+        outline-offset: 2px;
+      }
+    }
+
+    /* Intent */
+    &[data-intent="primary"] {
+      --color-button: var(--sys-color-primary);
+      --color-on-button: var(--sys-color-on-primary);
+      --color-button-border: var(--sys-color-primary);
+      --color-button-container: var(--sys-color-primary-container);
+      --color-button-focus-ring: var(--sys-color-primary);
+    }
+
+    &[data-intent="neutral"] {
+      --color-button: var(--sys-color-on-surface);
+      --color-on-button: var(--sys-color-surface-container-lowest);
+      --color-button-border: var(--sys-color-surface-variant);
+      --color-button-container: var(--sys-color-surface-container-low);
+      --color-button-focus-ring: var(--sys-color-primary);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &[data-appearance="solid"][data-intent="neutral"]:hover:not(
+          :disabled,
+          [aria-disabled="true"]
+        ) {
+        background-color: color-mix(
+          in srgb,
+          var(--color-button),
+          var(--color-on-button) 10%
+        );
+      }
+    }
+
+    &[data-appearance="link"] {
+      color: var(--color-button);
+      background:
+        linear-gradient(currentColor 0 0) 0 100%,
+        linear-gradient(currentColor 0 0) 0 100%,
+        linear-gradient(currentColor 0 0) 100% 0,
+        linear-gradient(currentColor 0 0) 100% 0;
+      background-repeat: no-repeat;
+      background-size:
+        var(--d, 0) 1px,
+        1px var(--d, 0);
+      border-color: transparent;
+      border-radius: 0;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled, [aria-disabled="true"]) {
+          --d: 10px;
+          background-color: transparent;
+        }
+      }
+    }
+
+    &[data-intent="error"] {
+      --color-button: var(--sys-color-error);
+      --color-on-button: var(--sys-color-on-error);
+      --color-button-border: var(--sys-color-error);
+      --color-button-container: var(--sys-color-error-container);
+      --color-button-focus-ring: var(--sys-color-error);
+    }
+
+    /* Active */
+    &:not([data-frost-control]):active {
+      scale: 0.97;
+    }
+
+    /* Focus */
+    &:not([data-frost-control]):focus-visible {
+      box-shadow: 0 0 0 3px
+        color-mix(in oklab, var(--color-button-focus-ring) 35%, transparent);
+    }
+
+    /* Disabled */
+    &:disabled,
+    &[aria-disabled="true"] {
+      color: color-mix(in srgb, var(--sys-color-on-surface) 38%, transparent);
+      pointer-events: none;
+      user-select: none;
+      background-color: var(--sys-color-surface-container);
+      border-color: transparent;
+    }
+
+    /* As Icon */
+    &[data-icon-only="true"] {
+      width: var(--button-size);
+    }
+
+    &[data-icon-only="false"] {
+      svg {
+        width: var(--svg-size);
+        height: var(--svg-size);
+        margin-inline: calc(var(--ref-space-4) * -1);
+      }
+    }
+
+    /* Icon */
+    /* biome-ignore lint/suspicious/noDuplicateSelectors: Material rules are grouped by concern; this later block intentionally extends the existing selector without changing cascade order. */
+    &[data-icon-only="true"] {
+      padding-inline: var(--ref-space-4);
+
+      svg {
+        width: var(--svg-as-icon-size);
+        height: var(--svg-as-icon-size);
+      }
+    }
+  }
+}
+
+@layer components {
+  [data-ui="button"]:is([data-appearance="frost"], [data-appearance="inset"]) {
+    --button-face-inset: var(--cmp-space-button-frost-inset, 0px);
+    height: var(--cmp-size-button-frost-height, 2.75rem);
+    padding: var(--button-face-inset);
+    color: var(--sys-color-ink-on-glass);
+    background: var(--sys-color-well-fill);
+    border: 0;
+    border-radius: var(--cmp-radius-button-word, 0.3rem);
+    transition: none;
+    [data-frost] {
+      display: flex;
+      gap: 0.6em;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding-inline: max(0px, calc(1.4em - var(--button-face-inset)));
+      font-size: 1rem;
+      font-weight: 400;
+    }
+    /* Keep the face lighting underneath the action's text and glyphs. */
+    [data-frost][data-lettering] {
+      isolation: isolate;
+      &::before,
+      &::after {
+        z-index: -1;
+      }
+    }
+    &[data-icon-only="false"]:not([aria-pressed]) {
+      --sys-color-frost-fill: var(--cmp-color-button-word-fill);
+      --sys-color-frost-fallback: var(--ref-color-paper);
+      [data-ripple="release"] {
+        background: none;
+        box-shadow:
+          0 0 0 1px var(--sys-color-ripple-light),
+          0 0 8px var(--sys-color-ripple-diffusion);
+      }
+    }
+    &[data-icon-only="false"][data-size="lg"] {
+      min-width: 7rem;
+      height: 3.25rem;
+      [data-frost] {
+        font-size: 1.3125rem;
+      }
+    }
+    &[data-icon-only="true"] {
+      width: var(--cmp-size-button-icon, 3rem);
+      height: var(
+        --cmp-size-button-frost-height,
+        var(--cmp-size-button-icon, 3rem)
+      );
+      border-radius: var(--cmp-radius-button-icon, var(--ref-radius-circled));
+      transition: border-radius var(--cmp-motion-button-reshape);
+      /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
+      [data-frost] {
+        padding: 0;
+      }
+      svg {
+        width: 36%;
+        height: 36%;
+      }
+    }
+    &:focus-visible {
+      outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+      outline-offset: var(--cmp-space-button-focus-offset, 5px);
+    }
+    &:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+    &[data-activation-hint] [data-frost]::before {
+      animation: frost-button-hint var(--cmp-motion-button-hint) 1;
+    }
+    /* Keep the depth choice independent of selection state. */
+    &[data-appearance="inset"] {
+      --button-face-inset: var(
+        --cmp-space-button-frost-inset,
+        var(--ref-space-4)
+      );
+    }
+    &[data-appearance="inset"][data-icon-only="true"] {
+      --button-face-inset: var(
+        --cmp-space-button-frost-inset,
+        calc(var(--cmp-size-button-icon, 3rem) * var(--sys-ratio-frost-inset))
+      );
+    }
+    &[aria-pressed="true"] {
+      --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+    }
+    &[aria-pressed="true"]::after {
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      content: "";
+      border-radius: inherit;
+      box-shadow: var(--sys-shadow-pressure-ring);
+      scale: 1.04;
+    }
+    @media (forced-colors: active) {
+      &[aria-pressed="true"]::after {
+        border: 2px solid Highlight;
+      }
+    }
+  }
+  /* A shallow track behind the letters gives secondary actions a resting edge. */
+  [data-ui="button"][data-appearance="etched"] {
+    position: relative;
+    height: auto;
+    min-height: 2.75rem;
+    padding: 0.75em;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--sys-color-ink-on-atmosphere);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    background: var(--sys-color-well-fill-emphasized);
+    border: 0;
+    border-radius: 0.25rem;
+    box-shadow:
+      inset 0 3px 6px -3px var(--sys-color-well-shade),
+      inset 0 1px 2px var(--sys-color-well-shade),
+      inset 0 -1px 0 var(--sys-color-well-light);
+    transition: background-color var(--sys-motion-control-settle);
+    &[data-size="lg"] {
+      font-size: 1.125rem;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled, [aria-disabled="true"]) {
+        text-decoration-line: var(--button-underline, underline);
+        background-color: var(--cmp-color-button-well-fill-hover);
+      }
+    }
+    &:active:not(:disabled, [aria-disabled="true"]) {
+      background-color: var(--cmp-color-button-well-fill-pressed);
+      box-shadow:
+        inset 0 2px 4px var(--sys-color-well-shade),
+        inset 0 -1px 0 var(--sys-color-well-light);
+      scale: 1;
+    }
+    &:focus-visible {
+      outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+      outline-offset: -4px;
+      box-shadow: none;
+    }
+    &:is(:disabled, [aria-disabled="true"]) {
+      box-shadow: none;
+      opacity: 0.55;
+      scale: 1;
+    }
+    @media (forced-colors: active) {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
+  [data-ui="button"][data-appearance="text"] {
+    height: auto;
+    min-height: 2.75rem;
+    padding: var(--button-text-padding, 0.5em 0.25em);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--sys-color-ink-on-atmosphere);
+    text-decoration-line: var(--button-underline, underline);
+    text-decoration-color: var(--sys-color-well-light);
+    text-underline-offset: 0.3em;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    &[data-icon-only="true"] {
+      min-inline-size: 2.75rem;
+    }
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: currentColor;
+      background-color: var(--button-text-hover-fill, transparent);
+    }
+    &:focus-visible {
+      outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+      outline-offset: -2px;
+    }
+    &:active {
+      background-color: var(
+        --button-text-pressed-fill,
+        var(--button-text-hover-fill, transparent)
+      );
+      scale: 1;
+    }
+    @media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+      color: var(--ref-color-paper);
+    }
+    @media (forced-colors: active) {
+      color: ButtonText;
+    }
+  }
+  @keyframes frost-button-hint {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-ui="button"]:is(
+        [data-appearance="frost"],
+        [data-appearance="inset"]
+      )[data-icon-only="true"] {
+      transition: none;
+    }
+    [data-ui="button"][data-activation-hint] [data-frost]::before {
+      animation: none;
+    }
+  }
+}

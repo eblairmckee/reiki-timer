@@ -1,0 +1,115 @@
+@layer components {
+  .dial {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    inline-size: var(--cmp-size-dial-diameter, min(58.5vw, 33svh, 25.5rem));
+  }
+  .dial-value {
+    position: absolute;
+    z-index: 2;
+    font-size: clamp(0.875rem, 3.5vw, 1.15rem);
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  .dial-control {
+    inline-size: 100%;
+    aspect-ratio: 1;
+    touch-action: pinch-zoom;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+    border-radius: var(--ref-radius-circled);
+    box-shadow:
+      inset 0 6px 12px -4px var(--sys-color-well-shade),
+      inset 0 -1px 1px var(--sys-color-well-light);
+  }
+  .dial-control[data-dragging] {
+    cursor: grabbing;
+  }
+  .dial-ticks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .dial-ticks path {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+  }
+  .dial-tick-light {
+    stroke: var(--sys-color-etch-light);
+    stroke-width: 1.1;
+  }
+  .dial-tick-major {
+    stroke: var(--sys-color-etch-ink);
+    stroke-width: 1.05;
+  }
+  .dial-tick-minor {
+    opacity: 0.72;
+    stroke: var(--sys-color-etch-ink);
+    stroke-width: 0.65;
+  }
+  .dial-face {
+    position: absolute;
+    inset: 10.5%;
+    pointer-events: none;
+    border-radius: var(--ref-radius-circled);
+    box-shadow:
+      inset 0 1px 1px var(--sys-color-frost-light),
+      inset 1px 0 1px var(--sys-color-well-light),
+      inset 0 -1px 1px var(--sys-color-well-light),
+      0 8px 13px -5px var(--sys-color-frost-shadow);
+  }
+  .dial-rotor {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .dial-index {
+    position: absolute;
+    top: 7%;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 10%;
+    background: var(--sys-color-ink-on-frost);
+    border-radius: 2px;
+    box-shadow: 1px 1px 0 var(--sys-color-etch-light);
+  }
+  .dial-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    touch-action: pinch-zoom;
+    cursor: inherit;
+    opacity: 0;
+  }
+  .dial[data-disabled] {
+    opacity: 0.55;
+  }
+  .dial[data-disabled] .dial-control {
+    cursor: default;
+  }
+  @media (forced-colors: active) {
+    .dial-tick-major,
+    .dial-tick-minor {
+      opacity: 1;
+      stroke: ButtonText;
+    }
+    .dial-tick-light {
+      display: none;
+    }
+    .dial-index {
+      background: ButtonText;
+      box-shadow: none;
+    }
+  }
+}

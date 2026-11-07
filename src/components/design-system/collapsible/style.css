@@ -1,0 +1,69 @@
+@layer components {
+  [data-ui="collapsible"] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-8);
+    justify-content: center;
+    width: 100%;
+    font: var(--sys-font-body-md);
+    border-radius: var(--ref-radius-sm);
+    transition: var(--sys-motion-control-settle);
+
+    [data-slot="collapsible-trigger"] {
+      display: flex;
+      gap: var(--ref-space-12);
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      outline: 0;
+      background-color: transparent;
+      border: 0;
+
+      &:focus-visible {
+        outline: var(--sys-size-focus-ring) solid
+          color-mix(in oklab, var(--sys-color-primary) 45%, transparent);
+      }
+
+      svg {
+        width: var(--ref-space-16);
+        height: var(--ref-space-16);
+        color: inherit;
+        transition: var(--sys-motion-disclosure-slide);
+      }
+    }
+
+    [data-ui="collapsible-panel"] {
+      height: var(--collapsible-panel-height);
+      overflow: hidden;
+      border-radius: var(--ref-radius-sm);
+      opacity: 1;
+      translate: 0 0;
+      transition:
+        height var(--sys-motion-disclosure-slide),
+        opacity var(--sys-motion-disclosure-slide),
+        translate var(--sys-motion-disclosure-slide);
+
+      &[data-starting-style],
+      &[data-ending-style] {
+        height: 0;
+        opacity: 0;
+        translate: 0 -5px;
+      }
+
+      &[hidden]:not([hidden="until-found"]) {
+        display: none;
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-ui="collapsible"] [data-ui="collapsible-panel"] {
+      transition: none;
+
+      &,
+      &[data-starting-style],
+      &[data-ending-style] {
+        translate: none;
+      }
+    }
+  }
+}

@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun run check:tokens && bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit && vite build",
+    "build": "bun run check:design && bun run check:tokens && bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit && vite build",
     "check": "biome check",
+    "check:design": "bun scripts/check-design-contracts.ts",
+    "check:design:fixtures": "bun scripts/design-contract-fixtures.ts && bun scripts/token-fixtures.ts",
     "check:fix": "biome check --write",
     "check:tokens": "bun scripts/check-design-tokens.ts",
     "dev": "vite",
@@ -15,7 +17,7 @@
     "skills:list": "intent list",
     "skills:load": "intent load",
     "test": "vitest run",
-    "typecheck": "bun run check:tokens && bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit"
+    "typecheck": "bun run check:design && bun run check:tokens && bun run routes:generate && node ./node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -46,6 +48,7 @@
     "axe-core": "4.14.0",
     "culori": "4.0.2",
     "happy-dom": "^21.0.4",
+    "lightningcss": "1.33.0",
     "playwright": "1.65.0",
     "postcss": "8.5.32",
     "postcss-value-parser": "4.2.0",

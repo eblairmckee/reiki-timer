@@ -1,12 +1,12 @@
 import { motion, useIsPresent } from "motion/react";
 import type { ReactNode } from "react";
-import { sceneMotion } from "../../components/ui/shared/motion";
-import { useReducedMotion } from "../../components/ui/shared/use-reduced-motion";
+import { motion as systemMotion } from "../../components/design-system/shared/motion";
+import { useReducedMotion } from "../../components/design-system/shared/use-reduced-motion";
 
 export function TimerScene({ children }: { children: ReactNode }) {
   const present = useIsPresent();
   const reduced = useReducedMotion();
-  const transition = present ? sceneMotion.enter : sceneMotion.exit;
+  const transition = present ? systemMotion.scene.enter : systemMotion.scene.exit;
   return (
     <motion.div
       animate={{ opacity: 1 }}

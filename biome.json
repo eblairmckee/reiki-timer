@@ -68,11 +68,40 @@
   "extends": ["ultracite/biome/core", "ultracite/biome/react"],
   "overrides": [
     {
-      "includes": ["src/components/ui/styles/theme.css"],
+      "includes": ["src/components/design-system/styles/theme.css"],
       "linter": {
         "rules": {
           "style": {
             "noHexColors": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/components/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": {
+              "level": "error",
+              "options": {
+                "strictCase": false,
+                "conventions": [
+                  {
+                    "selector": {
+                      "kind": "typeProperty"
+                    },
+                    "formats": ["camelCase"]
+                  },
+                  {
+                    "selector": {
+                      "kind": "any"
+                    },
+                    "match": ".*"
+                  }
+                ]
+              }
+            }
           }
         }
       }

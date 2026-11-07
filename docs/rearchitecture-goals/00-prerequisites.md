@@ -34,7 +34,7 @@ Root `AGENTS.md` adds one file and 187 words, for **38 files and 19,681 words** 
 - [x] **Warn on unused theme tokens.** Follow production reads, CSS aliases and fallbacks across files, including names assembled from the actual shader palette. Distinguish declarations, writes and test-only references from production reads. Show an orphan warning at its declaration, a valid alias and dynamic palette read staying quiet, and an exit status of zero with warnings alone.
 - [x] **Move the six suites to Vitest** behind `bun run test`. Reconcile all 43 cases by behavior. Keep fast unit/component tests and a headless Chromium project. For each of the five theme tests, identify which checks are static and retain its runtime guarantee. Use browser-resolved theme values and Culori for color parsing, compositing and WCAG calculations. Preserve contrast thresholds and polarity on glass, the shaded button face, timeline hierarchy, palette transitions, grain and dimming.
 - [x] **Prove the accessible rendering checks.** Run axe in Chromium on representative setup, choice and timeline states. Introduce a low-contrast value and an unnamed control separately, observe the intended failures and restore the originals. Record incomplete axe findings on translucent or shader surfaces and their numeric or visual coverage.
-- [x] Run lint, token checks, typecheck, Vitest including Chromium, and the production build. Record exact commands and results below. If hosted review is pending, identify the validated branch and commit and hold protected edits for human review before landing.
+- [x] Run lint, token checks, typecheck, Vitest including Chromium, and the production build. Record the validated revision, exact commands and results below.
 
 ## Evaluation log
 
@@ -63,3 +63,12 @@ No prerequisite decision needs your review.
 - **Token renaming.** All 28 shader pigments are live. The unused-token checker recognizes their current `--chakra-` prefix. Update its matcher and dynamic-read fixture alongside the rename so live pigments stay recognized.
 - **Naming rules.** Ordinary lint accepted both `Leading_icon` and `thing` as local identifiers. Probe actual exported props before relying on the earlier prop-spelling result. The [local audit](evidence/skill-lint-audit.md) identifies the exact patterns tested.
 - **Disclosure contrast.** Axe measured the “When chakras change” label at 2.26:1 during its fade. The passing browser suite checks settled states with reduced motion. If the disclosure or its materials change, recheck that transition with motion enabled.
+
+### Cleanup after user verification
+
+For every phase, finish the handoff with the actual paths or test cases created or carried forward. Give each a disposition (remove, consolidate, keep, or defer), the reason, any remaining consumer, and the check that proves cleanup preserved the intended behavior. Record the user's verification of the phase goal separately from passing tests. Once the user verifies it, the incoming agent performs the listed cleanup before starting its phase, repairs references and records the result. Defer anything still needed to its named owner and phase. Keep this record in the handoff. Do not stage or commit without the user's explicit request.
+
+| Phase 00 candidate | Disposition and last consumer |
+| --- | --- |
+| `evidence/*attempt*`, `final-*.txt`, raw JSON and output logs | Remove disposable local copies after acceptance and extraction of the findings. Keep the lint/skill matrix through Phase 02 and the test reconciliation through Phase 03 where their ledgers depend on them. Both evidence and its consumers must agree on what ships in a clean checkout. |
+| `scripts/probe-lint.ts` | Defer to Phase 02's rule-removal trials. It generates the baseline lint matrix and asserts several known gaps. After the last trial, transfer any enduring repo-specific case to the maintained suite, then retire the probe and its report writer. Verify ordinary lint catches the retained bad case and accepts its valid counterpart. |

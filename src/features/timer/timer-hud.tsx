@@ -1,17 +1,14 @@
 import { motion } from "motion/react";
 import type { ReactNode, RefObject } from "react";
 import {
-  EditIcon,
-  FinishIcon,
-  PauseIcon,
-  PlayIcon,
-  RestartIcon,
-} from "@/components/atoms/timer-icons";
-import { ActionGroup, ButtonGroup } from "@/components/molecules/button-group";
-import { ButtonGroupSeparator } from "@/components/ui/button-group";
-import { Button } from "../../components/ui/button";
-import { sceneMotion } from "../../components/ui/shared/motion";
-import { useReducedMotion } from "../../components/ui/shared/use-reduced-motion";
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupSummary,
+} from "@/components/design-system/button-group";
+import { EditIcon, FinishIcon, PauseIcon, PlayIcon, RestartIcon } from "@/features/timer/icons";
+import { Button } from "../../components/design-system/button";
+import { motion as systemMotion } from "../../components/design-system/shared/motion";
+import { useReducedMotion } from "../../components/design-system/shared/use-reduced-motion";
 
 interface Props {
   canResume: boolean;
@@ -59,46 +56,53 @@ export function TimerHud({
   const primary = (
     <Button
       aria-label={action.label}
-      asIcon
       disabled={hidden}
-      hint={mode === "setup"}
-      mode="frost"
+      iconOnly
       onClick={action.activate}
       ref={primaryRef}
+      showActivationHint={mode === "setup"}
       title={action.label}
     >
       {action.content}
     </Button>
   );
-  const group = summary
-    ? {
-        details: { content: summary.timeline, label: "Timer overview" },
-        summary: summary.content,
-        variant: "summary" as const,
-      }
-    : {
-        actions: mode === "paused" && (
-          <>
-            <Button
-              aria-haspopup="dialog"
-              aria-label="Finish timer"
-              asIcon
-              mode="frost"
-              onClick={onFinish}
-              ref={finishRef}
-              title="Finish timer"
-            >
-              <FinishIcon />
-            </Button>
-            <ButtonGroupSeparator aria-hidden="true" />
-            <Button aria-label="Edit timer" asIcon mode="frost" onClick={onEdit} title="Edit timer">
-              <EditIcon />
-            </Button>
-          </>
-        ),
-        variant: "actions" as const,
-      };
-  const transition = hidden ? sceneMotion.exit : sceneMotion.enter;
+  const showRestart = editing && (mode === "save" || (mode === "paused" && canResume));
+  const showSessionActions = !summary && mode === "paused";
+  const extraActions = (showRestart || showSessionActions) && (
+    <>
+      {showSessionActions === true && (
+        <>
+          <Button
+            aria-haspopup="dialog"
+            aria-label="Finish timer"
+            iconOnly
+            onClick={onFinish}
+            ref={finishRef}
+            title="Finish timer"
+          >
+            <FinishIcon />
+          </Button>
+          <ButtonGroupSeparator aria-hidden="true" />
+          <Button aria-label="Edit timer" iconOnly onClick={onEdit} title="Edit timer">
+            <EditIcon />
+          </Button>
+          {showRestart === true && <ButtonGroupSeparator aria-hidden="true" />}
+        </>
+      )}
+      {showRestart === true && (
+        <Button
+          aria-label={restart.label}
+          iconOnly
+          onClick={restart.activate}
+          title={restart.label}
+        >
+          {restart.content}
+        </Button>
+      )}
+    </>
+  );
+  const editingGroupLabel = mode === "save" ? "Timer actions" : "Playback actions";
+  const transition = hidden ? systemMotion.scene.exit : systemMotion.scene.enter;
   return (
     <motion.fieldset
       animate={{ opacity: hidden ? 0 : 1 }}
@@ -109,30 +113,18 @@ export function TimerHud({
       initial={false}
       transition={reduced ? { duration: 0 } : transition}
     >
-      <ButtonGroup
-        {...group}
-        primary={
-          editing && (mode === "save" || (mode === "paused" && canResume)) ? (
-            <ActionGroup
-              actions={
-                <Button
-                  aria-label={restart.label}
-                  asIcon
-                  mode="frost"
-                  onClick={restart.activate}
-                  title={restart.label}
-                >
-                  {restart.content}
-                </Button>
-              }
-              label={mode === "save" ? "Timer actions" : "Playback actions"}
-              primary={primary}
-            />
-          ) : (
-            primary
-          )
-        }
-      />
+      <ButtonGroupSummary
+        details={summary ? { content: summary.timeline, label: "Timer overview" } : undefined}
+        summary={summary?.content}
+      >
+        <ButtonGroup
+          actions={extraActions}
+          aria-label={summary && editing ? editingGroupLabel : "Session actions"}
+          variant="expandable"
+        >
+          {primary}
+        </ButtonGroup>
+      </ButtonGroupSummary>
     </motion.fieldset>
   );
 }

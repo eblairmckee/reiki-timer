@@ -1,6 +1,6 @@
 # Client data and browser behavior
 
-Render text through React's normal escaping. If HTML rendering is required, use the application's trusted sanitization policy. Follow the shared [navigation](../../ui-design/rules/navigation-and-input.md) and [form contracts](../../testing/rules/forms.md). Use SWR-specific examples when the target app already uses SWR; otherwise retain its established data and subscription layer.
+Render text through React's normal escaping. If HTML rendering is required, use the application's trusted sanitization policy. Follow the shared [form contracts](../../testing/rules/forms.md). Use SWR-specific examples when the target app already uses SWR; otherwise retain its established data and subscription layer.
 
 ## Deduplicate Global Event Listeners
 

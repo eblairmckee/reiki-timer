@@ -16,7 +16,7 @@ export interface Diagnostic {
   rule: "tokens/noLiteralColor" | "tokens/unusedThemeToken" | "tokens/parse";
   severity: "error" | "warning";
 }
-export const themePath = "src/components/ui/styles/theme.css";
+export const themePath = "src/components/design-system/styles/theme.css";
 const colorFunctions = new Set([
   "rgb",
   "rgba",
@@ -220,36 +220,33 @@ function writtenToken(node: ts.Node): string | undefined {
   return key && ts.isStringLiteralLike(key) && key.text.startsWith("--") ? key.text : undefined;
 }
 
-/** Recognize the actual nested chakraPalettes.map(names => names.map(name => ...)) read. */
-function isChakraRead(argument: ts.Expression): boolean {
-  if (
-    !ts.isTemplateExpression(argument) ||
-    argument.head.text !== "--chakra-" ||
-    argument.templateSpans.length !== 1
-  ) {
+/** Typed material palettes may be single tuples or readonly collections. */
+function isPaletteType(node: ts.TypeNode): boolean {
+  if (ts.isTypeOperatorNode(node)) {
+    return isPaletteType(node.type);
+  }
+  if (ts.isArrayTypeNode(node)) {
+    return isPaletteType(node.elementType);
+  }
+  return ts.isTypeReferenceNode(node) && node.typeName.getText() === "AtmospherePalette";
+}
+
+/** Recognize the controlled material renderer's direct palette-token read. */
+function isPaletteRead(argument: ts.Expression): boolean {
+  if (!ts.isIdentifier(argument)) {
     return false;
   }
-  const [span] = argument.templateSpans;
-  if (span?.literal.text !== "" || !ts.isIdentifier(span.expression)) {
-    return false;
-  }
-  let collection = span.expression.text;
   for (let ancestor: ts.Node | undefined = argument.parent; ancestor; ancestor = ancestor.parent) {
-    if (!ts.isArrowFunction(ancestor)) {
-      continue;
-    }
-    if (ancestor.parameters[0]?.name.getText() !== collection) {
+    if (!ts.isArrowFunction(ancestor) || ancestor.parameters[0]?.name.getText() !== argument.text) {
       continue;
     }
     const call = ancestor.parent;
     if (
-      !(ts.isCallExpression(call) && ts.isPropertyAccessExpression(call.expression)) ||
-      call.expression.name.text !== "map"
+      ts.isCallExpression(call) &&
+      ts.isPropertyAccessExpression(call.expression) &&
+      call.expression.name.text === "map" &&
+      call.expression.expression.getText() === "palette"
     ) {
-      continue;
-    }
-    collection = call.expression.expression.getText();
-    if (collection === "chakraPalettes") {
       return true;
     }
   }
@@ -278,9 +275,9 @@ function recordPropertyRead(
   if (ts.isStringLiteralLike(argument) && argument.text.startsWith("--")) {
     roots.add(argument.text);
   }
-  if (isChakraRead(argument)) {
+  if (isPaletteRead(argument)) {
     for (const name of paletteNames) {
-      roots.add(`--chakra-${name}`);
+      roots.add(name);
     }
   }
 }
@@ -312,11 +309,14 @@ export function analyzeTokens(files: SourceFile[]): Diagnostic[] {
       if (
         ts.isVariableDeclaration(node) &&
         ts.isIdentifier(node.name) &&
-        node.name.text === "chakraPalettes" &&
-        node.initializer
+        node.initializer &&
+        ts.isSatisfiesExpression(node.initializer) &&
+        isPaletteType(node.initializer.type)
       ) {
         for (const value of staticStrings(node.initializer)) {
-          paletteNames.add(value);
+          if (value.startsWith("--")) {
+            paletteNames.add(value);
+          }
         }
       }
       ts.forEachChild(node, palette);

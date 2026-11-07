@@ -1,0 +1,124 @@
+/* Material studies (silhouette and lighting): docs/concepts/controls/.
+   Current pigments and type are in ../styles/theme.css. */
+@layer utilities {
+  [data-ripple] {
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      closest-side,
+      transparent 82%,
+      var(--sys-color-ripple-light) 96%,
+      transparent
+    );
+    border-radius: inherit;
+    opacity: 0;
+  }
+  [data-ripple="pressure"] {
+    background: none;
+    box-shadow: var(--sys-shadow-pressure-ring);
+  }
+  [data-recess] {
+    position: relative;
+    background: var(--sys-color-well-fill);
+    border: 0;
+    box-shadow:
+      inset 0 5px 12px -5px var(--sys-color-well-shade),
+      inset 0 1px 2px var(--sys-color-well-shade),
+      inset 0 -1px 1px var(--sys-color-well-light);
+    isolation: isolate;
+  }
+  [data-frost] {
+    position: relative;
+    display: block;
+    background:
+      linear-gradient(
+        140deg,
+        var(--sys-color-frost-sheen),
+        transparent 52%,
+        var(--sys-color-frost-shade)
+      ),
+      var(--sys-color-frost-fill);
+    border-radius: inherit;
+    box-shadow:
+      inset 0 1px 1px var(--sys-color-frost-light),
+      inset 1px 0 1px var(--sys-color-well-light),
+      inset 0 -1px 1px var(--sys-color-well-light),
+      0 5px 9px -4px var(--sys-color-frost-shadow),
+      0 1px 3px var(--sys-color-frost-contact);
+    -webkit-backdrop-filter: var(--sys-filter-frost);
+    backdrop-filter: var(--sys-filter-frost);
+  }
+  [data-frost]::before,
+  [data-frost]::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--sys-motion-control-settle);
+  }
+  [data-frost] > [data-ink] {
+    position: relative;
+    z-index: 1;
+  }
+  [data-frost]::before {
+    background: var(--sys-color-frost-reveal);
+    box-shadow:
+      0 8px 14px -5px var(--sys-color-frost-shadow),
+      inset 0 1px 1px var(--sys-color-frost-light);
+  }
+  [data-frost]::after {
+    box-shadow: inset 0 3px 5px -2px var(--sys-color-well-shade);
+  }
+  [data-pressed] [data-frost]::after {
+    opacity: 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-frost-control]:hover:not(
+        [data-disabled],
+        [aria-readonly="true"],
+        [data-pressed]
+      )
+      [data-frost]::before {
+      opacity: 1;
+    }
+  }
+  [data-frost-control]:focus-visible,
+  [data-frost-control]:has(:focus-visible) {
+    outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+    outline-offset: 5px;
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    [data-frost] {
+      background: var(--sys-color-frost-fallback);
+    }
+  }
+  @supports not (
+      (backdrop-filter: blur(1px)) or
+      (-webkit-backdrop-filter: blur(1px))
+    ) {
+    [data-frost] {
+      background: var(--sys-color-frost-fallback);
+    }
+  }
+  @media (forced-colors: active) {
+    [data-recess] {
+      background: Canvas;
+      border: 1px solid ButtonText;
+      box-shadow: none;
+    }
+    [data-frost] {
+      background: ButtonFace;
+      border: 1px solid ButtonText;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+    [data-frost-control]:focus-visible,
+    [data-frost-control]:has(:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
+}

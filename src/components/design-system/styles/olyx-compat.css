@@ -1,0 +1,47 @@
+/* Registry CSS installed by the Olyx CLI consumes these upstream spellings. */
+:root {
+  --color-error: var(--sys-color-error);
+  --color-error-container: var(--sys-color-error-container);
+  --color-on-error: var(--sys-color-on-error);
+  --color-on-primary: var(--sys-color-on-primary);
+  --color-on-surface: var(--sys-color-on-surface);
+  --color-on-surface-variant: var(--sys-color-on-surface-variant);
+  --color-primary: var(--sys-color-primary);
+  --color-primary-container: var(--sys-color-primary-container);
+  --color-surface: var(--sys-color-surface);
+  --color-surface-container: var(--sys-color-surface-container);
+  --color-surface-container-highest: var(--sys-color-surface-container-highest);
+  --color-surface-container-low: var(--sys-color-surface-container-low);
+  --color-surface-container-lowest: var(--sys-color-surface-container-lowest);
+  --color-surface-variant: var(--sys-color-surface-variant);
+  --font-body-lg: var(--sys-font-body-lg);
+  --font-body-md: var(--sys-font-body-md);
+  --font-body-sm: var(--sys-font-body-sm);
+  --font-family: var(--sys-font-family-default);
+  --font-headline-lg: var(--sys-font-headline-lg);
+  --font-label-md: var(--sys-font-label-md);
+  --font-label-sm: var(--sys-font-label-sm);
+  --radius-circled: var(--ref-radius-circled);
+  --radius-lg: var(--ref-radius-lg);
+  --radius-md: var(--ref-radius-md);
+  --radius-none: var(--ref-radius-none);
+  --radius-rounded: var(--ref-radius-rounded);
+  --radius-sm: var(--ref-radius-sm);
+  --radius-xs: var(--ref-radius-xs);
+  --spacing-0: var(--ref-space-0);
+  --spacing-10: var(--ref-space-10);
+  --spacing-12: var(--ref-space-12);
+  --spacing-14: var(--ref-space-14);
+  --spacing-16: var(--ref-space-16);
+  --spacing-2: var(--ref-space-2);
+  --spacing-24: var(--ref-space-24);
+  --spacing-32: var(--ref-space-32);
+  --spacing-4: var(--ref-space-4);
+  --spacing-6: var(--ref-space-6);
+  --spacing-8: var(--ref-space-8);
+  --transition-expressive-default-spatial: var(--sys-motion-disclosure-slide);
+  --transition-expressive-fast-effects: var(--sys-motion-control-feedback);
+  --transition-standard-default-effects: var(--sys-motion-control-settle);
+  --transition-standard-fast-effects: var(--sys-motion-link-feedback);
+  --transition-standard-slow-effects: var(--sys-motion-group-feedback);
+}

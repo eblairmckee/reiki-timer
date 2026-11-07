@@ -1,58 +1,12 @@
-@import url("./components/ui/styles/theme.css") layer(tokens);
-@import url("./components/ui/shared/ink.css");
-@import url("./components/ui/shared/blurred-backdrop.css");
-
-@font-face {
-  font-family: "Bona Nova SC";
-  src: url("/fonts/bona-nova-sc-latin.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: Cabin;
-  src: url("/fonts/cabin-latin-variable.woff2") format("woff2");
-  font-weight: 400 700;
-  font-display: swap;
-}
-
-@layer reset {
-  * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
-  :where(button, [role="button"], [data-ui="button-group"]) {
-    font-family: var(--font-family);
-  }
-  :where(input, select, textarea) {
-    font-family: inherit;
-  }
-  :where(h1, h2, h3, h4, h5, h6) {
-    font-family: var(--font-heading);
-  }
-}
-
-@layer utilities {
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    white-space: nowrap;
-    border: 0;
-    clip-path: inset(50%);
-  }
-}
+@import url("./components/design-system/styles/index.css");
 
 body {
   min-width: 320px;
   margin: 0;
-  font-family: var(--font-family);
+  font-family: var(--sys-font-family-default);
   font-variant-numeric: lining-nums tabular-nums;
-  color: var(--color-on-surface);
-  background: var(--color-surface);
+  color: var(--sys-color-on-surface);
+  background: var(--sys-color-surface);
 }
 
 #root {
@@ -61,14 +15,14 @@ body {
 }
 
 ::selection {
-  color: var(--color-on-selection);
-  background: var(--color-selection);
+  color: var(--sys-color-on-selection);
+  background: var(--sys-color-selection);
 }
 
 .route-message {
-  padding: var(--spacing-32);
-  color: var(--color-ink);
-  background: var(--glass-fill-fallback);
+  padding: var(--ref-space-32);
+  color: var(--sys-color-ink-on-glass);
+  background: var(--sys-color-glass-fill-fallback);
   view-transition-name: foreground;
 }
 
@@ -85,10 +39,12 @@ body {
   opacity: 0;
 }
 ::view-transition-old(foreground) {
-  animation: foreground-out 900ms ease-in-out both;
+  animation: foreground-out var(--sys-motion-scene-exit)
+    var(--sys-motion-scene-easing) both;
 }
 ::view-transition-new(foreground) {
-  animation: foreground-in 1200ms ease-in-out 900ms both;
+  animation: foreground-in var(--sys-motion-scene-enter)
+    var(--sys-motion-scene-easing) var(--sys-motion-scene-exit) both;
 }
 @keyframes foreground-out {
   to {

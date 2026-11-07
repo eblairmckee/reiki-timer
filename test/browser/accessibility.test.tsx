@@ -1,8 +1,20 @@
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, expect, test, vi } from "vitest";
+import { userEvent as browserUser } from "vitest/browser";
+import { Button } from "../../src/components/design-system/button";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "../../src/components/design-system/dialog";
 import { ChimePlayer } from "../../src/features/timer/chimes";
 import { routeTree } from "../../src/routeTree.gen";
 import "../../src/index.css";
@@ -100,14 +112,14 @@ test("axe rejects a low-contrast theme value on a determinable surface and resto
   text.textContent = "Readable theme contrast probe";
   text.dataset.ink = "on-light-frost";
   fixture.dataset.contrastProbe = "";
-  fixture.style.backgroundColor = "var(--color-paper)";
+  fixture.style.backgroundColor = "var(--ref-color-paper)";
   fixture.append(text);
   document.body.append(fixture);
   const original = fixture.getAttribute("style");
   try {
     const baseline = await axe.run(fixture, { runOnly: ["color-contrast"] });
     expect(baseline.violations).toEqual([]);
-    fixture.style.setProperty("--color-ink", "var(--glass-edge-low)");
+    fixture.style.setProperty("--sys-color-ink-on-glass", "var(--sys-color-glass-edge-low)");
     const mutated = await axe.run(fixture, { runOnly: ["color-contrast"] });
     expect(mutated.violations.map(({ id }) => id)).toEqual(["color-contrast"]);
     expect(() => expect(mutated.violations).toEqual([])).toThrow();
@@ -135,4 +147,44 @@ test("axe rejects a low-contrast theme value on a determinable surface and resto
   } finally {
     fixture.remove();
   }
+});
+
+test("a modal contains Tab focus and returns focus after Escape and close activation", async () => {
+  render(
+    <Dialog>
+      <DialogTrigger render={<Button />}>Archive document</DialogTrigger>
+      <DialogPortal>
+        <DialogBackdrop />
+        <DialogPopup>
+          <DialogTitle>Archive this document?</DialogTitle>
+          <DialogDescription>The document stays available in the archive.</DialogDescription>
+          <DialogClose render={<Button />}>Keep editing</DialogClose>
+        </DialogPopup>
+      </DialogPortal>
+    </Dialog>
+  );
+  const trigger = screen.getByRole("button", { name: "Archive document" });
+  trigger.focus();
+  await browserUser.keyboard("{Enter}");
+  const modal = await screen.findByRole("dialog", { name: "Archive this document?" });
+  expect(modal.getAttribute("aria-describedby")).toBe(
+    screen.getByText("The document stays available in the archive.").id
+  );
+  const close = screen.getByRole("button", { name: "Keep editing" });
+  await waitFor(() => expect(document.activeElement).toBe(close));
+  await browserUser.tab();
+  await waitFor(() => expect(document.activeElement).toBe(close));
+  await browserUser.tab({ shift: true });
+  await waitFor(() => expect(document.activeElement).toBe(close));
+  await browserUser.keyboard("{Escape}");
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(document.activeElement).toBe(trigger);
+  await browserUser.keyboard("{Enter}");
+  await screen.findByRole("dialog", { name: "Archive this document?" });
+  await waitFor(() =>
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Keep editing" }))
+  );
+  await browserUser.keyboard("{Enter}");
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(document.activeElement).toBe(trigger);
 });

@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import { routeTree } from "../../routeTree.gen";
 import { ChimePlayer } from "./chimes";
+import { TimerSettings } from "./organisms/timer-settings";
 import { draftStorageKey } from "./timer-draft";
 import { configStorageKey, defaultConfig, timerTimeline } from "./timer-state";
 import { TimerTimeline } from "./timer-timeline";
@@ -23,6 +24,40 @@ async function renderTimer(path = "/") {
   const view = render(<RouterProvider router={router} />);
   return { router, ...view };
 }
+
+test.each([
+  ["warmUp", "Warm up", "slider", "Warm up time"],
+  ["coolDown", "Cool down", "slider", "Cool down time"],
+  ["showTime", "Show timer", "switch", "Show breakdown"],
+  ["chimes", "Chimes", "group", "Tone"],
+] as const)(
+  "%s keeps preference semantics and controls its dependent panel",
+  async (preference, label, role, name) => {
+    const user = userEvent.setup({ document });
+    const onChange = vi.fn();
+    const config = { ...defaultConfig, [preference]: true, chimeOnChange: true };
+    const props = { audioError: "", config, onChange, onPreviewChime: vi.fn() };
+    const { rerender } = render(<TimerSettings {...props} />);
+    const control = screen.getByRole("switch", { name: label });
+    const dependent = screen.getByRole(role, { name });
+    const panel = dependent.closest("[data-ui=collapsible-panel]");
+    expect(control.getAttribute("aria-checked")).toBe("true");
+    expect(control.getAttribute("aria-controls")).toBe(panel?.id);
+    await user.click(control);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.calls[0]?.[0]).toMatchObject({ [preference]: false });
+    // The preference owner updates both the switch and the panel together.
+    expect(screen.getByRole(role, { name })).toBe(dependent);
+    rerender(<TimerSettings {...props} config={{ ...config, [preference]: false }} />);
+    expect(control.getAttribute("aria-checked")).toBe("false");
+    expect(control.hasAttribute("aria-expanded")).toBe(false);
+    expect(control.hasAttribute("aria-controls")).toBe(false);
+    expect(screen.queryByRole(role, { name })).toBeNull();
+    expect(!panel?.isConnected || panel.hasAttribute("inert")).toBe(true);
+    expect(!panel?.isConnected || panel.getAttribute("aria-hidden") === "true").toBe(true);
+    expect(document.activeElement).toBe(control);
+  }
+);
 
 test("related fields reveal in place; sessions have no visible time by default", async () => {
   const { router } = await renderTimer();
@@ -413,9 +448,10 @@ test("chimes reveal six selectable previews, preserve preferences, and follow th
     await user.click(end());
     await user.click(changes());
     expect(enabled.getAttribute("aria-checked")).toBe("true");
+    const exitingPanel = screen.getByRole("group", { name: "Tone" }).closest(".timer-progressive");
     await user.click(enabled);
     expect(stop).toHaveBeenCalled();
-    expect(document.querySelector(".timer-progressive")?.hasAttribute("inert")).toBe(true);
+    expect(!exitingPanel?.isConnected || exitingPanel.hasAttribute("inert")).toBe(true);
     await user.click(enabled);
     expect(screen.getByRole("button", { name: "High zen tone" }).getAttribute("aria-pressed")).toBe(
       "true"

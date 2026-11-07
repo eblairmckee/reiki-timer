@@ -1,0 +1,120 @@
+@layer components {
+  [data-ui="link-button"] {
+    position: relative;
+    display: inline-flex;
+    gap: var(--ref-space-4);
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    color: var(--color-link-button);
+    transition: color var(--sys-motion-link-feedback);
+
+    &:is(a) {
+      text-decoration: none;
+    }
+
+    &:is(button) {
+      background-color: transparent;
+      border: none;
+    }
+
+    &::before {
+      position: absolute;
+      inset-block-end: var(--ref-space-0);
+      width: 100%;
+      height: 1px;
+      content: "";
+      background-color: currentcolor;
+      transition: opacity var(--sys-motion-link-feedback);
+    }
+
+    /* Icon */
+    & > i {
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    /* Underline */
+    &:not([data-underline="true"])::before {
+      opacity: 0;
+    }
+
+    /* Size */
+    &[data-size="md"] {
+      font: var(--sys-font-body-md);
+    }
+
+    &[data-size="sm"] {
+      font: var(--sys-font-body-sm);
+    }
+
+    /* Variant */
+    &[data-intent="muted"] {
+      --color-link-button: var(--sys-color-on-surface-variant);
+    }
+
+    &[data-intent="default"] {
+      --color-link-button: var(--sys-color-on-surface);
+    }
+
+    &[data-intent="primary"] {
+      --color-link-button: var(--sys-color-primary);
+    }
+
+    &[data-intent="error"] {
+      --color-link-button: var(--sys-color-error);
+    }
+
+    /* Disabled */
+    &:disabled,
+    &[aria-disabled="true"] {
+      color: color-mix(in srgb, var(--sys-color-on-surface) 38%, transparent);
+      pointer-events: none;
+      cursor: auto;
+    }
+
+    /* Hover */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled, [aria-disabled="true"]) {
+        color: color-mix(
+          in srgb,
+          var(--color-link-button),
+          var(--sys-color-on-surface) 30%
+        );
+
+        &::before {
+          opacity: 1;
+        }
+      }
+    }
+    &[data-inline] {
+      display: inline-block;
+      max-inline-size: 100%;
+      padding: 0;
+      font: inherit;
+      font-weight: 700;
+      line-height: inherit;
+      vertical-align: baseline;
+      color: var(--sys-color-ink-on-dark-glass);
+      text-decoration: none;
+      cursor: pointer;
+      border: 0;
+      border-radius: 2px;
+      &::before {
+        content: none;
+      }
+      &:hover,
+      &:active {
+        color: var(--ref-color-paper);
+        background: var(--sys-color-frost-sheen);
+      }
+      &:focus-visible {
+        outline: var(--sys-size-focus-ring) solid currentColor;
+        outline-offset: 2px;
+      }
+      @media (forced-colors: active) {
+        color: LinkText;
+      }
+    }
+  }
+}

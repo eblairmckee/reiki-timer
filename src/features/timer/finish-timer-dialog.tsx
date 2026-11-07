@@ -1,8 +1,16 @@
 // biome-ignore-all lint/performance/noJsxPropsBind: Event handlers intentionally close over current state; no memoized consumer requires stable callback identity.
-import { Dialog } from "@base-ui/react/dialog";
 import { type RefObject, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { LinkButton } from "@/components/ui/link-button";
+import { Button } from "@/components/design-system/button";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogPortal,
+  DialogTitle,
+} from "@/components/design-system/dialog";
+import { LinkButton } from "@/components/design-system/link-button";
 import "./finish-timer-dialog.css";
 
 interface Props {
@@ -28,7 +36,7 @@ export function FinishTimerDialog({
 }: Props) {
   const title = useRef<HTMLHeadingElement>(null);
   return (
-    <Dialog.Root
+    <Dialog
       onOpenChange={(nextOpen, details) => {
         if (nextOpen || !open) {
           return;
@@ -41,18 +49,18 @@ export function FinishTimerDialog({
       }}
       open={open}
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="reiki-off-backdrop" />
-        <Dialog.Popup
+      <DialogPortal>
+        <DialogBackdrop />
+        <DialogPopup
           className="reiki-off-dialog"
           finalFocus={finishRef}
           inert={!open}
           initialFocus={title}
         >
-          <Dialog.Title data-lettering="etched" ref={title} tabIndex={-1}>
+          <DialogTitle ref={title} tabIndex={-1}>
             Reiki off
-          </Dialog.Title>
-          <Dialog.Description>
+          </DialogTitle>
+          <DialogDescription>
             {expired ? "Your session is complete." : "Want to close out this session?"} Before you
             go, you can{" "}
             <LinkButton as="button" inline onClick={onSave}>
@@ -73,11 +81,11 @@ export function FinishTimerDialog({
               make changes
             </LinkButton>{" "}
             to it first
-          </Dialog.Description>
+          </DialogDescription>
           {Boolean(saveError) && <p role="alert">Couldn’t save in this browser. Try again</p>}
-          <Dialog.Close render={<Button mode="frost" />}>Leave without saving</Dialog.Close>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+          <DialogClose render={<Button />}>Leave without saving</DialogClose>
+        </DialogPopup>
+      </DialogPortal>
+    </Dialog>
   );
 }

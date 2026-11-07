@@ -1,5 +1,5 @@
-import { mkdir, rm } from "node:fs/promises";
-import { resolve } from "node:path";
+import { mkdtemp, rm } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { spawnSync, write } from "bun";
 import { analyzeTokens, type SourceFile, themePath } from "./token-analysis";
 
@@ -186,7 +186,7 @@ const fixtures: Fixture[] = [
     files: [
       {
         path: themePath,
-        text: ":root {\n--orphan: red;\n--alias: var(--base, var(--fallback));\n--base: blue;\n--fallback: green;\n--test-only: pink;\n--write-only: navy;\n--declaration-only: plum;\n--chakra-bold-root-ruby: maroon;\n--chakra-unused-pigment: purple;\n--direct-read: gold;\n--js-alias: var(--base);\n--js-dependency: purple;\n--write-dependency: pink;\n}",
+        text: ":root {\n--orphan: red;\n--alias: var(--base, var(--fallback));\n--base: blue;\n--fallback: green;\n--test-only: pink;\n--write-only: navy;\n--declaration-only: plum;\n--ref-color-pigment-ruby: maroon;\n--ref-color-pigment-unused: purple;\n--direct-read: gold;\n--js-alias: var(--base);\n--js-dependency: purple;\n--write-dependency: pink;\n}",
       },
       {
         path: "src/production.css",
@@ -199,8 +199,7 @@ const fixtures: Fixture[] = [
       },
       {
         path: "src/production.ts",
-        // biome-ignore lint/suspicious/noTemplateCurlyInString: The fixture must contain the actual dynamic token read as source text.
-        text: 'export const chakraPalettes = [["bold-root-ruby"]] as const; const declared = "--declaration-only"; style.setProperty("--write-only", "var(--write-dependency)"); style.setProperty("--js-alias", "var(--js-dependency)"); style.getPropertyValue("--direct-read"); chakraPalettes.map(names => names.map(name => style.getPropertyValue(`--chakra-${name}`)));',
+        text: 'export const colors = [["--ref-color-pigment-ruby"]] as const satisfies readonly AtmospherePalette[]; const declared = "--declaration-only"; style.setProperty("--write-only", "var(--write-dependency)"); style.setProperty("--js-alias", "var(--js-dependency)"); style.getPropertyValue("--direct-read"); palette.map(token => style.getPropertyValue(token));',
       },
     ],
     name: "Unused graph distinguishes reads writes tests declarations",
@@ -209,9 +208,21 @@ const fixtures: Fixture[] = [
       "--test-only",
       "--write-only",
       "--declaration-only",
-      "--chakra-unused-pigment",
+      "--ref-color-pigment-unused",
       "--write-dependency",
     ],
+  },
+  {
+    errors: 0,
+    files: [
+      { path: themePath, text: ":root {--ocean-deep: red; --unused-ocean: blue;}" },
+      {
+        path: "src/weather.ts",
+        text: 'const shoreline = ["--ocean-deep"] as const satisfies AtmospherePalette; palette.map(token => style.getPropertyValue(token));',
+      },
+    ],
+    name: "Unrelated typed material palette uses direct custom-property names",
+    warnings: ["--unused-ocean"],
   },
   {
     errors: 0,
@@ -222,15 +233,14 @@ const fixtures: Fixture[] = [
   {
     errors: 0,
     files: [
-      { path: themePath, text: ":root {--chakra-bold-root-ruby: red;}" },
+      { path: themePath, text: ":root {--ref-color-pigment-ruby: red;}" },
       {
         path: "src/read.ts",
-        // biome-ignore lint/suspicious/noTemplateCurlyInString: The fixture contains source text for an unrelated dynamic read.
-        text: 'export const chakraPalettes = [["bold-root-ruby"]]; const name = arbitraryInput; style.getPropertyValue(`--chakra-${name}`);',
+        text: 'export const colors = [["--ref-color-pigment-ruby"]] satisfies readonly AtmospherePalette[]; const name = arbitraryInput; style.getPropertyValue(name);',
       },
     ],
     name: "Unrelated dynamic read does not bless palette",
-    warnings: ["--chakra-bold-root-ruby"],
+    warnings: ["--ref-color-pigment-ruby"],
   },
 ];
 
@@ -252,21 +262,25 @@ const results = fixtures.map((fixture) => {
 });
 
 // Exercise the ordinary configured lint command, not just --only capability.
-const fixtureDirectory = resolve("scripts/token-probe-fixtures");
-await mkdir(fixtureDirectory, { recursive: true });
+// Keep probes under the repository so Biome applies its ordinary VCS and path policy.
+// mkdtemp gives this run sole ownership of the directory removed in finally.
+const fixtureDirectory = await mkdtemp(resolve("scripts/.token-fixtures-"));
 const biomeResults: { name: string; exitStatus: number; passed: boolean; output: string }[] = [];
 try {
   for (const [name, text, expected] of [
     ["CSS hex rejected by ordinary lint", ".x {color: #abcdef;}\n", 1],
     ["CSS token accepted by ordinary lint", ".x {color: var(--ink);}\n", 0],
   ] as const) {
-    const path = `${fixtureDirectory}/probe.css`;
+    const path = join(fixtureDirectory, "probe.css");
     // biome-ignore lint/performance/noAwaitInLoops: The same fixture path must be rewritten before each sequential lint process.
     await write(path, text);
-    const result = spawnSync(["bun", "run", "--bun", "biome", "lint", path], {
-      stderr: "pipe",
-      stdout: "pipe",
-    });
+    const result = spawnSync(
+      ["bun", "run", "--bun", "biome", "lint", "--config-path", resolve("."), path],
+      {
+        stderr: "pipe",
+        stdout: "pipe",
+      }
+    );
     const output =
       new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
     biomeResults.push({
@@ -280,18 +294,18 @@ try {
 } finally {
   await rm(fixtureDirectory, { force: true, recursive: true });
 }
-const evidence = {
-  command: "bun scripts/token-fixtures.ts",
-  fixtures: results,
-  ordinaryLint: biomeResults,
-};
-await write(
-  "docs/rearchitecture-goals/evidence/token-fixtures.json",
-  `${JSON.stringify(evidence, null, 2)}\n`
-);
 for (const result of [...results, ...biomeResults]) {
   console.log(`${result.passed ? "PASS" : "FAIL"} ${result.name} (exit ${result.exitStatus})`);
+  if (!result.passed) {
+    console.error("output" in result ? result.output : result.diagnostics);
+  }
 }
+console.log(
+  `${results.filter((result) => result.passed).length}/${results.length} token analysis fixtures passed.`
+);
+console.log(
+  `${biomeResults.filter((result) => result.passed).length}/${biomeResults.length} ordinary lint fixtures passed.`
+);
 if ([...results, ...biomeResults].some((result) => !result.passed)) {
   process.exitCode = 1;
 }
