@@ -1,6 +1,5 @@
 node_modules/
-# Retained audit evidence. Do not remove during routine cleanup; see
-# docs/rearchitecture-goals/021-tooling.md (Evidence retention).
+
 /.audit-evidence/
 dist/
 build/

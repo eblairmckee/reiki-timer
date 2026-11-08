@@ -1,37 +1,33 @@
-# Agent instructions
+# Repository guidance
 
-This is a client-side React, TypeScript, Vite and TanStack Router app. Use Bun and the declared scripts. This file and `.agents/skills/` contain agent instructions. README, CONTRIBUTING and `docs/` are for human contributors; they are not prerequisites for ordinary agent work.
+This is a client-side React, TypeScript, Vite and TanStack Router app. Use Bun and the declared scripts. Start with the affected source contract and real callers; read only the relevant linked sections and skills. Skills and their supporting references are the source of truth for conventions; this file routes to the relevant guidance.
 
-Start with the affected public declaration, implementation and real callers. Load only the relevant skill below. Types, lint and tests establish their stated guarantees; skills guide semantic choices and evidence selection. Do not load the historical audit corpus unless the task calls for it.
+## Organizing code and public APIs
 
-## Task skills
+Before adding or moving code, use [placement](.agents/references/code-organization.md#placement) and [dependency boundaries](.agents/references/code-organization.md#dependency-boundaries). For public types or untrusted inputs, use [contract boundaries](.agents/references/code-organization.md#public-contracts-and-runtime-data).
 
-| Decision | Skill |
-| --- | --- |
-| State ownership, Effects, subscriptions, async work, persistence or resource identity | [React lifetime](.agents/skills/react-lifetime/SKILL.md) |
-| Shared promotion, atoms/molecules/organisms, controlled APIs, slots or coordinated parts | [React composition](.agents/skills/react-composition/SKILL.md) |
-| Native activation, keyboard/focus, forms, cancellation or recovery | [Interaction evidence](.agents/skills/interaction-evidence/SKILL.md) |
-| Visual hierarchy, typography, responsive content, surfaces or motion | [Visual design](.agents/skills/visual-design/SKILL.md) |
-| Architecture, shared contracts or quality policy | [Maintainer role](.agents/skills/design-system-maintainer/SKILL.md); its matrix selects guidance, checks and accountable judgment |
+Use [React composition](.agents/skills/react-composition/SKILL.md) for shared promotion, atomic classification, controlled APIs, slots and coordinated parts.
 
-## Repository boundaries
+## State, interaction and appearance
 
-The adapted Olyx foundations in `src/components/design-system/` are app-owned and configured by `components.json`. Merge additions into that system, preserving public APIs, brand, accessibility and motion; inspect affected callers. Shared app UI lives in `src/components/{atoms,molecules,organisms}/`. The composition skill owns the classification and promotion rules.
+- State ownership, Effects, subscriptions, async work or resource identity: [React lifetime](.agents/skills/react-lifetime/SKILL.md).
+- Native activation, keyboard/focus, forms, cancellation or recovery: [Interaction evidence](.agents/skills/interaction-evidence/SKILL.md).
+- Visual hierarchy, typography, responsive content, surfaces or motion: [Visual design](.agents/skills/visual-design/SKILL.md).
 
-Feature UI lives in `src/features/<feature>/components/` and `screens/`, without atomic tiers. Feature `hooks/` own React lifetimes/commands; `state/` owns context; `model/` and `data/` own pure rules/catalogues; `services/` owns I/O. Shared hooks/utilities live in `src/hooks/` and `src/utils/`; app routing/styles live in `src/app/`. Keep CSS, private helpers and focused tests beside their owner. Whole-feature tests stay with the layout; native browser tests live in `test/browser/`.
+## Routes and framework integration
 
-Shared components, hooks and utilities must not import features; neutral helpers must not import component implementations. Pure models must not import browser services or components. Use populated, concern-named directories; feature components have named implementation files. Shared components may implement in `index.tsx`. Avoid passthrough wrappers/re-exports for internal moves and private system material imports.
+Use [routes and generated files](.agents/references/development-workflow.md#routes-and-generated-files) for route changes and [installed packages](.agents/references/development-workflow.md#installed-packages) for unfamiliar APIs or build configuration.
 
-## Checks and frameworks
+## Verification and handoff
 
-Use `bun run check` for Biome, `bun run typecheck` for types, `bun run check:colors` for static paint ownership, and the relevant `test:unit`, `test:tools` or `test:browser` script. Run `bun run verify` before handoff unless execution is restricted; it runs lint, colors, build/types and all Vitest projects without duplicate compilation. Ordinary tests use `bun run test`, not `bun test`. Respect requests to stop tests/evaluations and report checks not run. Recheck only when a change, failure or unresolved concern warrants it.
+Choose [focused checks](.agents/references/development-workflow.md#check-selection) during edits. Before finishing, follow the [verification and handoff requirements](.agents/references/development-workflow.md#handoff).
 
-Routes live in `src/routes/`; the Router plugin precedes React and owns `src/routeTree.gen.ts`. Run `bun run routes:generate` after route edits; typecheck/build also generate it. Keep it outside Biome and never edit it manually. Check affected direct navigation and history. Production hosting must serve `index.html` for application routes.
+## Quality conventions
 
-For unfamiliar APIs, inspect installed declarations. Use `bun run skills:list` and `bun run skills:load <package>#<skill>` for relevant installed package guidance; optional server/Query examples do not establish app capabilities. The [Vite documentation index](https://vite.dev/llms.txt) covers build configuration. Use strict TypeScript and runtime validation for untrusted data; casts are not validation. Keep normal React escaping; explicit HTML requires a trusted sanitization boundary. Optimize observed workloads and preserve identity where the contract requires it; avoid blanket memoization or new performance dependencies.
+Before introducing a convention, adding a checker, disabling a rule or changing required verification, [choose enforcement](.agents/references/quality-conventions.md#choosing-enforcement) and assess [costs and remaining judgment](.agents/references/quality-conventions.md#costs-and-remaining-judgment).
 
-## Handoff and guidance changes
+Use [static rules/checkers](.agents/references/quality-conventions.md#static-rules-and-custom-checkers) for checking changes, [colors/tokens](.agents/references/quality-conventions.md#color-and-token-ownership) for paint enforcement or token cleanup, [performance](.agents/references/quality-conventions.md#performance-and-resources) for optimization, and [check reliability](.agents/references/quality-conventions.md#check-reliability) for acceptance criteria. Load only the relevant section.
 
-Review the diff, report checks and remaining limits, and preserve user edits. Do not stage or commit without explicit authorization. The ignored `.audit-evidence/` directory is retained evidence and excluded from routine cleanup; remove material only when the user explicitly identifies it.
+## Changing guidance
 
-Keep agent decisions in these instructions or a focused skill, human explanations in README/CONTRIBUTING/docs, and mechanical guarantees in types/configuration/scripts/tests. Update both audiences when a convention changes without making agents load human docs. Skill metadata changes use `bun run skills:validate .agents/skills`; review paths, commands and applicability separately. Preserve source attribution. Another evaluation batch requires a concrete question and authorization, not merely a documentation edit.
+Use [convention placement](.agents/references/guidance-maintenance.md#convention-placement) when editing AGENTS, references or skills, and [validation and efficacy](.agents/references/guidance-maintenance.md#validation-and-efficacy) when assessing their structure or benefit.

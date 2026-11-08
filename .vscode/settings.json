@@ -13,8 +13,6 @@
   },
   "biome.requireConfiguration": true,
   "biome.suggestInstallingGlobally": false,
-  "eslint.enable": false,
-  "eslint.format.enable": false,
   "js/ts.experimental.useTsgo": true,
   "js/ts.tsdk.path": "./node_modules/typescript",
   "extensions.ignoreRecommendations": false
