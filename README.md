@@ -12,4 +12,4 @@ bun run test:install
 bun run dev
 ```
 
-Run `bun run verify` before handoff. [CONTRIBUTING.md](CONTRIBUTING.md) explains focused commands, browser setup, evidence and check limits.
+Follow the [repository verification scope](AGENTS.md#verification-and-handoff) to decide which checks apply before handoff. [CONTRIBUTING.md](CONTRIBUTING.md) explains focused commands, browser setup, evidence and check limits.

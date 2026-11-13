@@ -6,6 +6,8 @@ Start with the affected public contract and its consumers. Use the [task entrypo
 
 Follow the [README setup](README.md#develop-and-verify). Browser checks require local-server access and Chromium. Linux hosts may also need `bunx --no-install playwright install-deps chromium`. The editor uses repository Biome configuration; extensions are optional.
 
+Use the [repository verification scope](AGENTS.md#verification-and-handoff) to decide when checks and rendered review apply. See [browser access and test servers](AGENTS.md#browser-access-and-test-servers) for the distinction between the running app, the in-app browser and Vitest's browser suite.
+
 | Change or question | Command | Scope |
 | --- | --- | --- |
 | Formatting and static rules | `bun run check` | Biome; `bun run check:fix` applies fixes for review. |

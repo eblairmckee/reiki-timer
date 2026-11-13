@@ -20,7 +20,18 @@ Use [routes and generated files](.agents/references/development-workflow.md#rout
 
 ## Verification and handoff
 
-Choose [focused checks](.agents/references/development-workflow.md#check-selection) during edits. Before finishing, follow the [verification and handoff requirements](.agents/references/development-workflow.md#handoff).
+The following scope rules apply to every session in this repository and take precedence over unconditional verification or rendered-inspection steps in linked skills, references and other docs.
+
+- **Automatic visual review requires TSX edits in the current turn.** Trigger it only when the agent adds, modifies, renames or deletes a `.tsx` file during that turn. Use the turn-start state as the baseline; pre-existing staged/unstaged changes, previous turns and reading TSX files do not count. Planning, discussion, read-only review and edits confined to Markdown, CSS, `.ts` or configuration do not trigger automatic visual review. Explicit requests to inspect the UI or diagnose browser access remain actionable without TSX edits.
+- **Do not run full verification just because a turn is ending.** Planning, discussion, read-only review and documentation/guidance-only edits do not require `bun run verify` or runtime tests. For documentation/guidance edits, review the diff, links, applicability and consistency; validate skill metadata only when changed. Explicit requests to run checks or diagnose tooling remain actionable without source edits.
+- For implementation, configuration or test changes, choose [focused checks](.agents/references/development-workflow.md#check-selection) during edits and follow the [handoff requirements](.agents/references/development-workflow.md#handoff). Automated browser tests are separate from automatic visual review. Repeat checks or rendered review only after further relevant changes or for an unresolved finding.
+
+### Browser access and test servers
+
+- For rendered review, use the in-app browser with the user's already-running dev server (normally `http://localhost:5173`). Check the current session's browser connection and tabs; a tab in another conversation does not establish access here. Do not start a second dev server or run browser tests just to view the app.
+- `bun run test:browser` runs Vitest's Chromium project, which starts its own test server and Playwright-managed Chromium. It does not reuse the app dev server or the in-app browser. `bun run verify` includes this suite; a running dev server cannot satisfy its separate listening/launch permissions.
+- Diagnose these paths independently. A test-server `listen EPERM` is a permission failure, not evidence that the app server is down, the port is occupied or the in-app browser is unavailable. A browser-session routing/connection failure is a separate access problem. Do not repeatedly retry unchanged permission failures, replace the user's server, change ports as a permissions workaround or weaken tests to obtain a pass.
+- Report confirmed blockers prominently when encountered, naming the affected path and exact error; continue independent work. Distinguish rendered review, automated tests and checks not required for the task. Do not repeat an old verification blocker in unrelated planning or documentation handoffs.
 
 ## Quality conventions
 
