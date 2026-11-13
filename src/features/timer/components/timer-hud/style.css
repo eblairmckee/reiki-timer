@@ -1,18 +1,4 @@
 @layer components {
-  .timer-hud {
-    --cmp-size-button-icon: clamp(3.5rem, 14vw, 4.25rem);
-    --summary-align: flex-end;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: end;
-    inline-size: 100%;
-    min-inline-size: 0;
-    max-inline-size: 100%;
-    padding: 0;
-    margin: 0;
-    pointer-events: none;
-    border: 0;
-  }
   .timer-hud-error {
     position: absolute;
     inset-block-start: 100%;

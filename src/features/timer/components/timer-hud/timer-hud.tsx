@@ -1,14 +1,8 @@
-import { motion } from "motion/react";
 import type { ReactNode, RefObject } from "react";
 import { EditIcon, ExitIcon, PauseIcon, PlayIcon, ResetIcon } from "@/components/atoms/icons";
 import { Button } from "@/components/design-system/button";
-import {
-  ButtonGroup,
-  ButtonGroupSeparator,
-  ButtonGroupSummary,
-} from "@/components/design-system/button-group";
-import { motion as systemMotion } from "@/components/design-system/shared/motion";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { ButtonGroupSeparator } from "@/components/design-system/button-group";
+import { ControlSurface } from "@/components/organisms/control-surface";
 
 import "./style.css";
 
@@ -41,7 +35,6 @@ export function TimerHud({
   onEdit,
   onSave,
 }: Props) {
-  const reduced = useReducedMotion();
   const restart = {
     activate: () => onStart(true),
     content: <ResetIcon />,
@@ -105,29 +98,16 @@ export function TimerHud({
     </>
   );
   const editingGroupLabel = mode === "save" ? "Timer actions" : "Playback actions";
-  const transition = hidden ? systemMotion.scene.exit : systemMotion.scene.enter;
   return (
-    <motion.fieldset
-      animate={{ opacity: hidden ? 0 : 1 }}
-      aria-hidden={hidden}
-      aria-label="Timer controls"
-      className="timer-hud"
-      inert={hidden}
-      initial={false}
-      transition={reduced ? { duration: 0 } : transition}
+    <ControlSurface
+      actions={extraActions}
+      details={summary ? { content: summary.timeline, label: "Timer overview" } : undefined}
+      groupLabel={summary && editing ? editingGroupLabel : "Session actions"}
+      hidden={hidden}
+      label="Timer controls"
+      summary={summary?.content}
     >
-      <ButtonGroupSummary
-        details={summary ? { content: summary.timeline, label: "Timer overview" } : undefined}
-        summary={summary?.content}
-      >
-        <ButtonGroup
-          actions={extraActions}
-          aria-label={summary && editing ? editingGroupLabel : "Session actions"}
-          variant="expandable"
-        >
-          {primary}
-        </ButtonGroup>
-      </ButtonGroupSummary>
-    </motion.fieldset>
+      {primary}
+    </ControlSurface>
   );
 }

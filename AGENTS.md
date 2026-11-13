@@ -6,7 +6,7 @@ This is a client-side React, TypeScript, Vite and TanStack Router app. Use Bun a
 
 Before adding or moving code, use [placement](.agents/references/code-organization.md#placement) and [dependency boundaries](.agents/references/code-organization.md#dependency-boundaries). For public types or untrusted inputs, use [contract boundaries](.agents/references/code-organization.md#public-contracts-and-runtime-data).
 
-Use [React composition](.agents/skills/react-composition/SKILL.md) for shared promotion, atomic classification, controlled APIs, slots and coordinated parts.
+For new UI or changes to its consumers, composition or state responsibility, use [UI promotion](.agents/skills/ui-promotion/SKILL.md) to decide whether its home should change. Use [React composition](.agents/skills/react-composition/SKILL.md) for atomic contracts, controlled APIs, slots and coordinated parts.
 
 ## State, interaction and appearance
 

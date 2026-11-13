@@ -2,14 +2,14 @@
 
 ## Placement
 
-The adapted Olyx foundations in `src/components/design-system/` are app-owned and configured by `components.json`. Merge additions into that system, preserving its public APIs, brand, accessibility and motion; inspect affected consumers. The [composition skill](../skills/react-composition/SKILL.md) owns atomic classification and promotion criteria.
+The adapted Olyx foundations in `src/components/design-system/` are app-owned and configured by `components.json`. Merge additions into that system, preserving its public APIs, brand, accessibility and motion; inspect affected consumers. The [promotion decision tree](../skills/ui-promotion/SKILL.md#decide-the-home) owns move decisions; [atomic contracts](../skills/react-composition/rules/atomic-ui.md) define shared UI responsibilities.
 
 | Home | Responsibility |
 | --- | --- |
 | `src/components/design-system/` | Adapted foundations, theme, materials, motion and system-specific helpers. |
 | `src/components/{atoms,molecules,organisms}/` | Shared app UI, classified by its public state responsibility. |
 | `src/features/<feature>/screens/` | Route/view composition, navigation transactions and focus choreography. |
-| Feature `components/` | Product UI and meaningful domain-content adapters; no atomic tiers inside features. |
+| Feature `components/` | Product UI and meaningful domain-content adapters; use atomic contracts where relevant without nesting tier directories inside features. |
 | Feature `hooks/`, `state/` | React lifetimes/commands and context contracts. |
 | Feature `model/`, `data/` | Pure domain rules, validation, calculations and catalogues. |
 | Feature `services/` | Browser/external I/O, compatibility and failure handling. |

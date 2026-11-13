@@ -19,6 +19,7 @@ function SummaryItem({
       animate={{ opacity: 1, scale: 1 }}
       aria-hidden={!present}
       exit={{ opacity: 0, scale: reduced ? 1 : 0.96 }}
+      inert={!present}
       initial={{ opacity: 0, scale: reduced ? 1 : 0.94 }}
       layout={reduced ? false : "position"}
       ref={ref}

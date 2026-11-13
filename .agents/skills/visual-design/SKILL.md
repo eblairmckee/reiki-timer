@@ -1,18 +1,30 @@
 ---
 name: visual-design
-description: Design or materially change the app's visual composition, typography, responsive hierarchy, surfaces or motion while preserving its brand and accessible presentation. Use for visual design decisions and rendered review, independently of React composition work.
+description: Design or review changes to visual hierarchy, content, layout, typography, surfaces, feedback, data display or motion. Select only rules relevant to the affected UX; use for rendered and adversarial self-review independently of React composition work.
 ---
 
 # Visual design in this app
 
-Start with the intended hierarchy and actual content, then inspect the affected views and existing system contracts. The app owns the adapted design system's brand and interaction. Reuse its typography roles, semantic theme colors, atmosphere, material defaults and motion behavior. Preserve Bona Nova SC for headings, countdowns and field labels, and Cabin for dialog body/actions, descriptions and summary copy; use Hugeicons consistently. Button defaults to frost, with inset as a variant. Exact product hierarchy, including the finish dialog’s icon-or-text choices, stays with that feature. Preserve intentional distinctions; neither exact historical timer constants nor upstream examples define a universal design rule.
+Start with the user's task, actual content, affected states and existing system contracts. Preserve intentional brand and interaction distinctions. Read only the rule files selected below; they own the detailed principles.
 
-Choose each surface for its content and interaction purpose. Keep foreground content legible against its actual backing, including atmospheric or changing surfaces. Numerical token contrast does not certify gradients, translucency or every rendered frame. Retain native/forced-color and reduced-transparency behavior where promised; do not hard-code literal paints around a token failure. Color values belong in `src/components/design-system/styles/theme.css`; consumers use semantic references. Preserve `currentColor`, transparency and theme-derived renderer inputs. Keep theme values with the system, reusable geometry/state with the component, and product arrangement with the feature. Public root styling extensions must preserve portal theming and required Olyx aliases; private CSS variables/selectors are not public APIs merely because they appear in source.
+## Select the rules
 
-Use content-driven layout. Check narrow and wide views, long headings, empty/error states, enlarged text, wrapping and meaningful content order. An icon-only control still needs a useful name; visible labels and context must communicate the action. Product copy and localization decisions belong with the feature. Do not hide essential content or require a hover gesture to understand it.
+1. Identify what changes or could regress in the affected experience.
+2. Select each matching row; for self-review turn its criteria into observable checks. Skip unrelated rows (a HUD promotion does not need chart guidance).
+3. Inspect running states, then distinguish contract failures from optional improvements. For organism journeys use the [review checklist](../ui-promotion/references/organism-review.md).
 
-Use motion to explain relationships and state, without blocking input or making completion depend on an animation. Preserve reduced-motion behavior and interruption/exit behavior. Atmospheric renderers preserve theme-derived colors, canvas continuity, fallback and hidden-tab behavior. Test ordinary motion separately from the reduced-motion test default. Do not impose one timing value on interactions with different purposes.
+| When making or reviewing… | Read |
+| --- | --- |
+| Content priority, grouping, disclosure, orientation or comparative decisions | [Hierarchy and meaning](rules/design-principles.md) |
+| Spacing, responsive layout, overflow or content density | [Layout and spacing](rules/layout-spacing.md) |
+| Type roles, reading order, icons or media | [Typography and media](rules/typography-media.md) |
+| Color, materials, theme extensions or legibility over a backing | [Surfaces and theme](rules/surfaces-theme.md) |
+| Loading, empty, error, success or changing system state | [Status and feedback](rules/status-feedback.md) |
+| Formatted numbers, comparable metrics or charts | [Data display](rules/data-display.md) |
+| Animation, presence, reveal, transitions or atmospheric rendering | [Motion](rules/motion.md) |
 
-Typography and media choices have semantic roles as well as delivery cost. Preserve reading hierarchy, useful fallbacks, stable media dimensions and appropriate alternative text. Load what the view needs; investigate a measured performance problem before adding a broad optimization recipe.
+## Rendered review
 
-Inspect the running affected states for hierarchy, brand, legibility, spacing and motion. Use browser relationships and resolved styles for objective guarantees. A preview or layout fixture must load the app's actual global stylesheet and cascade. Observe the cue the contract allows, including color or pseudo-elements when relevant, rather than assuming motion means element travel or opacity. Report uninspected device, font, screen-reader or perceptual conditions. Do not turn generated screenshots into a mandatory approval baseline or claim static color/a11y checks prove visual quality.
+Inspect affected states for selected criteria. Use the in-app browser when requested. A fixture must load the app's actual global stylesheet and cascade. Use browser relationships and resolved styles for objective guarantees; static colors, axe and screenshots alone do not establish visual quality. Observe the cue the contract allows (including color or pseudo-elements), rather than assuming motion means travel or opacity.
+
+Record viewport/content/state, observations and uninspected conditions. Ordinary and reduced motion need separate evidence. Do not turn screenshots into mandatory approval baselines. Report device, font, screen-reader and perceptual limits without claiming they passed.
