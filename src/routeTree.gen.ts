@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimerRouteRouteImport } from './routes/_timer/route'
 import { Route as TimerIndexRouteImport } from './routes/_timer/index'
+import { Route as TarotFlashIndexRouteImport } from './routes/tarot-flash.index'
+import { Route as TarotFlashDeckIndexRouteRouteImport } from './routes/tarot-flash/$deckIndex/route'
 import { Route as TimerReikiOnIndexRouteImport } from './routes/_timer/reiki-on/index'
 import { Route as TimerReikiOnEditRouteImport } from './routes/_timer/reiki-on/edit'
 
@@ -23,6 +25,17 @@ const TimerIndexRoute = TimerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TimerRouteRoute,
 } as any)
+const TarotFlashIndexRoute = TarotFlashIndexRouteImport.update({
+  id: '/tarot-flash/',
+  path: '/tarot-flash/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarotFlashDeckIndexRouteRoute =
+  TarotFlashDeckIndexRouteRouteImport.update({
+    id: '/tarot-flash/$deckIndex',
+    path: '/tarot-flash/$deckIndex',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TimerReikiOnIndexRoute = TimerReikiOnIndexRouteImport.update({
   id: '/reiki-on/',
   path: '/reiki-on/',
@@ -36,36 +49,56 @@ const TimerReikiOnEditRoute = TimerReikiOnEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof TimerIndexRoute
+  '/tarot-flash/$deckIndex': typeof TarotFlashDeckIndexRouteRoute
+  '/tarot-flash/': typeof TarotFlashIndexRoute
   '/reiki-on/edit': typeof TimerReikiOnEditRoute
   '/reiki-on/': typeof TimerReikiOnIndexRoute
 }
 export interface FileRoutesByTo {
+  '/tarot-flash/$deckIndex': typeof TarotFlashDeckIndexRouteRoute
   '/': typeof TimerIndexRoute
+  '/tarot-flash': typeof TarotFlashIndexRoute
   '/reiki-on/edit': typeof TimerReikiOnEditRoute
   '/reiki-on': typeof TimerReikiOnIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_timer': typeof TimerRouteRouteWithChildren
+  '/tarot-flash/$deckIndex': typeof TarotFlashDeckIndexRouteRoute
   '/_timer/': typeof TimerIndexRoute
+  '/tarot-flash/': typeof TarotFlashIndexRoute
   '/_timer/reiki-on/edit': typeof TimerReikiOnEditRoute
   '/_timer/reiki-on/': typeof TimerReikiOnIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reiki-on/edit' | '/reiki-on/'
+  fullPaths:
+    | '/'
+    | '/tarot-flash/$deckIndex'
+    | '/tarot-flash/'
+    | '/reiki-on/edit'
+    | '/reiki-on/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reiki-on/edit' | '/reiki-on'
+  to:
+    | '/tarot-flash/$deckIndex'
+    | '/'
+    | '/tarot-flash'
+    | '/reiki-on/edit'
+    | '/reiki-on'
   id:
     | '__root__'
     | '/_timer'
+    | '/tarot-flash/$deckIndex'
     | '/_timer/'
+    | '/tarot-flash/'
     | '/_timer/reiki-on/edit'
     | '/_timer/reiki-on/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   TimerRouteRoute: typeof TimerRouteRouteWithChildren
+  TarotFlashDeckIndexRouteRoute: typeof TarotFlashDeckIndexRouteRoute
+  TarotFlashIndexRoute: typeof TarotFlashIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -83,6 +116,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof TimerIndexRouteImport
       parentRoute: typeof TimerRouteRoute
+    }
+    '/tarot-flash/': {
+      id: '/tarot-flash/'
+      path: '/tarot-flash'
+      fullPath: '/tarot-flash/'
+      preLoaderRoute: typeof TarotFlashIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarot-flash/$deckIndex': {
+      id: '/tarot-flash/$deckIndex'
+      path: '/tarot-flash/$deckIndex'
+      fullPath: '/tarot-flash/$deckIndex'
+      preLoaderRoute: typeof TarotFlashDeckIndexRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_timer/reiki-on/': {
       id: '/_timer/reiki-on/'
@@ -119,6 +166,8 @@ const TimerRouteRouteWithChildren = TimerRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   TimerRouteRoute: TimerRouteRouteWithChildren,
+  TarotFlashDeckIndexRouteRoute: TarotFlashDeckIndexRouteRoute,
+  TarotFlashIndexRoute: TarotFlashIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Tarot Flash — artwork references</title>
+    <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      color: rgb(37 37 37);
+      color-scheme: light;
+      background: rgb(238 234 228);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      max-width: 1440px;
+      padding: 32px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 28px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font:
+        500 32px / 1.2 Georgia,
+        serif;
+    }
+    p {
+      max-width: 760px;
+      line-height: 1.5;
+    }
+    a {
+      color: inherit;
+    }
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-weight: 600;
+    }
+    select {
+      max-width: 100%;
+      padding: 10px;
+      font: inherit;
+      background: white;
+      border: 1px solid rgb(153 153 153);
+      border-radius: 6px;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    body.single main {
+      grid-template-columns: repeat(2, minmax(0, 420px));
+      justify-content: center;
+    }
+    figure {
+      min-width: 0;
+      margin: 0;
+    }
+    body.single figure {
+      grid-row: var(--cell-row);
+      grid-column: var(--cell-column);
+      order: var(--cell-order);
+    }
+    body.one main {
+      grid-template-columns: minmax(0, 420px);
+    }
+    figure[hidden] {
+      display: none;
+    }
+    .art {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      background: white;
+      border-radius: 8px;
+    }
+    .art img {
+      position: absolute;
+      width: 200%;
+      max-width: none;
+      height: 200%;
+    }
+    figcaption {
+      padding: 12px 2px;
+    }
+    figcaption strong,
+    figcaption span {
+      display: block;
+    }
+    figcaption span {
+      margin-top: 5px;
+      font-size: 12px;
+      color: rgb(96 96 96);
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 20px;
+      }
+      main {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      figcaption {
+        font-size: 14px;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Tarot Flash · illustration references</h1>
+      <p>
+        78 Rider–Waite–Smith cards. Transparent source line art shown against white for review. The
+        gallery shows the current source reference for each card.
+      </p>
+      <p>
+        <a href="README.md">Artwork notes</a>
+        · <a href="svg-review.html">Editable SVGs</a>
+        · <a href="manifest.json">Card-to-sheet manifest</a>
+      </p>
+      <label for="sheet">View cards</label>
+      <select id="sheet">
+        <option value="">All 78 cards, in deck order</option>
+        <option value="00-style-sample">
+          Sheet 00 — The Fool, The Tower, Queen of Cups, Two of Swords
+        </option>
+        <option value="01-major-01-to-major-04">
+          Sheet 01 — The Magician, The High Priestess, The Empress, The Emperor
+        </option>
+        <option value="02-major-05-to-major-08">
+          Sheet 02 — The Hierophant, The Lovers, The Chariot, Strength
+        </option>
+        <option value="03-major-09-to-major-12">
+          Sheet 03 — The Hermit, Wheel of Fortune, Justice, The Hanged Man
+        </option>
+        <option value="04-major-13-to-major-17">Sheet 04 — Death, Temperance, The Devil</option>
+        <option value="05-major-18-to-major-21">
+          Sheet 05 — The Moon, The Sun, Judgement, The World
+        </option>
+        <option value="06-wands-01-to-wands-04">
+          Sheet 06 — Ace of Wands, Two of Wands, Three of Wands, Four of Wands
+        </option>
+        <option value="07-wands-05-to-wands-08">Sheet 07 — Six of Wands, Seven of Wands</option>
+        <option value="08-wands-09-to-wands-12">
+          Sheet 08 — Nine of Wands, Page of Wands, Knight of Wands
+        </option>
+        <option value="09-wands-13-to-cups-02">
+          Sheet 09 — Queen of Wands, King of Wands, Ace of Cups, Two of Cups
+        </option>
+        <option value="10-cups-03-to-cups-06">
+          Sheet 10 — Three of Cups, Four of Cups, Five of Cups, Six of Cups
+        </option>
+        <option value="11-cups-07-to-cups-10">
+          Sheet 11 — Seven of Cups, Eight of Cups, Nine of Cups, Ten of Cups
+        </option>
+        <option value="12-cups-11-to-swords-01">
+          Sheet 12 — Page of Cups, Knight of Cups, King of Cups, Ace of Swords
+        </option>
+        <option value="13-swords-03-to-swords-06">
+          Sheet 13 — Three of Swords, Four of Swords, Five of Swords
+        </option>
+        <option value="14-swords-07-to-swords-10">
+          Sheet 14 — Seven of Swords, Nine of Swords, Ten of Swords
+        </option>
+        <option value="15-swords-11-to-swords-14">
+          Sheet 15 — Queen of Swords, King of Swords
+        </option>
+        <option value="16-pentacles-01-to-pentacles-04">
+          Sheet 16 — Ace of Pentacles, Two of Pentacles, Three of Pentacles, Four of Pentacles
+        </option>
+        <option value="17-pentacles-05-to-pentacles-08">
+          Sheet 17 — Five of Pentacles, Six of Pentacles, Seven of Pentacles, Eight of Pentacles
+        </option>
+        <option value="18-pentacles-09-to-pentacles-12">
+          Sheet 18 — Ten of Pentacles, Page of Pentacles, Knight of Pentacles
+        </option>
+        <option value="19-pentacles-13-to-pentacles-14">
+          Sheet 19 — Queen of Pentacles, King of Pentacles
+        </option>
+        <option value="revision-major-17">Revised card — The Star</option>
+        <option value="revision-wands-05">Revised card — Five of Wands</option>
+        <option value="revision-wands-08">Revised card — Eight of Wands</option>
+        <option value="revision-wands-10">Revised card — Ten of Wands</option>
+        <option value="revision-swords-06">Revised card — Six of Swords</option>
+        <option value="revision-swords-08">Revised card — Eight of Swords</option>
+        <option value="revision-swords-12">Revised card — Knight of Swords</option>
+        <option value="revision-pentacles-09">Revised card — Nine of Pentacles</option>
+        <option value="revision-swords-11">Revised card — Page of Swords</option>
+      </select>
+    </header>
+    <main>
+      <figure data-sheet="00-style-sample" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="The Fool line-art reference"
+            loading="eager"
+            src="sheets/00-style-sample.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption><strong>The Fool</strong><span>major-00 · Deck 1 · Top left</span></figcaption>
+      </figure>
+      <figure
+        data-sheet="01-major-01-to-major-04"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Magician line-art reference"
+            loading="eager"
+            src="sheets/01-major-01-to-major-04.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Magician</strong><span>major-01 · Deck 2 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="01-major-01-to-major-04"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The High Priestess line-art reference"
+            loading="eager"
+            src="sheets/01-major-01-to-major-04.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The High Priestess</strong><span>major-02 · Deck 3 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="01-major-01-to-major-04"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Empress line-art reference"
+            loading="eager"
+            src="sheets/01-major-01-to-major-04.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Empress</strong><span>major-03 · Deck 4 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="01-major-01-to-major-04"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The Emperor line-art reference"
+            loading="eager"
+            src="sheets/01-major-01-to-major-04.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Emperor</strong><span>major-04 · Deck 5 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="02-major-05-to-major-08"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Hierophant line-art reference"
+            loading="eager"
+            src="sheets/02-major-05-to-major-08.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Hierophant</strong><span>major-05 · Deck 6 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="02-major-05-to-major-08"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The Lovers line-art reference"
+            loading="eager"
+            src="sheets/02-major-05-to-major-08.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Lovers</strong><span>major-06 · Deck 7 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="02-major-05-to-major-08"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Chariot line-art reference"
+            loading="eager"
+            src="sheets/02-major-05-to-major-08.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Chariot</strong><span>major-07 · Deck 8 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="02-major-05-to-major-08"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Strength line-art reference"
+            loading="eager"
+            src="sheets/02-major-05-to-major-08.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Strength</strong><span>major-08 · Deck 9 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="03-major-09-to-major-12"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Hermit line-art reference"
+            loading="eager"
+            src="sheets/03-major-09-to-major-12.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Hermit</strong><span>major-09 · Deck 10 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="03-major-09-to-major-12"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Wheel of Fortune line-art reference"
+            loading="eager"
+            src="sheets/03-major-09-to-major-12.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Wheel of Fortune</strong><span>major-10 · Deck 11 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="03-major-09-to-major-12"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Justice line-art reference"
+            loading="eager"
+            src="sheets/03-major-09-to-major-12.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Justice</strong><span>major-11 · Deck 12 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="03-major-09-to-major-12"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The Hanged Man line-art reference"
+            loading="eager"
+            src="sheets/03-major-09-to-major-12.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Hanged Man</strong><span>major-12 · Deck 13 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="04-major-13-to-major-17"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Death line-art reference"
+            loading="eager"
+            src="sheets/04-major-13-to-major-17.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption><strong>Death</strong><span>major-13 · Deck 14 · Top left</span></figcaption>
+      </figure>
+      <figure
+        data-sheet="04-major-13-to-major-17"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Temperance line-art reference"
+            loading="eager"
+            src="sheets/04-major-13-to-major-17.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Temperance</strong><span>major-14 · Deck 15 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="04-major-13-to-major-17"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Devil line-art reference"
+            loading="eager"
+            src="sheets/04-major-13-to-major-17.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Devil</strong><span>major-15 · Deck 16 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="00-style-sample" style="--cell-order:3;--cell-row:2;--cell-column:2">
+        <div class="art">
+          <img
+            alt="The Tower line-art reference"
+            loading="eager"
+            src="sheets/00-style-sample.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Tower</strong><span>major-16 · Deck 17 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-major-17" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="The Star line-art reference"
+            loading="eager"
+            src="cards/major-17.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>The Star</strong><span>major-17 · Deck 18 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="05-major-18-to-major-21"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="The Moon line-art reference"
+            loading="eager"
+            src="sheets/05-major-18-to-major-21.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption><strong>The Moon</strong><span>major-18 · Deck 19 · Top left</span></figcaption>
+      </figure>
+      <figure
+        data-sheet="05-major-18-to-major-21"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The Sun line-art reference"
+            loading="eager"
+            src="sheets/05-major-18-to-major-21.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption><strong>The Sun</strong><span>major-19 · Deck 20 · Top right</span></figcaption>
+      </figure>
+      <figure
+        data-sheet="05-major-18-to-major-21"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Judgement line-art reference"
+            loading="eager"
+            src="sheets/05-major-18-to-major-21.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Judgement</strong><span>major-20 · Deck 21 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="05-major-18-to-major-21"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="The World line-art reference"
+            loading="eager"
+            src="sheets/05-major-18-to-major-21.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>The World</strong><span>major-21 · Deck 22 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="06-wands-01-to-wands-04"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Ace of Wands line-art reference"
+            loading="eager"
+            src="sheets/06-wands-01-to-wands-04.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ace of Wands</strong><span>wands-01 · Deck 23 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="06-wands-01-to-wands-04"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Two of Wands line-art reference"
+            loading="eager"
+            src="sheets/06-wands-01-to-wands-04.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Two of Wands</strong><span>wands-02 · Deck 24 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="06-wands-01-to-wands-04"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Three of Wands line-art reference"
+            loading="eager"
+            src="sheets/06-wands-01-to-wands-04.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Three of Wands</strong><span>wands-03 · Deck 25 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="06-wands-01-to-wands-04"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Four of Wands line-art reference"
+            loading="eager"
+            src="sheets/06-wands-01-to-wands-04.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Four of Wands</strong><span>wands-04 · Deck 26 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-wands-05" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Five of Wands line-art reference"
+            loading="eager"
+            src="cards/wands-05.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Five of Wands</strong><span>wands-05 · Deck 27 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="07-wands-05-to-wands-08"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Six of Wands line-art reference"
+            loading="eager"
+            src="sheets/07-wands-05-to-wands-08.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Six of Wands</strong><span>wands-06 · Deck 28 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="07-wands-05-to-wands-08"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Seven of Wands line-art reference"
+            loading="eager"
+            src="sheets/07-wands-05-to-wands-08.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Seven of Wands</strong><span>wands-07 · Deck 29 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-wands-08" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Eight of Wands line-art reference"
+            loading="eager"
+            src="cards/wands-08.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Eight of Wands</strong><span>wands-08 · Deck 30 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="08-wands-09-to-wands-12"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Nine of Wands line-art reference"
+            loading="eager"
+            src="sheets/08-wands-09-to-wands-12.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Nine of Wands</strong><span>wands-09 · Deck 31 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-wands-10" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Ten of Wands line-art reference"
+            loading="eager"
+            src="cards/wands-10.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ten of Wands</strong><span>wands-10 · Deck 32 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="08-wands-09-to-wands-12"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Page of Wands line-art reference"
+            loading="eager"
+            src="sheets/08-wands-09-to-wands-12.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Page of Wands</strong><span>wands-11 · Deck 33 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="08-wands-09-to-wands-12"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Knight of Wands line-art reference"
+            loading="eager"
+            src="sheets/08-wands-09-to-wands-12.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Knight of Wands</strong><span>wands-12 · Deck 34 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="09-wands-13-to-cups-02"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Queen of Wands line-art reference"
+            loading="eager"
+            src="sheets/09-wands-13-to-cups-02.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Queen of Wands</strong><span>wands-13 · Deck 35 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="09-wands-13-to-cups-02"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="King of Wands line-art reference"
+            loading="eager"
+            src="sheets/09-wands-13-to-cups-02.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>King of Wands</strong><span>wands-14 · Deck 36 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="09-wands-13-to-cups-02"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Ace of Cups line-art reference"
+            loading="eager"
+            src="sheets/09-wands-13-to-cups-02.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ace of Cups</strong><span>cups-01 · Deck 37 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="09-wands-13-to-cups-02"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Two of Cups line-art reference"
+            loading="eager"
+            src="sheets/09-wands-13-to-cups-02.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Two of Cups</strong><span>cups-02 · Deck 38 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="10-cups-03-to-cups-06"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Three of Cups line-art reference"
+            loading="eager"
+            src="sheets/10-cups-03-to-cups-06.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Three of Cups</strong><span>cups-03 · Deck 39 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="10-cups-03-to-cups-06"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Four of Cups line-art reference"
+            loading="eager"
+            src="sheets/10-cups-03-to-cups-06.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Four of Cups</strong><span>cups-04 · Deck 40 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="10-cups-03-to-cups-06"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Five of Cups line-art reference"
+            loading="eager"
+            src="sheets/10-cups-03-to-cups-06.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Five of Cups</strong><span>cups-05 · Deck 41 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="10-cups-03-to-cups-06"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Six of Cups line-art reference"
+            loading="eager"
+            src="sheets/10-cups-03-to-cups-06.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Six of Cups</strong><span>cups-06 · Deck 42 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="11-cups-07-to-cups-10"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Seven of Cups line-art reference"
+            loading="eager"
+            src="sheets/11-cups-07-to-cups-10.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Seven of Cups</strong><span>cups-07 · Deck 43 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="11-cups-07-to-cups-10"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Eight of Cups line-art reference"
+            loading="eager"
+            src="sheets/11-cups-07-to-cups-10.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Eight of Cups</strong><span>cups-08 · Deck 44 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="11-cups-07-to-cups-10"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Nine of Cups line-art reference"
+            loading="eager"
+            src="sheets/11-cups-07-to-cups-10.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Nine of Cups</strong><span>cups-09 · Deck 45 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="11-cups-07-to-cups-10"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Ten of Cups line-art reference"
+            loading="eager"
+            src="sheets/11-cups-07-to-cups-10.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ten of Cups</strong><span>cups-10 · Deck 46 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="12-cups-11-to-swords-01"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Page of Cups line-art reference"
+            loading="eager"
+            src="sheets/12-cups-11-to-swords-01.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Page of Cups</strong><span>cups-11 · Deck 47 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="12-cups-11-to-swords-01"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Knight of Cups line-art reference"
+            loading="eager"
+            src="sheets/12-cups-11-to-swords-01.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Knight of Cups</strong><span>cups-12 · Deck 48 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="00-style-sample" style="--cell-order:2;--cell-row:2;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Queen of Cups line-art reference"
+            loading="eager"
+            src="sheets/00-style-sample.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Queen of Cups</strong><span>cups-13 · Deck 49 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="12-cups-11-to-swords-01"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="King of Cups line-art reference"
+            loading="eager"
+            src="sheets/12-cups-11-to-swords-01.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>King of Cups</strong><span>cups-14 · Deck 50 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="12-cups-11-to-swords-01"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Ace of Swords line-art reference"
+            loading="eager"
+            src="sheets/12-cups-11-to-swords-01.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ace of Swords</strong><span>swords-01 · Deck 51 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="00-style-sample" style="--cell-order:1;--cell-row:1;--cell-column:2">
+        <div class="art">
+          <img
+            alt="Two of Swords line-art reference"
+            loading="eager"
+            src="sheets/00-style-sample.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Two of Swords</strong><span>swords-02 · Deck 52 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="13-swords-03-to-swords-06"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Three of Swords line-art reference"
+            loading="eager"
+            src="sheets/13-swords-03-to-swords-06.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Three of Swords</strong><span>swords-03 · Deck 53 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="13-swords-03-to-swords-06"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Four of Swords line-art reference"
+            loading="eager"
+            src="sheets/13-swords-03-to-swords-06.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Four of Swords</strong><span>swords-04 · Deck 54 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="13-swords-03-to-swords-06"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Five of Swords line-art reference"
+            loading="eager"
+            src="sheets/13-swords-03-to-swords-06.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Five of Swords</strong><span>swords-05 · Deck 55 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-swords-06" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Six of Swords line-art reference"
+            loading="eager"
+            src="cards/swords-06.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Six of Swords</strong><span>swords-06 · Deck 56 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="14-swords-07-to-swords-10"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Seven of Swords line-art reference"
+            loading="eager"
+            src="sheets/14-swords-07-to-swords-10.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Seven of Swords</strong><span>swords-07 · Deck 57 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-swords-08" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Eight of Swords line-art reference"
+            loading="eager"
+            src="cards/swords-08.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Eight of Swords</strong><span>swords-08 · Deck 58 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="14-swords-07-to-swords-10"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Nine of Swords line-art reference"
+            loading="eager"
+            src="sheets/14-swords-07-to-swords-10.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Nine of Swords</strong><span>swords-09 · Deck 59 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="14-swords-07-to-swords-10"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Ten of Swords line-art reference"
+            loading="eager"
+            src="sheets/14-swords-07-to-swords-10.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ten of Swords</strong><span>swords-10 · Deck 60 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-swords-11" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Page of Swords line-art reference"
+            loading="eager"
+            src="cards/swords-11.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Page of Swords</strong><span>swords-11 · Deck 61 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure data-sheet="revision-swords-12" style="--cell-order:0;--cell-row:1;--cell-column:1">
+        <div class="art">
+          <img
+            alt="Knight of Swords line-art reference"
+            loading="eager"
+            src="cards/swords-12.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Knight of Swords</strong><span>swords-12 · Deck 62 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="15-swords-11-to-swords-14"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Queen of Swords line-art reference"
+            loading="eager"
+            src="sheets/15-swords-11-to-swords-14.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Queen of Swords</strong><span>swords-13 · Deck 63 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="15-swords-11-to-swords-14"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="King of Swords line-art reference"
+            loading="eager"
+            src="sheets/15-swords-11-to-swords-14.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>King of Swords</strong><span>swords-14 · Deck 64 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="16-pentacles-01-to-pentacles-04"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Ace of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/16-pentacles-01-to-pentacles-04.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ace of Pentacles</strong><span>pentacles-01 · Deck 65 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="16-pentacles-01-to-pentacles-04"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Two of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/16-pentacles-01-to-pentacles-04.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Two of Pentacles</strong><span>pentacles-02 · Deck 66 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="16-pentacles-01-to-pentacles-04"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Three of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/16-pentacles-01-to-pentacles-04.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Three of Pentacles</strong><span>pentacles-03 · Deck 67 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="16-pentacles-01-to-pentacles-04"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Four of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/16-pentacles-01-to-pentacles-04.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Four of Pentacles</strong><span>pentacles-04 · Deck 68 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="17-pentacles-05-to-pentacles-08"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Five of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/17-pentacles-05-to-pentacles-08.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Five of Pentacles</strong><span>pentacles-05 · Deck 69 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="17-pentacles-05-to-pentacles-08"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Six of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/17-pentacles-05-to-pentacles-08.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Six of Pentacles</strong><span>pentacles-06 · Deck 70 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="17-pentacles-05-to-pentacles-08"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Seven of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/17-pentacles-05-to-pentacles-08.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Seven of Pentacles</strong><span>pentacles-07 · Deck 71 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="17-pentacles-05-to-pentacles-08"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Eight of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/17-pentacles-05-to-pentacles-08.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Eight of Pentacles</strong><span>pentacles-08 · Deck 72 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="revision-pentacles-09"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Nine of Pentacles line-art reference"
+            loading="eager"
+            src="cards/pentacles-09.png"
+            style="left:0%;top:0%;width:100%;height:100%"
+          >
+        </div>
+        <figcaption>
+          <strong>Nine of Pentacles</strong><span>pentacles-09 · Deck 73 · Whole image</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="18-pentacles-09-to-pentacles-12"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Ten of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/18-pentacles-09-to-pentacles-12.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Ten of Pentacles</strong><span>pentacles-10 · Deck 74 · Top right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="18-pentacles-09-to-pentacles-12"
+        style="--cell-order:2;--cell-row:2;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Page of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/18-pentacles-09-to-pentacles-12.png"
+            style="left:0%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Page of Pentacles</strong><span>pentacles-11 · Deck 75 · Bottom left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="18-pentacles-09-to-pentacles-12"
+        style="--cell-order:3;--cell-row:2;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="Knight of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/18-pentacles-09-to-pentacles-12.png"
+            style="left:-100%;top:-100%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Knight of Pentacles</strong><span>pentacles-12 · Deck 76 · Bottom right</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="19-pentacles-13-to-pentacles-14"
+        style="--cell-order:0;--cell-row:1;--cell-column:1"
+      >
+        <div class="art">
+          <img
+            alt="Queen of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/19-pentacles-13-to-pentacles-14.png"
+            style="left:0%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>Queen of Pentacles</strong><span>pentacles-13 · Deck 77 · Top left</span>
+        </figcaption>
+      </figure>
+      <figure
+        data-sheet="19-pentacles-13-to-pentacles-14"
+        style="--cell-order:1;--cell-row:1;--cell-column:2"
+      >
+        <div class="art">
+          <img
+            alt="King of Pentacles line-art reference"
+            loading="eager"
+            src="sheets/19-pentacles-13-to-pentacles-14.png"
+            style="left:-100%;top:0%;width:200%;height:200%"
+          >
+        </div>
+        <figcaption>
+          <strong>King of Pentacles</strong><span>pentacles-14 · Deck 78 · Top right</span>
+        </figcaption>
+      </figure>
+    </main>
+    <script>
+    "use strict";
+    const picker = document.querySelector("#sheet");
+    const sheets = new Set(Array.from(picker.options, (option) => option.value));
+    const requested = new URLSearchParams(location.search).get("sheet") || "";
+    function showSheet(value) {
+      document.body.classList.toggle("single", Boolean(value));
+      for (const tile of document.querySelectorAll("figure")) {
+        tile.hidden = Boolean(value) && tile.dataset.sheet !== value;
+      }
+      document.body.classList.toggle(
+        "one",
+        document.querySelectorAll("figure:not([hidden])").length === 1
+      );
+      picker.value = value;
+    }
+    showSheet(sheets.has(requested) ? requested : "");
+    picker.addEventListener("change", () => {
+      const url = new URL(location.href);
+      if (picker.value) {
+        url.searchParams.set("sheet", picker.value);
+      } else {
+        url.searchParams.delete("sheet");
+      }
+      history.replaceState(null, "", url);
+      showSheet(picker.value);
+    });
+    </script>
+  </body>
+</html>

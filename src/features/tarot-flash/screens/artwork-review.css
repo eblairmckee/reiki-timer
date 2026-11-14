@@ -1,0 +1,177 @@
+@layer components {
+  .artwork-review {
+    padding: var(--ref-space-24);
+  }
+  .artwork-review-toolbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    padding: var(--ref-space-16);
+    margin-block-end: var(--ref-space-32);
+    background: var(--sys-color-well-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-md);
+    backdrop-filter: blur(32px);
+  }
+  .artwork-review-heading {
+    display: flex;
+    gap: var(--ref-space-16);
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: var(--ref-space-16);
+  }
+  .artwork-review-heading h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+  .artwork-review-heading :where(h1) span {
+    margin-inline-start: var(--ref-space-16);
+    font: var(--sys-font-body-lg);
+  }
+  .artwork-review-heading [data-ui="button"] {
+    --cmp-size-button-icon: 2.75rem;
+  }
+  .artwork-review-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: var(--ref-space-16) var(--ref-space-24);
+  }
+  .artwork-review-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-8);
+    justify-content: space-between;
+    min-inline-size: 0;
+    font-size: 0.875rem;
+  }
+  .artwork-review-control > span {
+    display: flex;
+    gap: var(--ref-space-8);
+    justify-content: space-between;
+  }
+  .artwork-review-control input,
+  .artwork-review-control select {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+  .artwork-review-control select {
+    min-block-size: 2.75rem;
+    padding: var(--ref-space-8);
+    font: inherit;
+    color: inherit;
+    color-scheme: dark;
+    background: var(--sys-color-well-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-sm);
+  }
+  .artwork-review-control input[type="range"] {
+    min-block-size: 2.75rem;
+    cursor: pointer;
+  }
+  @supports (accent-color: auto) {
+    .artwork-review-control input {
+      accent-color: var(--sys-color-ink-on-atmosphere);
+    }
+  }
+  .artwork-review-control input[type="color"] {
+    block-size: 2.75rem;
+    padding: var(--ref-space-4);
+    cursor: pointer;
+    background: var(--sys-color-well-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-sm);
+  }
+  .artwork-review-control :is(input, select):focus-visible {
+    outline: 2px solid var(--sys-color-ink-on-atmosphere);
+    outline-offset: 3px;
+  }
+  .artwork-review-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--review-card-size)), 1fr)
+      );
+    gap: var(--ref-space-32) var(--ref-space-24);
+  }
+  .artwork-review-grid[data-compare="true"] {
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, calc(var(--review-card-size) * 2)), 1fr)
+      );
+  }
+  .artwork-review-grid[data-single="true"] {
+    grid-template-columns: minmax(0, var(--review-card-size));
+    justify-content: center;
+  }
+  .artwork-review-grid[data-single="true"][data-compare="true"] {
+    grid-template-columns: minmax(0, calc(var(--review-card-size) * 2));
+  }
+  .artwork-review-grid figure {
+    min-inline-size: 0;
+    margin: 0;
+  }
+  .artwork-review-pair {
+    display: flex;
+    gap: var(--ref-space-16);
+    align-items: start;
+  }
+  .artwork-review-pair > * {
+    flex: 1;
+    inline-size: 0;
+    min-inline-size: 0;
+  }
+  .artwork-review .tarot-artwork {
+    block-size: auto;
+    aspect-ratio: 2 / 3;
+    margin: 0;
+  }
+  .artwork-review-grid figcaption {
+    display: flex;
+    gap: var(--ref-space-8);
+    justify-content: space-between;
+    padding-block: var(--ref-space-12);
+    font-size: 0.875rem;
+  }
+  .artwork-review a {
+    color: inherit;
+    text-underline-offset: 0.25em;
+  }
+  .artwork-review-grid figcaption a:first-child {
+    text-decoration: none;
+  }
+  .artwork-review-reference {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+  }
+  .artwork-review-reference img {
+    position: absolute;
+    max-inline-size: none;
+  }
+  @media (max-width: 700px) {
+    .artwork-review {
+      padding: var(--ref-space-12);
+    }
+    .artwork-review-toolbar {
+      position: static;
+    }
+    .artwork-review-heading :where(h1) span {
+      display: block;
+      margin-block-start: var(--ref-space-8);
+      margin-inline-start: 0;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .artwork-review-toolbar {
+      background: var(--sys-color-frost-fallback);
+      backdrop-filter: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .artwork-review-toolbar {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+    }
+  }
+}

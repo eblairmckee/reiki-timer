@@ -97,10 +97,16 @@
   --sys-color-frost-contact: rgb(0 0 0 / 22%);
   --sys-color-frost-reveal: rgb(255 255 255 / var(--sys-opacity-frost-reveal));
   --sys-color-frost-fallback: #34363c;
+  --cmp-color-choice-popup-fill: color-mix(
+    in srgb,
+    var(--sys-color-frost-fallback) 90%,
+    transparent
+  );
   --sys-color-etch-ink: rgb(0 0 0 / 46%);
   --sys-color-etch-light: rgb(255 255 255 / 44%);
   --sys-color-letterpress-shade: rgb(0 0 0 / 68%);
   --sys-color-letterpress-rim: rgb(255 255 255 / 24%);
+  --cmp-color-tarot-illustration-fill: var(--ref-color-paper);
   --sys-color-ripple-light: rgb(255 255 255 / 22%);
   --sys-color-ripple-diffusion: rgb(255 255 255 / 9%);
   --sys-shadow-pressure-ring:

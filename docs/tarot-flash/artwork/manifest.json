@@ -1,0 +1,1616 @@
+{
+  "schemaVersion": 1,
+  "kind": "tarot-flash-raster-source-artwork",
+  "status": "source-for-completed-svg-reconstructions",
+  "styleReference": "00-style-sample",
+  "stylePrompt": "Create a NEW 2-by-2 sheet of tarot line illustrations using the attached approved sheet ONLY as a STYLE REFERENCE. Replace all four subjects with the requested cards below. Maintain the same restrained fluid contours, rounded line endings and joins, human quality, generous negative space, sparse inner details and consistent fully opaque BLACK lines about 3 to 4 pixels wide at 1024px sheet width. This must be clean, readable outline drawing on TRUE TRANSPARENT ALPHA. Do not simulate any material. Background and interiors of all shapes fully transparent; no white background, no dark or smoky background, no shading, gradients, glow, crosshatching, sketching, repeated lines, filled silhouettes, title lettering, numerals, grid dividers, card frames or borders. Minimal recognizable upright Rider-Waite-Smith compositions, preserving essential gestures, objects and meaningful symbol counts. Each numbered suit card must have EXACTLY its specified count of suit symbols. All pentacles are circular disks with a FIVE-pointed star. Generous internal margin and broad empty gutters; keep ALL art inside equal-sized portrait cells. Overall canvas portrait 2:3, two columns and two rows; each cell portrait 2:3. Keep scale and stroke weight uniform across all cards. No objects touch or cross cell boundaries. Reading order top-left, top-right, bottom-left, bottom-right. Do not add any text or labels.",
+  "coordinateConvention": "Zero-based row/column; crop rectangles are source-image pixels.",
+  "sheets": {
+    "00-style-sample": {
+      "file": "sheets/00-style-sample.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-00", "swords-02", "cups-13", "major-16"],
+      "activeCards": ["major-00", "major-16", "cups-13", "swords-02"]
+    },
+    "01-major-01-to-major-04": {
+      "file": "sheets/01-major-01-to-major-04.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-01", "major-02", "major-03", "major-04"],
+      "activeCards": ["major-01", "major-02", "major-03", "major-04"]
+    },
+    "02-major-05-to-major-08": {
+      "file": "sheets/02-major-05-to-major-08.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-05", "major-06", "major-07", "major-08"],
+      "activeCards": ["major-05", "major-06", "major-07", "major-08"]
+    },
+    "03-major-09-to-major-12": {
+      "file": "sheets/03-major-09-to-major-12.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-09", "major-10", "major-11", "major-12"],
+      "activeCards": ["major-09", "major-10", "major-11", "major-12"]
+    },
+    "04-major-13-to-major-17": {
+      "file": "sheets/04-major-13-to-major-17.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-13", "major-14", "major-15", "major-17"],
+      "activeCards": ["major-13", "major-14", "major-15"]
+    },
+    "05-major-18-to-major-21": {
+      "file": "sheets/05-major-18-to-major-21.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["major-18", "major-19", "major-20", "major-21"],
+      "activeCards": ["major-18", "major-19", "major-20", "major-21"]
+    },
+    "06-wands-01-to-wands-04": {
+      "file": "sheets/06-wands-01-to-wands-04.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["wands-01", "wands-02", "wands-03", "wands-04"],
+      "activeCards": ["wands-01", "wands-02", "wands-03", "wands-04"]
+    },
+    "07-wands-05-to-wands-08": {
+      "file": "sheets/07-wands-05-to-wands-08.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["wands-05", "wands-06", "wands-07", "wands-08"],
+      "activeCards": ["wands-06", "wands-07"]
+    },
+    "08-wands-09-to-wands-12": {
+      "file": "sheets/08-wands-09-to-wands-12.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["wands-09", "wands-10", "wands-11", "wands-12"],
+      "activeCards": ["wands-09", "wands-11", "wands-12"]
+    },
+    "09-wands-13-to-cups-02": {
+      "file": "sheets/09-wands-13-to-cups-02.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["wands-13", "wands-14", "cups-01", "cups-02"],
+      "activeCards": ["wands-13", "wands-14", "cups-01", "cups-02"]
+    },
+    "10-cups-03-to-cups-06": {
+      "file": "sheets/10-cups-03-to-cups-06.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["cups-03", "cups-04", "cups-05", "cups-06"],
+      "activeCards": ["cups-03", "cups-04", "cups-05", "cups-06"]
+    },
+    "11-cups-07-to-cups-10": {
+      "file": "sheets/11-cups-07-to-cups-10.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["cups-07", "cups-08", "cups-09", "cups-10"],
+      "activeCards": ["cups-07", "cups-08", "cups-09", "cups-10"]
+    },
+    "12-cups-11-to-swords-01": {
+      "file": "sheets/12-cups-11-to-swords-01.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["cups-11", "cups-12", "cups-14", "swords-01"],
+      "activeCards": ["cups-11", "cups-12", "cups-14", "swords-01"]
+    },
+    "13-swords-03-to-swords-06": {
+      "file": "sheets/13-swords-03-to-swords-06.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["swords-03", "swords-04", "swords-05", "swords-06"],
+      "activeCards": ["swords-03", "swords-04", "swords-05"]
+    },
+    "14-swords-07-to-swords-10": {
+      "file": "sheets/14-swords-07-to-swords-10.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["swords-07", "swords-08", "swords-09", "swords-10"],
+      "activeCards": ["swords-07", "swords-09", "swords-10"]
+    },
+    "15-swords-11-to-swords-14": {
+      "file": "sheets/15-swords-11-to-swords-14.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["swords-11", "swords-12", "swords-13", "swords-14"],
+      "activeCards": ["swords-13", "swords-14"]
+    },
+    "16-pentacles-01-to-pentacles-04": {
+      "file": "sheets/16-pentacles-01-to-pentacles-04.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["pentacles-01", "pentacles-02", "pentacles-03", "pentacles-04"],
+      "activeCards": [
+        "pentacles-01",
+        "pentacles-02",
+        "pentacles-03",
+        "pentacles-04"
+      ]
+    },
+    "17-pentacles-05-to-pentacles-08": {
+      "file": "sheets/17-pentacles-05-to-pentacles-08.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["pentacles-05", "pentacles-06", "pentacles-07", "pentacles-08"],
+      "activeCards": [
+        "pentacles-05",
+        "pentacles-06",
+        "pentacles-07",
+        "pentacles-08"
+      ]
+    },
+    "18-pentacles-09-to-pentacles-12": {
+      "file": "sheets/18-pentacles-09-to-pentacles-12.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["pentacles-09", "pentacles-10", "pentacles-11", "pentacles-12"],
+      "activeCards": ["pentacles-10", "pentacles-11", "pentacles-12"]
+    },
+    "19-pentacles-13-to-pentacles-14": {
+      "file": "sheets/19-pentacles-13-to-pentacles-14.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 2,
+      "rows": 2,
+      "cards": ["pentacles-13", "pentacles-14"],
+      "activeCards": ["pentacles-13", "pentacles-14"]
+    },
+    "revision-major-17": {
+      "file": "cards/major-17.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["major-17"],
+      "activeCards": ["major-17"]
+    },
+    "revision-wands-05": {
+      "file": "cards/wands-05.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["wands-05"],
+      "activeCards": ["wands-05"]
+    },
+    "revision-wands-08": {
+      "file": "cards/wands-08.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["wands-08"],
+      "activeCards": ["wands-08"]
+    },
+    "revision-wands-10": {
+      "file": "cards/wands-10.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["wands-10"],
+      "activeCards": ["wands-10"]
+    },
+    "revision-swords-06": {
+      "file": "cards/swords-06.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["swords-06"],
+      "activeCards": ["swords-06"]
+    },
+    "revision-swords-08": {
+      "file": "cards/swords-08.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["swords-08"],
+      "activeCards": ["swords-08"]
+    },
+    "revision-swords-12": {
+      "file": "cards/swords-12.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["swords-12"],
+      "activeCards": ["swords-12"]
+    },
+    "revision-pentacles-09": {
+      "file": "cards/pentacles-09.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["pentacles-09"],
+      "activeCards": ["pentacles-09"]
+    },
+    "revision-swords-11": {
+      "file": "cards/swords-11.png",
+      "width": 1024,
+      "height": 1536,
+      "columns": 1,
+      "rows": 1,
+      "cards": ["swords-11"],
+      "activeCards": ["swords-11"]
+    }
+  },
+  "cards": {
+    "major-00": {
+      "name": "The Fool",
+      "deckIndex": 1,
+      "sheetId": "00-style-sample",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A youthful traveler approaching a cliff with head lifted, flower in hand, staff and small bundle over shoulder, small dog leaping at the feet, sparse mountain contours and sun.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-00.svg"
+    },
+    "major-01": {
+      "name": "The Magician",
+      "deckIndex": 2,
+      "sheetId": "01-major-01-to-major-04",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Standing robed magician behind a simple table. Right arm raised with a short double-ended wand, left hand pointing down. Infinity sign above head. Exactly one sword, one cup, one pentacle disk and one laid-down wand on the table. Sparse roses and lilies.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-01.svg"
+    },
+    "major-02": {
+      "name": "The High Priestess",
+      "deckIndex": 3,
+      "sheetId": "01-major-01-to-major-04",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Front-facing seated priestess between two plain pillars, one on each side, with a thin veil behind. Horned lunar headdress with central disk, closed scroll resting in lap, crescent at feet. Sparse pomegranate shapes on veil. No letters on pillars or scroll.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-02.svg"
+    },
+    "major-03": {
+      "name": "The Empress",
+      "deckIndex": 4,
+      "sheetId": "01-major-01-to-major-04",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned woman seated comfortably on a cushioned throne, one short scepter in her hand, flowing dress, sparse wheat at feet and trees behind, small heart-shaped shield bearing Venus symbol beside throne.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-03.svg"
+    },
+    "major-04": {
+      "name": "The Emperor",
+      "deckIndex": 5,
+      "sheetId": "01-major-01-to-major-04",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Bearded crowned emperor seated frontally on a blocky stone throne with simple ram-head finials, orb in one hand, ankh-topped scepter in the other, a few mountain outlines behind. Sparse robe contours.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-04.svg"
+    },
+    "major-05": {
+      "name": "The Hierophant",
+      "deckIndex": 6,
+      "sheetId": "02-major-05-to-major-08",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated religious teacher with triple-tier crown, one hand raised in blessing and other holding triple-cross staff, two kneeling acolytes below, two pillars, crossed keys at feet. Simplify robes, no writing.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-05.svg"
+    },
+    "major-06": {
+      "name": "The Lovers",
+      "deckIndex": 7,
+      "sheetId": "02-major-05-to-major-08",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Two unclothed adult figures, a man and a woman, standing separated beneath a large blessing winged angel and sun. Figure bodies have simple non-graphic contours. Fruit tree with snake behind woman, flame-leaf tree behind man, small distant mountain.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-06.svg"
+    },
+    "major-07": {
+      "name": "The Chariot",
+      "deckIndex": 8,
+      "sheetId": "02-major-05-to-major-08",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned armored charioteer standing inside a compact stone chariot under a star canopy. Two clearly separate resting sphinxes in front, one to each side. Crescent shoulder pieces, vertical scepter, small city outline. Unfilled contours, do not fill either sphinx black.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-07.svg"
+    },
+    "major-08": {
+      "name": "Strength",
+      "deckIndex": 9,
+      "sheetId": "02-major-05-to-major-08",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Woman in flowing robe gently holding the muzzle of a lion standing beside her, infinity sign over her head, small floral garland, distant hill. Calm caring gesture, not fighting.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-08.svg"
+    },
+    "major-09": {
+      "name": "The Hermit",
+      "deckIndex": 10,
+      "sheetId": "03-major-09-to-major-12",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Elderly bearded hooded figure standing on a small rocky summit, holding one raised lantern with a six-pointed star inside, other hand holding long walking staff. Sparse robe folds and abundant empty space.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-09.svg"
+    },
+    "major-10": {
+      "name": "Wheel of Fortune",
+      "deckIndex": 11,
+      "sheetId": "03-major-09-to-major-12",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Large central wheel with simple spokes and concentric circles. Small sphinx with sword at top, snake descending on left, jackal-headed figure rising on right. Four small winged creatures in corners: angel upper left, eagle upper right, bull lower left, lion lower right. Each with a simple open book. No letters or writing on wheel or books.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-10.svg"
+    },
+    "major-11": {
+      "name": "Justice",
+      "deckIndex": 12,
+      "sheetId": "03-major-09-to-major-12",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Front-facing crowned seated figure between two simple pillars, sword upright in right hand (viewer left), two-pan balance scales suspended in left hand (viewer right). Sparse robe and veil contours.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-11.svg"
+    },
+    "major-12": {
+      "name": "The Hanged Man",
+      "deckIndex": 13,
+      "sheetId": "03-major-09-to-major-12",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One man suspended upside down by ONE ankle from a living T-shaped wooden beam, other leg bent crossing behind the straight leg. Hands hidden behind back, calm face, small halo around head. Keep his head clear of ground; simple foliage on beam ends.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-12.svg"
+    },
+    "major-13": {
+      "name": "Death",
+      "deckIndex": 14,
+      "sheetId": "04-major-13-to-major-17",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Skeleton knight on a walking horse, carrying black-flag symbolism as an UNFILLED banner with a five-petal rose. Small fallen crowned figure near ground, kneeling child and woman, standing bishop; rising sun between distant towers. Extremely sparse details and no gruesome content.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-13.svg"
+    },
+    "major-14": {
+      "name": "Temperance",
+      "deckIndex": 15,
+      "sheetId": "04-major-13-to-major-17",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Winged angel standing with one foot in shallow water and one on land, pouring a single slender stream between exactly TWO cups held at different heights. Small triangle on chest, sparse irises and path to a distant sun between hills.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-14.svg"
+    },
+    "major-15": {
+      "name": "The Devil",
+      "deckIndex": 16,
+      "sheetId": "04-major-13-to-major-17",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Horned goat-headed winged creature perched on a low block, one raised open hand, other lowered hand holding a small inverted torch. Inverted pentagram above forehead. Two adult human figures stand beneath at left and right with loose chains to the block, one flame-tipped tail and one grape-tipped tail. Simplified non-graphic contours.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-15.svg"
+    },
+    "major-16": {
+      "name": "The Tower",
+      "deckIndex": 17,
+      "sheetId": "00-style-sample",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Lightning striking a tall stone tower, tilted crown flying from its top, flames at windows, exactly two people falling one on each side, jagged rocky base.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-16.svg"
+    },
+    "major-17": {
+      "name": "The Star",
+      "deckIndex": 18,
+      "sheetId": "revision-major-17",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Adult woman kneeling beside a small pool, one knee on land and one foot in water, pouring water from exactly TWO pitchers, one into pool and one onto ground. One large eight-pointed star and exactly SEVEN smaller stars above (eight stars total). Small tree and bird in distance. Simple non-graphic figure contours.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-17.svg"
+    },
+    "major-18": {
+      "name": "The Moon",
+      "deckIndex": 19,
+      "sheetId": "05-major-18-to-major-21",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Large moon with a face overhead, two distant towers, a dog and a wolf howling from opposite sides of a winding path, one crayfish emerging from pool at bottom. Sparse droplets and hill lines.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-18.svg"
+    },
+    "major-19": {
+      "name": "The Sun",
+      "deckIndex": 20,
+      "sheetId": "05-major-18-to-major-21",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Large sun with simple face and alternating rays above a cheerful unclothed young child seated on a white horse, one long curved banner staff in hand. Body rendered non-graphically. Low wall and four simplified sunflowers behind, flowing banner left unfilled.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-19.svg"
+    },
+    "major-20": {
+      "name": "Judgement",
+      "deckIndex": 21,
+      "sheetId": "05-major-18-to-major-21",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Winged angel in cloud above blowing a long trumpet with small cross-marked banner. Below, three visible people rising upright from three open rectangular coffins, arms raised, simple non-graphic human contours. Sparse distant mountain and water lines.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-20.svg"
+    },
+    "major-21": {
+      "name": "The World",
+      "deckIndex": 22,
+      "sheetId": "05-major-18-to-major-21",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Adult dancing figure inside an elongated leafy oval wreath, draped ribbon across body, one small baton in each hand. Four separate corner creatures: human head upper left, eagle upper right, bull lower left, lion lower right. Elegant simple outline, no ornate detail.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/major-21.svg"
+    },
+    "wands-01": {
+      "name": "Ace of Wands",
+      "deckIndex": 23,
+      "sheetId": "06-wands-01-to-wands-04",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A single hand emerging from a small cloud holding ONE upright leafy wooden staff, a distant hill and castle below.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-01.svg"
+    },
+    "wands-02": {
+      "name": "Two of Wands",
+      "deckIndex": 24,
+      "sheetId": "06-wands-01-to-wands-04",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One standing cloaked figure on a parapet holding a small globe and ONE upright staff; a SECOND upright staff fixed beside him, exactly TWO staffs total. Sparse distant land and water.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-02.svg"
+    },
+    "wands-03": {
+      "name": "Three of Wands",
+      "deckIndex": 25,
+      "sheetId": "06-wands-01-to-wands-04",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Back-view cloaked figure looking out over a bay with small ships, surrounded by exactly THREE upright staffs: one in his hand, two planted nearby.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-03.svg"
+    },
+    "wands-04": {
+      "name": "Four of Wands",
+      "deckIndex": 26,
+      "sheetId": "06-wands-01-to-wands-04",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Exactly FOUR upright leafy staffs supporting a hanging flower garland across their tops; two small celebrating figures beyond holding bouquets; faint castle outline.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-04.svg"
+    },
+    "wands-05": {
+      "name": "Five of Wands",
+      "deckIndex": 27,
+      "sheetId": "revision-wands-05",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Exactly FIVE young people playfully sparring, each holding exactly ONE staff, exactly FIVE staffs total in a loose crisscross composition. Separate limbs from staffs, no extra sticks.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-05.svg"
+    },
+    "wands-06": {
+      "name": "Six of Wands",
+      "deckIndex": 28,
+      "sheetId": "07-wands-05-to-wands-08",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One wreath-crowned rider on a horse holding one upright staff with a small victory wreath attached; exactly FIVE other staffs held by companions behind, SIX staffs total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-06.svg"
+    },
+    "wands-07": {
+      "name": "Seven of Wands",
+      "deckIndex": 29,
+      "sheetId": "07-wands-05-to-wands-08",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One standing figure on high rocky ground holding one staff diagonally in defense, with exactly SIX staffs entering upward from lower edge, SEVEN total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-07.svg"
+    },
+    "wands-08": {
+      "name": "Eight of Wands",
+      "deckIndex": 30,
+      "sheetId": "revision-wands-08",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Exactly EIGHT separate parallel leafy staffs flying diagonally down toward the right above a minimal river and hillside. No people, no extra staffs.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-08.svg"
+    },
+    "wands-09": {
+      "name": "Nine of Wands",
+      "deckIndex": 31,
+      "sheetId": "08-wands-09-to-wands-12",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Bandaged standing figure gripping ONE upright staff, with exactly EIGHT separate staffs in a loose fence behind, NINE total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-09.svg"
+    },
+    "wands-10": {
+      "name": "Ten of Wands",
+      "deckIndex": 32,
+      "sheetId": "revision-wands-10",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "One bent-over walking figure carrying a visible bundle of exactly TEN long staffs toward a tiny distant town. Distinguish and count all ten staff ends, no additional upright objects.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-10.svg"
+    },
+    "wands-11": {
+      "name": "Page of Wands",
+      "deckIndex": 33,
+      "sheetId": "08-wands-09-to-wands-12",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Young standing page in a feathered cap looking upward along ONE tall leafy staff held in both hands, simple desert mounds behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-11.svg"
+    },
+    "wands-12": {
+      "name": "Knight of Wands",
+      "deckIndex": 34,
+      "sheetId": "08-wands-09-to-wands-12",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Armored knight on a rearing horse, holding ONE leafy staff, windblown cloak and feather plume, sparse desert hills.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-12.svg"
+    },
+    "wands-13": {
+      "name": "Queen of Wands",
+      "deckIndex": 35,
+      "sheetId": "09-wands-13-to-cups-02",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned queen seated frontally on a simple lion-decorated throne, ONE leafy staff upright in one hand and a sunflower in the other, small black-cat symbolism rendered as unfilled cat outline at her feet.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-13.svg"
+    },
+    "wands-14": {
+      "name": "King of Wands",
+      "deckIndex": 36,
+      "sheetId": "09-wands-13-to-cups-02",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned bearded king seated in profile on a simple throne, holding ONE upright leafy staff, small salamander at base, minimal lion or salamander throne details.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/wands-14.svg"
+    },
+    "cups-01": {
+      "name": "Ace of Cups",
+      "deckIndex": 37,
+      "sheetId": "09-wands-13-to-cups-02",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A hand emerging from cloud holding ONE large chalice. Dove descending toward cup, exactly five slender water streams flow down into a small lily pool. No letters.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-01.svg"
+    },
+    "cups-02": {
+      "name": "Two of Cups",
+      "deckIndex": 38,
+      "sheetId": "09-wands-13-to-cups-02",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Two standing adults facing one another, each holding ONE cup, TWO cups total. Above them a caduceus with two snakes and a winged lion head. Sparse background.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-02.svg"
+    },
+    "cups-03": {
+      "name": "Three of Cups",
+      "deckIndex": 39,
+      "sheetId": "10-cups-03-to-cups-06",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Exactly THREE women dancing in a circle raising exactly THREE cups, one per person, fruit and flowers at their feet.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-03.svg"
+    },
+    "cups-04": {
+      "name": "Four of Cups",
+      "deckIndex": 40,
+      "sheetId": "10-cups-03-to-cups-06",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated person under a tree with folded arms, exactly THREE cups on ground in front, a cloud-hand offers a FOURTH cup from the side.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-04.svg"
+    },
+    "cups-05": {
+      "name": "Five of Cups",
+      "deckIndex": 41,
+      "sheetId": "10-cups-03-to-cups-06",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Cloaked back/side-view figure looking down at exactly THREE fallen cups; exactly TWO upright cups behind, FIVE total. Sparse bridge over stream in background.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-05.svg"
+    },
+    "cups-06": {
+      "name": "Six of Cups",
+      "deckIndex": 42,
+      "sheetId": "10-cups-03-to-cups-06",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Two children in a simple garden or courtyard; the taller child offers ONE flower-filled cup to the smaller child, exactly FIVE other flower-filled cups arranged around them, SIX total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-06.svg"
+    },
+    "cups-07": {
+      "name": "Seven of Cups",
+      "deckIndex": 43,
+      "sheetId": "11-cups-07-to-cups-10",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Back-view figure contemplating exactly SEVEN floating cups arranged in cloud. Each cup contains one simplified image: face, veiled figure, snake, small castle, jewels, laurel wreath, dragon. All seven cup silhouettes distinct.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-07.svg"
+    },
+    "cups-08": {
+      "name": "Eight of Cups",
+      "deckIndex": 44,
+      "sheetId": "11-cups-07-to-cups-10",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A walking cloaked figure with staff heading into hills under a moon, leaving exactly EIGHT upright cups neatly stacked: FIVE in bottom row and THREE in upper row. Staff is plain with no cup shape.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-08.svg"
+    },
+    "cups-09": {
+      "name": "Nine of Cups",
+      "deckIndex": 45,
+      "sheetId": "11-cups-07-to-cups-10",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated satisfied figure with folded arms before a curved shelf bearing exactly NINE cups. All cups clearly separated and visible.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-09.svg"
+    },
+    "cups-10": {
+      "name": "Ten of Cups",
+      "deckIndex": 46,
+      "sheetId": "11-cups-07-to-cups-10",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Two standing adults with raised arms and two playing children beneath a broad arc containing exactly TEN cups; small house and river in background. Cups are inside the arc, not stars.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-10.svg"
+    },
+    "cups-11": {
+      "name": "Page of Cups",
+      "deckIndex": 47,
+      "sheetId": "12-cups-11-to-swords-01",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A young page standing by water holding ONE cup with a small fish peeking from it, soft cap and sparse tunic folds.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-11.svg"
+    },
+    "cups-12": {
+      "name": "Knight of Cups",
+      "deckIndex": 48,
+      "sheetId": "12-cups-11-to-swords-01",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Armored knight on a calmly walking horse, holding ONE cup forward, narrow stream below and low hills behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-12.svg"
+    },
+    "cups-13": {
+      "name": "Queen of Cups",
+      "deckIndex": 49,
+      "sheetId": "00-style-sample",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned queen in left-facing profile seated on a throne beside water, looking at ONE ornate lidded cup held in both hands. Sparse robe contours, shell or cherub throne cues.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-13.svg"
+    },
+    "cups-14": {
+      "name": "King of Cups",
+      "deckIndex": 50,
+      "sheetId": "12-cups-11-to-swords-01",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned king on a stone throne surrounded by water, holding ONE cup and ONE short scepter. Small fish leaping and tiny sailboat far behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/cups-14.svg"
+    },
+    "swords-01": {
+      "name": "Ace of Swords",
+      "deckIndex": 51,
+      "sheetId": "12-cups-11-to-swords-01",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "A cloud-hand holds ONE upright sword through a floating crown at its tip. Small olive and palm branches hang from the crown, sparse mountain outlines below.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-01.svg"
+    },
+    "swords-02": {
+      "name": "Two of Swords",
+      "deckIndex": 52,
+      "sheetId": "00-style-sample",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Blindfolded seated woman with crossed arms holding exactly TWO swords diagonally upward and outward, still-water horizon, rocks and crescent moon.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-02.svg"
+    },
+    "swords-03": {
+      "name": "Three of Swords",
+      "deckIndex": 53,
+      "sheetId": "13-swords-03-to-swords-06",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One large unfilled heart pierced by exactly THREE swords: one vertical and two diagonal. Small cloud and rain marks behind. Clean symbolic contour, no blood.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-03.svg"
+    },
+    "swords-04": {
+      "name": "Four of Swords",
+      "deckIndex": 54,
+      "sheetId": "13-swords-03-to-swords-06",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Reclining resting figure on stone slab, hands together; exactly THREE swords hang vertically on wall above, FOURTH sword lies horizontally along side of slab. Simple arched window.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-04.svg"
+    },
+    "swords-05": {
+      "name": "Five of Swords",
+      "deckIndex": 55,
+      "sheetId": "13-swords-03-to-swords-06",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Standing foreground figure holding exactly THREE swords, exactly TWO additional swords lying on ground; two distant people walking away by water. FIVE swords total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-05.svg"
+    },
+    "swords-06": {
+      "name": "Six of Swords",
+      "deckIndex": 56,
+      "sheetId": "revision-swords-06",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Small boat carrying seated cloaked adult and child, with standing ferryman using ONE plain blunt pole; exactly SIX swords planted vertically in the bow, distinct from the pole. Quiet water.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-06.svg"
+    },
+    "swords-07": {
+      "name": "Seven of Swords",
+      "deckIndex": 57,
+      "sheetId": "14-swords-07-to-swords-10",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One sneaking figure carrying exactly FIVE swords, glancing back toward exactly TWO swords planted upright in ground, SEVEN swords total. Tiny tent shapes in background.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-07.svg"
+    },
+    "swords-08": {
+      "name": "Eight of Swords",
+      "deckIndex": 58,
+      "sheetId": "revision-swords-08",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Blindfolded lightly bound standing woman surrounded by exactly EIGHT upright swords, four on each side, sparse wet ground and distant castle. Clear gaps between swords and figure.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-08.svg"
+    },
+    "swords-09": {
+      "name": "Nine of Swords",
+      "deckIndex": 59,
+      "sheetId": "14-swords-07-to-swords-10",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Person sitting upright in bed holding face in hands, exactly NINE swords horizontally aligned in distinct rows on the wall behind. Sparse bedcover contours.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-09.svg"
+    },
+    "swords-10": {
+      "name": "Ten of Swords",
+      "deckIndex": 60,
+      "sheetId": "14-swords-07-to-swords-10",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One prone figure on ground with exactly TEN swords aligned along their back. Symbolic non-graphic depiction, no blood. Calm sea and low sunrise on horizon.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-10.svg"
+    },
+    "swords-11": {
+      "name": "Page of Swords",
+      "deckIndex": 61,
+      "sheetId": "revision-swords-11",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Standing young page in wind holding ONE long sword upright with both hands, torso turned, windblown hair and sparse clouds.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-11.svg"
+    },
+    "swords-12": {
+      "name": "Knight of Swords",
+      "deckIndex": 62,
+      "sheetId": "revision-swords-12",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Armored knight leaning forward on a galloping horse, raising ONE sword diagonally forward, cloak and plume streaming behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-12.svg"
+    },
+    "swords-13": {
+      "name": "Queen of Swords",
+      "deckIndex": 63,
+      "sheetId": "15-swords-11-to-swords-14",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated crowned queen in profile, ONE sword held vertically, other hand extended palm outward. Simple throne with small butterfly motif, one distant bird.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-13.svg"
+    },
+    "swords-14": {
+      "name": "King of Swords",
+      "deckIndex": 64,
+      "sheetId": "15-swords-11-to-swords-14",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned king seated frontally on a throne, holding ONE upright slightly angled sword, simple butterfly throne detail and sparse clouds.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/swords-14.svg"
+    },
+    "pentacles-01": {
+      "name": "Ace of Pentacles",
+      "deckIndex": 65,
+      "sheetId": "16-pentacles-01-to-pentacles-04",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Cloud-hand presenting ONE large disk inscribed with a five-pointed star, below a simple flowering garden and archway opening onto distant mountains.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-01.svg"
+    },
+    "pentacles-02": {
+      "name": "Two of Pentacles",
+      "deckIndex": 66,
+      "sheetId": "16-pentacles-01-to-pentacles-04",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Standing juggler holding exactly TWO star-inscribed disks connected by an infinity-shaped ribbon, small ships on high waves behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-02.svg"
+    },
+    "pentacles-03": {
+      "name": "Three of Pentacles",
+      "deckIndex": 67,
+      "sheetId": "16-pentacles-01-to-pentacles-04",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Stoneworker on a low bench working inside a pointed church arch, with two standing observers, exactly THREE star-inscribed disks embedded above in the arch.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-03.svg"
+    },
+    "pentacles-04": {
+      "name": "Four of Pentacles",
+      "deckIndex": 68,
+      "sheetId": "16-pentacles-01-to-pentacles-04",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated crowned figure clutching ONE star disk to chest, SECOND disk above crown, and one disk beneath each foot, exactly FOUR disks. Sparse city outline.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-04.svg"
+    },
+    "pentacles-05": {
+      "name": "Five of Pentacles",
+      "deckIndex": 69,
+      "sheetId": "17-pentacles-05-to-pentacles-08",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Two weary cloaked figures, one on crutches, walking below a tall arched window containing exactly FIVE star-inscribed disks, sparse snow marks.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-05.svg"
+    },
+    "pentacles-06": {
+      "name": "Six of Pentacles",
+      "deckIndex": 70,
+      "sheetId": "17-pentacles-05-to-pentacles-08",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Standing well-dressed benefactor holding small balance scales in one hand and dropping small coins with the other toward two kneeling figures. Exactly SIX LARGE star-inscribed pentacle disks float above (three to each side); giving coins are only tiny unmarked dots.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-06.svg"
+    },
+    "pentacles-07": {
+      "name": "Seven of Pentacles",
+      "deckIndex": 71,
+      "sheetId": "17-pentacles-05-to-pentacles-08",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "One standing gardener leaning on a plain tool handle contemplating exactly SEVEN star-inscribed disks: SIX on a climbing vine and ONE on ground by feet.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-07.svg"
+    },
+    "pentacles-08": {
+      "name": "Eight of Pentacles",
+      "deckIndex": 72,
+      "sheetId": "17-pentacles-05-to-pentacles-08",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Seated craftsperson engraving ONE star disk on a bench, ONE completed disk on ground, exactly SIX completed star disks hanging vertically to the side, EIGHT total.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-08.svg"
+    },
+    "pentacles-09": {
+      "name": "Nine of Pentacles",
+      "deckIndex": 73,
+      "sheetId": "revision-pentacles-09",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 1536
+      },
+      "subjectPrompt": "Standing elegant woman in a grape garden, small hooded falcon perched on one gloved hand, exactly NINE star-inscribed disks among vines, small snail at feet.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-09.svg"
+    },
+    "pentacles-10": {
+      "name": "Ten of Pentacles",
+      "deckIndex": 74,
+      "sheetId": "18-pentacles-09-to-pentacles-12",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Older cloaked person seated at lower left, two dogs at feet, an adult couple and small child beneath an arch in background. Exactly TEN star-inscribed disks distributed across composition, all visible and clearly separated.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-10.svg"
+    },
+    "pentacles-11": {
+      "name": "Page of Pentacles",
+      "deckIndex": 75,
+      "sheetId": "18-pentacles-09-to-pentacles-12",
+      "cell": {
+        "row": 1,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Young standing page holding ONE star-inscribed disk up in both hands, simple meadow and distant hills.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-11.svg"
+    },
+    "pentacles-12": {
+      "name": "Knight of Pentacles",
+      "deckIndex": 76,
+      "sheetId": "18-pentacles-09-to-pentacles-12",
+      "cell": {
+        "row": 1,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 768,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Armored knight sitting on a still horse, holding ONE star-inscribed disk, plain plowed field behind.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-12.svg"
+    },
+    "pentacles-13": {
+      "name": "Queen of Pentacles",
+      "deckIndex": 77,
+      "sheetId": "19-pentacles-13-to-pentacles-14",
+      "cell": {
+        "row": 0,
+        "column": 0
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned queen seated on a simple leafy throne looking down at ONE star-inscribed disk cradled in her lap, small rabbit near feet and a sparse rose branch overhead.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-13.svg"
+    },
+    "pentacles-14": {
+      "name": "King of Pentacles",
+      "deckIndex": 78,
+      "sheetId": "19-pentacles-13-to-pentacles-14",
+      "cell": {
+        "row": 0,
+        "column": 1
+      },
+      "crop": {
+        "x": 512,
+        "y": 0,
+        "width": 512,
+        "height": 768
+      },
+      "subjectPrompt": "Crowned king seated on a throne with simple bull-head finials, holding ONE star-inscribed disk in one hand and a short scepter in other, sparse grapevines and distant castle.",
+      "svgFile": "../../../src/features/tarot-flash/assets/illustrations/pentacles-14.svg"
+    }
+  },
+  "reconstruction": {
+    "viewBox": [0, 0, 240, 360],
+    "geometry": "unfilled-cubic-bezier-centerlines",
+    "alphaThreshold": 128,
+    "curveFitTolerance": 0.32,
+    "reviewGallery": "svg-review.html"
+  }
+}

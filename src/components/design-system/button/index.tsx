@@ -13,6 +13,20 @@ type ButtonSize = "lg" | "md" | "sm";
 /** Only traditional surfaces use semantic pigments. Frost, text and etched keep brand ink. */
 type ButtonAppearanceProps =
   | {
+      /** Translucent, fully rounded tag action with foreground ink. */
+      appearance: "liquid";
+      iconOnly?: false;
+      intent?: "primary";
+      size?: "md";
+    }
+  | {
+      /** Quieter frosted icon surface for secondary actions. */
+      appearance: "secondary";
+      iconOnly: true;
+      intent?: "primary";
+      size?: "md";
+    }
+  | {
       /** Intent-colored surface. Omit appearance for the brand frost default. */
       appearance: TraditionalAppearance;
       /** Semantic pigment for this surface. Defaults to primary. */
@@ -80,8 +94,15 @@ export function Button({
   children,
   ...rest
 }: ButtonProps) {
-  const frosted = appearance === "frost" || appearance === "inset";
-  const actionInk = iconOnly ? "control" : "on-light-frost";
+  const frosted =
+    appearance === "frost" ||
+    appearance === "inset" ||
+    appearance === "secondary" ||
+    appearance === "liquid";
+  let actionInk = iconOnly ? "control" : "on-light-frost";
+  if (appearance === "liquid") {
+    actionInk = "on-atmosphere";
+  }
   const feedback = useFrostMotion({ disabled: !frosted || rest.disabled });
   const unfrostedContent =
     appearance === "etched" ? <span data-lettering="etched">{children}</span> : children;

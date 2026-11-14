@@ -237,8 +237,40 @@
   }
 }
 
+@layer utilities {
+  [data-ui="button"][data-appearance="liquid"] {
+    --cmp-radius-button-word: var(--ref-radius-rounded);
+    --sys-color-frost-fill: var(--sys-color-frost-reveal);
+    --sys-color-frost-fallback: var(--cmp-color-choice-popup-fill);
+    color: var(--sys-color-ink-on-atmosphere);
+    box-shadow: inset 0 0 0 1px var(--sys-color-well-light);
+    [data-frost] {
+      padding-inline: var(--ref-space-16);
+      box-shadow:
+        inset 0 1px 1px var(--sys-color-well-light),
+        0 3px 10px var(--sys-color-frost-shade);
+    }
+  }
+  [data-ui="button"][data-appearance="secondary"] {
+    --sys-color-frost-fill: var(--sys-color-frost-reveal);
+    background: var(--sys-color-well-fill);
+    box-shadow: inset 0 0 0 1px var(--sys-color-well-light);
+    [data-frost] {
+      box-shadow: inset 0 1px 0 var(--sys-color-well-light);
+    }
+    &[aria-pressed="true"] {
+      --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+    }
+  }
+}
+
 @layer components {
-  [data-ui="button"]:is([data-appearance="frost"], [data-appearance="inset"]) {
+  [data-ui="button"]:is(
+    [data-appearance="frost"],
+    [data-appearance="inset"],
+    [data-appearance="secondary"],
+    [data-appearance="liquid"]
+  ) {
     /* Root well inset; callers never target the moving face. */
     --button-face-inset: var(--cmp-space-button-frost-inset, 0px);
     /* Standard word height; large words intentionally use the fixed height below. */
@@ -269,7 +301,7 @@
         z-index: -1;
       }
     }
-    &[data-icon-only="false"] {
+    &[data-icon-only="false"]:not([data-appearance="liquid"]) {
       --sys-color-frost-fill: var(--cmp-color-button-word-fill);
       --sys-color-frost-fallback: var(--ref-color-paper);
       [data-ripple="release"] {

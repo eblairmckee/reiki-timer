@@ -1,0 +1,174 @@
+@layer components {
+  [data-ui="select-trigger"],
+  [data-ui="combobox-chips"] {
+    display: flex;
+    gap: var(--ref-space-8);
+    align-items: center;
+    inline-size: 100%;
+    min-block-size: 3.25rem;
+    padding: var(--ref-space-10) var(--ref-space-12);
+    font: var(--sys-font-body-lg);
+    color: var(--sys-color-ink-on-atmosphere);
+    background: var(--sys-color-well-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-md);
+    box-shadow: inset 0 1px 4px var(--sys-color-frost-shade);
+    backdrop-filter: var(--sys-filter-frost);
+  }
+  [data-ui="select-trigger"] {
+    justify-content: space-between;
+    text-align: start;
+    cursor: pointer;
+  }
+  [data-ui="select-trigger"]:disabled,
+  [data-ui="combobox-chips"][data-disabled] {
+    cursor: default;
+    opacity: 0.55;
+  }
+  [data-ui="select-trigger"]:focus-visible,
+  [data-ui="combobox-chips"]:focus-within {
+    outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+    outline-offset: 3px;
+  }
+  [data-ui="choice-positioner"] {
+    z-index: 30;
+    outline: none;
+  }
+  [data-ui="choice-popup"] {
+    min-inline-size: var(--anchor-width);
+    max-inline-size: min(28rem, calc(100vw - 2rem));
+    padding: var(--ref-space-6);
+    overflow: hidden;
+    font: var(--sys-font-body-lg);
+    color: var(--sys-color-ink-on-dark-glass);
+    background: var(--sys-color-well-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-md);
+    box-shadow:
+      inset 0 1px 4px var(--sys-color-frost-shade),
+      0 1px 0 var(--sys-color-well-light);
+    backdrop-filter: blur(32px) saturate(1.12);
+    transform-origin: var(--transform-origin);
+    transition:
+      opacity 150ms ease,
+      transform 150ms ease;
+  }
+  [data-ui="choice-popup"]:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  [data-ui="choice-list"] {
+    max-block-size: min(19rem, var(--available-height));
+    overflow: auto;
+    outline: none;
+  }
+  [data-ui="choice-item"] {
+    display: flex;
+    gap: var(--ref-space-16);
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 2.75rem;
+    padding: var(--ref-space-10) var(--ref-space-12);
+    cursor: pointer;
+    outline: none;
+    border-radius: var(--ref-radius-sm);
+  }
+  [data-ui="choice-item-text"] {
+    display: flex;
+    gap: var(--ref-space-10);
+    align-items: center;
+  }
+  [data-ui="choice-item"][data-highlighted] {
+    background: var(--sys-color-frost-fill-selected);
+  }
+  [data-ui="choice-item"][data-disabled] {
+    cursor: default;
+    opacity: 0.5;
+  }
+  [data-ui="combobox-chips"] {
+    flex-wrap: wrap;
+  }
+  [data-ui="combobox-input"] {
+    flex: 1;
+    inline-size: 6rem;
+    min-inline-size: 6rem;
+    min-block-size: 2rem;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    outline: none;
+    background: transparent;
+    border: 0;
+  }
+  [data-ui="combobox-chip"] {
+    display: inline-flex;
+    gap: var(--ref-space-4);
+    align-items: center;
+    max-inline-size: 100%;
+    padding-inline-start: var(--ref-space-10);
+    overflow-wrap: anywhere;
+    background: var(--sys-color-frost-fill);
+    border: 1px solid var(--sys-color-well-light);
+    border-radius: var(--ref-radius-sm);
+  }
+  [data-ui="combobox-chip"]:focus-visible {
+    outline: 2px solid currentColor;
+  }
+  [data-ui="combobox-chip"][data-appearance="liquid"] {
+    padding-inline: var(--ref-space-12) var(--ref-space-4);
+    color: inherit;
+    background: linear-gradient(
+      145deg,
+      var(--sys-color-frost-sheen),
+      var(--sys-color-frost-reveal)
+    );
+    border-radius: var(--ref-radius-rounded);
+    box-shadow:
+      inset 0 1px 1px var(--sys-color-well-light),
+      0 3px 10px var(--sys-color-frost-shade);
+    backdrop-filter: var(--sys-filter-frost);
+  }
+  [data-ui="combobox-chip-remove"] {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: var(--ref-radius-circled);
+  }
+  [data-ui="combobox-chip-remove"]:hover {
+    background: var(--sys-color-frost-fill-selected);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-ui="choice-popup"] {
+      transition: none;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    [data-ui="choice-popup"],
+    [data-ui="select-trigger"],
+    [data-ui="combobox-chips"] {
+      background: var(--sys-color-frost-fallback);
+      backdrop-filter: none;
+    }
+  }
+  @media (forced-colors: active) {
+    [data-ui="choice-popup"],
+    [data-ui="select-trigger"],
+    [data-ui="combobox-chips"],
+    [data-ui="combobox-chip"] {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+    }
+    [data-ui="choice-item"][data-highlighted] {
+      color: HighlightText;
+      background: Highlight;
+    }
+  }
+}

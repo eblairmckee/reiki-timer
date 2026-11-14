@@ -17,7 +17,7 @@ Use **repository seed data plus IndexedDB**. The deployed app reads and explicit
 | --- | --- |
 | Card catalog | Immutable card identity, RWS default name, arcana/suit/rank, and fixed route order. No seeded meanings or correspondences. |
 | Study library | Local ownership, schema version, and correspondence definitions. One active library in MVP. |
-| Library card | Editable names and study content for one catalog card within one library, plus revision and timestamps. |
+| Library card | Editable alternative names and study content for one catalog card within one library, plus revision and timestamps. |
 | Illustration manifest | Bundled SVG asset/renderer and descriptive alternative text, keyed by catalog ID. Separate from user edits. |
 
 Enforce one library card per `(libraryId, catalogCardId)`; initialization creates exactly 78. Custom cards/decks are outside MVP, so `catalogCardId` is required.
@@ -26,7 +26,7 @@ Ownership belongs to the library. A local owner ID is not authentication; compon
 
 ## Catalog and route identity
 
-Use a stable catalog ID (for example, `major-00` or `swords-02`) independently of editable names, display numerals, and library-card IDs.
+Use a stable catalog ID (for example, `major-00` or `swords-02`) independently of alternative names, display numerals, and library-card IDs.
 
 Freeze this order for `/tarot-flash/{deckIndex}`:
 
@@ -40,7 +40,7 @@ Freeze this order for `/tarot-flash/{deckIndex}`:
 
 Within each suit, 1 is Ace; 11–14 are Page, Knight, Queen, King. Use Roman numerals for the title's catalog number/rank, with `0` for The Fool. Court quick-selection controls use icons; their numeric search equivalents remain 11–14. A URL index is never interpreted as the card's printed number in search.
 
-Renaming a card or adding names never changes any identity, numeral, route, or asset association. Seed only RWS names; the user adds alternative traditions' names later.
+The catalog’s RWS name is the fixed title; title editing is outside MVP. Users may add alternative names without changing any identity, numeral, route, or asset association. Other names start empty.
 
 ## Contracts
 
@@ -80,9 +80,8 @@ interface CardMeaning {
 }
 
 interface CardContent {
-  names: string[]; // Ordered display names; each also participates in search.
+  otherNames: string[]; // Ordered personal aliases, shown as a subtitle and included in search.
   correspondences: Record<string, string[]>;
-  imagery: string; // Shared symbology/imagery text; artwork lives in the manifest.
   meanings: {
     upright: CardMeaning;
     reversed: CardMeaning | null;
@@ -100,17 +99,16 @@ interface LibraryCard {
 }
 ```
 
-Correspondence definitions start with stable IDs `element` and `zodiac`, each accepting unrestricted text arrays and multiple values. MVP edits these values only; new field definitions have no UI.
+Correspondence definitions use stable IDs `element`, `zodiac`, and `planet`, each storing text arrays and multiple values. The editor offers fixed choice lists while preserving previously saved values. MVP edits these values only; new field definitions have no UI.
 
-Names, correspondences, and imagery are shared across orientations. Upright and reversed meanings are independent; reversed content never silently falls back to upright content.
+Other names and correspondences are shared across orientations. Upright and reversed meanings are independent; reversed content never silently falls back to upright content.
 
 ### Seed content
 
 For every catalog card, initialize:
 
-- `names`: an array containing its single RWS default name.
-- `correspondences`: empty element/zodiac arrays.
-- `imagery`: an empty string.
+- `otherNames`: an empty array; the title comes from `CatalogCard.defaultName`.
+- `correspondences`: empty element/zodiac/planet arrays.
 - `meanings.upright`: empty keywords and notes.
 - `meanings.reversed`: `null`.
 - Stable library/card IDs, an initial revision, and valid timestamps.
@@ -124,9 +122,9 @@ Separate **stored-record validity** from **editor save validity**:
 | Boundary | Rule |
 | --- | --- |
 | Seed/read/migration | Empty study content is structurally valid and may be viewed. Validate types, identifiers, relationships, catalog ranges, schema version, revisions, and timestamps. |
-| Editor save | Require at least one nonblank upright keyword. Notes, correspondences, imagery text, and all reversed content are optional. |
+| Editor save | Require at least one nonblank upright keyword. Other names, notes, correspondences, and all reversed content are optional. |
 | Reversed meaning | `null` means unconfigured. Either reversed keywords or notes may be entered independently; no reversed keyword requirement is introduced. Normalize both-empty content to `null` on save. |
-| Names and list values | Trim list entries and ignore blank entries. If no names remain, display/search the catalog default name; this does not introduce another required editor field. |
+| Other names and list values | Trim list entries and ignore blanks. Free-entry controls commit on comma and split comma-separated paste, ignoring duplicates. The catalog title is always displayed/searchable independently of aliases. |
 
 The save rule applies to the whole draft, even when only a shared field or reversed meaning was edited. A blank starter card therefore opens normally, but entering its editor immediately shows the missing-upright-keyword error and disables Save.
 
@@ -149,6 +147,9 @@ Routes resolve `deckIndex` through the catalog, then read the corresponding libr
 ### Persistence and drafts
 
 - Drafts contain all shared content and both meanings. Present `null` reversed content as empty editor fields without mutating storage.
+- Correspondence arrays remain storage-compatible. New Element selections come from Fire/Water/Air/Earth; Zodiac selections come from the twelve signs; Planet selections come from Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Older free-text values remain visible and removable, without being silently discarded on save. Keywords remain user-authored strings; the combobox derives suggestions from saved library meanings and supports new values without seeding interpretations.
+- Schema 2 replaces `names` with `otherNames` and removes `imagery`. Initialization migrates schema 1 in one transaction, removes the catalog title from aliases, preserves personal aliases/meanings/correspondences and all identities, and rotates revisions to reject stale saves. Invalid records abort the migration without partial writes; initialization never reseeds existing data.
+- Records without `planet` treat it as empty. Initialization adds missing Planet metadata. Saving includes its Planet array; missing and empty Planet values are equivalent for draft-change detection.
 - Explicit Save checks `expectedRevision` and writes the whole draft in one transaction, returning the new revision/timestamps. UI-only revision checks are insufficient.
 - Validation/storage failures and conflicts preserve the draft and saved content. Recovery must not silently overwrite newer data; Cancel restores the saved snapshot. There is no autosave.
 - Scope pending/error state and async results to their owning card/operation; obsolete completions must not update another screen.
@@ -156,15 +157,15 @@ Routes resolve `deckIndex` through the catalog, then read the corresponding libr
 
 ## Search contract
 
-Derive search from catalog metadata and saved names, without a persisted search index or unsaved drafts. See [search behavior](product-brief.md#search-typing-and-buttons-together) for controls and presentation.
+Derive search from catalog titles and saved Other names, without a persisted search index or unsaved drafts. See [search behavior](product-brief.md#search-typing-and-buttons-together) for controls and presentation.
 
 - Match names case-insensitively with normalized whitespace. Support name prefixes/partial matches for autocomplete.
 - Normalize complete number tokens: Arabic, Roman, and spelled-out forms. `2 of swords`, `II of swords`, and `two of swords` identify the same catalog card. Recognize Ace/one and Page/Knight/Queen/King as ranks 1 and 11–14 respectively.
 - Recognize singular/plural suits. Use category/suit context to resolve ranks; otherwise return candidates across the catalog. Suit-only queries remain incomplete. Roman-letter substrings inside names are not number tokens.
-- Filters constrain matching; quick-selection buttons directly resolve identities. Preserve suit/rank lookup after renaming.
+- Filters constrain matching; quick-selection buttons directly resolve identities. Preserve catalog-title and suit/rank lookup when aliases change.
 - Return name-level suggestions with a stable card ID and matched label. Different matching names for one card remain separate suggestions; do not deduplicate by card ID.
 - Prefer exact matches, then prefixes, then other partial matches; break ties by catalog order and saved name order. The first result supplies the initial inline completion.
-- Label numeric/rank matches with the first configured name or catalog fallback.
+- Label numeric/rank matches with the fixed catalog title.
 
 ## Study and session state
 
@@ -181,15 +182,15 @@ Keep study state separate from persisted interpretations:
 
 Store visited catalog IDs in validated, library-scoped tab-session storage. Apply the [shuffle/reset rules](product-brief.md#shuffle-session). Failure to restore transient session data may start a fresh pass without changing saved interpretations.
 
-Reveal targets identify card and field, plus orientation for keywords/notes. Group shared illustration/text as one target; element and zodiac are independent targets. Exclude empty fields. There is no score, assessment history, or spaced-repetition model.
+Reveal targets identify card and field, plus orientation for keywords/notes. The illustration is visible only in view mode; element, zodiac, and planet are independent targets. Exclude empty fields. There is no score, assessment history, or spaced-repetition model.
 
 ## Illustration assets
 
 Follow the separate [illustration prompt](illustration-prompt.md). Keep the 78 bundled illustrations and their manifest outside IndexedDB and editable `CardContent`.
 
-- Map stable `catalogCardId` to an SVG asset/renderer and descriptive alternative text. Coordinate output paths with the illustration session.
+- Map stable `catalogCardId` to an SVG asset/renderer and descriptive alternative text. Generated reference sheets and their ID-to-cell mapping live in [artwork/](artwork/README.md), separate from the runtime SVG manifest.
 - Use one asset per card, shared across orientations, with real vector strokes accepting application color/opacity/stroke tokens.
-- Distinguish asset loading/failure from study concealment; descriptive alternatives remain hidden until reveal.
+- Distinguish asset loading/failure from study concealment; the illustration and its descriptive alternative are visible by default in view mode and absent from the editor.
 
 ## Repository placement
 
@@ -202,7 +203,7 @@ Follow the separate [illustration prompt](illustration-prompt.md). Keep the 78 b
 | `src/features/tarot-flash/state/`, `hooks/` | Feature state and React lifetimes where needed. |
 | `src/features/tarot-flash/screens/`, `components/` | Route composition and tarot-specific UI. Reuse shared design-system public contracts. |
 
-Coordinate the artwork asset directory with the separate illustration session. Keep model code independent of React, components, and browser I/O. Create directories only as populated concerns need them.
+Place finished SVG assets in `src/features/tarot-flash/assets/illustrations/`, named by catalog ID. Keep generated raster references in [docs/tarot-flash/artwork/](artwork/README.md). Keep model code independent of React, components, and browser I/O. Create directories only as populated concerns need them.
 
 ## Adding accounts later
 

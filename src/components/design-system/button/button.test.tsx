@@ -8,10 +8,14 @@ import { LinkButton } from "../link-button";
 import { Button } from ".";
 
 describe("public control contracts", () => {
-  test.each(["frost", "inset"] as const)(
+  test.each(["frost", "inset", "liquid"] as const)(
     "%s owns the shared moving face and feedback",
     (appearance) => {
-      render(<Button appearance={appearance}>Run</Button>);
+      render(
+        <Button appearance={appearance} iconOnly={false}>
+          Run
+        </Button>
+      );
       const button = screen.getByRole("button", { name: "Run" });
       expect(button.getAttribute("data-appearance")).toBe(appearance);
       expect(button.querySelector("[data-frost]")).not.toBeNull();
