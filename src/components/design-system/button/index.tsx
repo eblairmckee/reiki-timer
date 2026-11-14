@@ -20,7 +20,7 @@ type ButtonAppearanceProps =
       size?: "md";
     }
   | {
-      /** Quieter frosted icon surface for secondary actions. */
+      /** Lower-opacity frost for a secondary icon action. */
       appearance: "secondary";
       iconOnly: true;
       intent?: "primary";
@@ -45,10 +45,11 @@ type ButtonAppearanceProps =
       iconOnly?: boolean;
     }
   | ({
-      /** Default frost; inset exposes a stationary well around the moving face.
+      /** Primary uses a denser frost face. Default frost and inset retain
+       * their original surfaces; inset exposes the stationary well.
        * Button owns face lighting and press/release feedback. See
        * docs/concepts/controls/button-frost-states.png for the material study. */
-      appearance?: "frost" | "inset";
+      appearance?: "frost" | "inset" | "primary";
       /** Fixed brand ink; primary is retained for compatibility. */
       intent?: "primary";
     } & (
@@ -68,7 +69,7 @@ type ButtonAppearanceProps =
  * Native/Base UI handlers, refs, disabled behavior and cancellation pass through.
  * onClick runs for each supported activation, including repeated activation of the same value.
  * Root styling hooks for frost/inset (also inherited by grouped controls):
- * --cmp-size-button-icon sets icon width and default height;
+ * --cmp-size-button-icon sets icon width and height (defaults to --sys-size-control-height);
  * --cmp-size-button-frost-height overrides standard word/icon height (large words stay 3.25rem);
  * --cmp-space-button-frost-inset sets the stationary well inset;
  * --cmp-radius-button-word / --cmp-radius-button-icon set the corresponding root radius;
@@ -97,9 +98,10 @@ export function Button({
   const frosted =
     appearance === "frost" ||
     appearance === "inset" ||
+    appearance === "primary" ||
     appearance === "secondary" ||
     appearance === "liquid";
-  let actionInk = iconOnly ? "control" : "on-light-frost";
+  let actionInk = iconOnly && appearance !== "primary" ? "control" : "on-light-frost";
   if (appearance === "liquid") {
     actionInk = "on-atmosphere";
   }

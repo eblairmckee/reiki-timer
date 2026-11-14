@@ -15,6 +15,7 @@ import {
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { type ReactNode, type Ref, useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button } from "@/components/design-system/button";
+import { ButtonGroup } from "@/components/design-system/button-group";
 import { Icon } from "@/components/design-system/icon";
 import { Input } from "@/components/design-system/input";
 import { motion as systemMotion } from "@/components/design-system/shared/motion";
@@ -23,6 +24,8 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { catalog, displayNumeral, inCategory, rankNames } from "../data/catalog";
 import { normalizeQuery, searchCards } from "../model/search";
 import type { CatalogCard, Category, LibraryCard } from "../model/types";
+
+import "./search-footer.css";
 
 const filters = [
   { icon: MagicWand01Icon, id: "wands", label: "Wands" },
@@ -33,7 +36,7 @@ const filters = [
 ] as const;
 const courts = [ChessPawnIcon, ChessKnightIcon, ChessQueenIcon, CrownIcon];
 // A little more give than a disclosure: the search control travels, then its rows unfold.
-const footerSpring = { ...systemMotion.disclosure.slide, damping: 22, stiffness: 260 };
+const footerSpring = systemMotion.disclosure.pop;
 
 function SearchRow({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   const present = useIsPresent();
@@ -52,7 +55,7 @@ function SearchRow({ children, delay = 0 }: { children: ReactNode; delay?: numbe
           : {
               ...footerSpring,
               delay: present ? delay : 0,
-              opacity: { delay: present ? delay : 0, duration: 0.16 },
+              opacity: { ...systemMotion.disclosure.fade, delay: present ? delay : 0 },
             }
       }
     >
@@ -98,7 +101,7 @@ function RankChoices({
           ? { duration: 0 }
           : {
               ...footerSpring,
-              opacity: { duration: 0.16 },
+              opacity: systemMotion.disclosure.fade,
             }
       }
     >
@@ -151,8 +154,11 @@ function SearchInputReveal({ children }: { children: ReactNode }) {
           ? { duration: 0 }
           : {
               ...footerSpring,
-              delay: present ? 0.12 : 0,
-              opacity: { delay: present ? 0.12 : 0, duration: 0.16 },
+              delay: present ? systemMotion.disclosure.stagger.content : 0,
+              opacity: {
+                ...systemMotion.disclosure.fade,
+                delay: present ? systemMotion.disclosure.stagger.content : 0,
+              },
             }
       }
     >
@@ -200,6 +206,7 @@ function SearchInput({
         </div>
       )}
       <Input
+        appearance="frost"
         aria-autocomplete="inline"
         aria-describedby="tarot-search-feedback"
         aria-label="Search cards"
@@ -257,7 +264,7 @@ function SearchMatches({
           title={match.label}
           type="button"
         >
-          <span>{match.label}</span>
+          <span className="tarot-match-label">{match.label}</span>
         </Button>
       ))}
     </fieldset>
@@ -283,6 +290,7 @@ function SearchTrigger({
       transition={reducedMotion ? { duration: 0 } : footerSpring}
     >
       <Button
+        appearance={open ? "primary" : "secondary"}
         aria-label={open ? "Open suggested card" : "Search cards"}
         disabled={open && !canSubmit}
         iconOnly
@@ -302,16 +310,20 @@ function SearchTrigger({
 }
 
 export function SearchFooter({
+  actions,
   cards,
   onSelect,
   onShuffle,
   onOpenChange,
 }: {
+  /** Secondary card controls beside Shuffle, concealed while search occupies the footer. */
+  actions?: ReactNode;
   cards: readonly LibraryCard[];
   onSelect: (card: CatalogCard) => void;
   onShuffle: () => void;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const present = useIsPresent();
   const [open, setOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const [query, setQuery] = useState("");
@@ -325,7 +337,7 @@ export function SearchFooter({
     filter && filter !== "major" ? catalog.filter((card) => inCategory(card, filter)) : [];
   const dismissSearch = useEffectEvent((restoreFocus: boolean) => toggle(false, restoreFocus));
   useEffect(() => {
-    if (!open) {
+    if (!(open && present)) {
       return;
     }
     input.current?.focus();
@@ -348,7 +360,7 @@ export function SearchFooter({
       document.removeEventListener("pointerdown", dismissOutside);
       document.removeEventListener("focusin", dismissOutside);
     };
-  }, [open]);
+  }, [open, present]);
   function toggle(next: boolean, restoreFocus = false) {
     setOpen(next);
     onOpenChange?.(next);
@@ -410,7 +422,7 @@ export function SearchFooter({
           </SearchRow>
         )}
         {Boolean(open) && (
-          <SearchRow delay={0.22} key="filters">
+          <SearchRow delay={systemMotion.disclosure.stagger.group} key="filters">
             <ToggleGroup<Category>
               aria-label="Filter cards"
               attached
@@ -433,7 +445,7 @@ export function SearchFooter({
           </SearchRow>
         )}
       </AnimatePresence>
-      <p className="tarot-sr-only" id="tarot-search-feedback" role="status">
+      <p className="visually-hidden" id="tarot-search-feedback" role="status">
         {open ? feedback : ""}
       </p>
       <div className="tarot-search-entry">
@@ -458,29 +470,36 @@ export function SearchFooter({
         <motion.div
           animate={{ opacity: open ? 0 : 1, scale: open ? 0.7 : 1 }}
           aria-hidden={open ? true : undefined}
-          className="tarot-shuffle"
+          className="tarot-card-actions"
           inert={open}
           initial={false}
+          style={{ originX: 1 }}
           transition={
             reducedMotion
               ? { duration: 0 }
               : {
                   ...footerSpring,
-                  delay: open ? 0 : 0.12,
-                  opacity: { delay: open ? 0 : 0.12, duration: 0.12 },
+                  delay: open ? 0 : systemMotion.disclosure.stagger.content,
+                  opacity: {
+                    ...systemMotion.disclosure.fade,
+                    delay: open ? 0 : systemMotion.disclosure.stagger.content,
+                  },
                 }
           }
         >
-          <Button
-            aria-label="Shuffle"
-            disabled={open}
-            iconOnly
-            onClick={onShuffle}
-            title="Shuffle"
-            type="button"
-          >
-            <Icon icon={ShuffleIcon} />
-          </Button>
+          <ButtonGroup actions={actions} aria-label="Card actions" variant="expandable">
+            <Button
+              appearance="primary"
+              aria-label="Shuffle"
+              disabled={open}
+              iconOnly
+              onClick={onShuffle}
+              title="Shuffle"
+              type="button"
+            >
+              <Icon icon={ShuffleIcon} />
+            </Button>
+          </ButtonGroup>
         </motion.div>
       </div>
     </form>

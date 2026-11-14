@@ -1,0 +1,133 @@
+@layer components {
+  .tarot-search-form {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .tarot-search-reveal {
+    margin-inline: -3px;
+    overflow: clip;
+  }
+  .tarot-search-row {
+    padding: 3px 3px calc(var(--ref-space-10) + 3px);
+  }
+  .tarot-rank-reveal {
+    position: relative;
+  }
+  .tarot-search-form fieldset {
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  .tarot-filter-row button {
+    --cmp-size-button-icon: 3.5rem;
+  }
+  .tarot-match-row {
+    display: flex;
+    gap: var(--ref-space-8);
+    padding: var(--ref-space-4);
+    margin: 0 -0.25rem;
+    overflow: auto;
+    scrollbar-width: thin;
+  }
+  .tarot-rank {
+    --cmp-size-button-icon: 3rem;
+    flex-shrink: 0;
+    min-inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+    font-family: var(--sys-font-family-heading);
+  }
+  .tarot-match {
+    flex: 0 0 auto;
+    max-inline-size: min(14rem, 65vw);
+  }
+  .tarot-match-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tarot-search-feedback {
+    margin: 0;
+    font: var(--sys-font-body-sm);
+  }
+  .tarot-search-feedback:empty {
+    display: none;
+  }
+  .tarot-search-entry {
+    position: sticky;
+    inset-block-end: 0;
+    flex: 0 0 var(--cmp-size-button-icon);
+    block-size: var(--cmp-size-button-icon);
+  }
+  .tarot-search-trigger,
+  .tarot-card-actions {
+    position: absolute;
+    inset-block-start: 0;
+    block-size: var(--cmp-size-button-icon);
+  }
+  .tarot-search-trigger {
+    inset-inline-start: 0;
+    z-index: 2;
+    inline-size: var(--cmp-size-button-icon);
+  }
+  .tarot-search-form[data-searching="true"] .tarot-search-trigger {
+    inset-inline-start: calc(100% - var(--cmp-size-button-icon));
+  }
+  .tarot-card-actions {
+    inset-inline-end: 0;
+  }
+  .tarot-search-input-reveal {
+    position: absolute;
+    inset-block-start: -3px;
+    inset-inline-start: -3px;
+    inline-size: calc(
+      100% -
+      var(--cmp-size-button-icon) -
+      var(--ref-space-10) +
+      6px
+    );
+    padding: 3px;
+  }
+  .tarot-autocomplete {
+    --cmp-space-input-inline-end: 3rem;
+    position: relative;
+    min-inline-size: 0;
+  }
+  .tarot-completion {
+    position: absolute;
+    inset: 1px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding-inline: var(--ref-space-12) var(--cmp-space-input-inline-end);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font: var(--sys-font-body-lg);
+    color: var(--sys-color-ink-placeholder-on-frost-field);
+    white-space: pre;
+    pointer-events: none;
+  }
+  .tarot-completion-typed {
+    visibility: hidden;
+  }
+  .tarot-search-input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .tarot-autocomplete .tarot-search-clear {
+    --cmp-color-button-ghost-ink: var(--sys-color-ink-on-frost-field);
+    --cmp-color-button-ghost-fill-hover: var(--sys-color-frost-reveal);
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: var(--ref-space-4);
+    z-index: 2;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    translate: 0 -50%;
+  }
+  @media (forced-colors: active) {
+    .tarot-completion {
+      color: GrayText;
+    }
+  }
+}

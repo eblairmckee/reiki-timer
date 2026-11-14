@@ -83,7 +83,7 @@ export function FinishTimerDialog({
             to it first
           </DialogDescription>
           {Boolean(saveError) && <p role="alert">Couldn’t save in this browser. Try again</p>}
-          <DialogClose render={<Button className="reiki-off-dialog-leave" />}>
+          <DialogClose render={<Button appearance="primary" className="reiki-off-dialog-leave" />}>
             Leave without saving
           </DialogClose>
         </DialogPopup>

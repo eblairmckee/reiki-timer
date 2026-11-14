@@ -102,11 +102,16 @@ test.each(["reduce", "no-preference"] as const)(
     }
     const items = [...container.querySelectorAll(".tarot-study-item")];
     const before = items.map((item) => item.getBoundingClientRect().toJSON());
-    const hints = container.querySelectorAll(".tarot-study-hint");
-    expect(hints).toHaveLength(items.length);
-    for (const hint of hints) {
-      expect(Number(getComputedStyle(hint).opacity)).toBeGreaterThan(0);
-      expect(Number(getComputedStyle(hint).opacity)).toBeLessThan(0.35);
+    const labels = container.querySelectorAll(".tarot-study-label");
+    expect(labels).toHaveLength(5);
+    expect(container.querySelector(".tarot-study-mask svg")).toBeNull();
+    for (const label of labels) {
+      expect(Number(getComputedStyle(label).opacity)).toBe(1);
+      const answer = label.nextElementSibling;
+      if (!answer) {
+        throw new Error("Missing field answer beside its label");
+      }
+      expect(label.getBoundingClientRect().right).toBeLessThan(answer.getBoundingClientRect().left);
     }
     const keyword = container.querySelector(".tarot-keyword");
     if (!keyword) {
@@ -124,9 +129,8 @@ test.each(["reduce", "no-preference"] as const)(
     if (!answer) {
       throw new Error("Missing revealed content");
     }
-    expect(getComputedStyle(answer).animationName).toBe(
-      motion === "reduce" ? "none" : "tarot-reveal-in"
-    );
+    await waitFor(() => expect(Number(getComputedStyle(answer).opacity)).toBe(1));
+    await waitFor(() => expect(Number(getComputedStyle(labels[0]).opacity)).toBe(0));
     await userEvent.click(screen.getByRole("button", { name: "Reveal planet" }));
     await userEvent.click(screen.getByRole("button", { name: "Reveal zodiac" }));
     await userEvent.click(screen.getByRole("button", { name: "Reveal keywords" }));
@@ -158,6 +162,15 @@ test.each(["reduce", "no-preference"] as const)(
     await waitFor(() =>
       expect(document.activeElement).toBe(screen.getByRole("searchbox", { name: "Search cards" }))
     );
+    const searchInput = screen.getByRole("searchbox", { name: "Search cards" });
+    const searchButton = screen.getByRole("button", { name: "Open suggested card" });
+    expect(searchInput.getBoundingClientRect().height).toBe(
+      searchButton.getBoundingClientRect().height
+    );
+    expect(searchInput.getBoundingClientRect().top).toBeCloseTo(
+      searchButton.getBoundingClientRect().top,
+      0
+    );
     await userEvent.keyboard("II of swords");
     const clear = screen.getByRole("button", { name: "Clear search" });
     expect(getComputedStyle(clear).color).toBe(
@@ -176,15 +189,35 @@ test.each(["reduce", "no-preference"] as const)(
 );
 
 test("validation focus reaches the upright field after reversal in a reduced viewport", async () => {
-  await page.viewport(390, 400);
+  await page.viewport(320, 400);
   const { router } = await setup();
   await browserAction(() =>
     router.navigate({ params: { deckIndex: "2" }, to: "/tarot-flash/$deckIndex" })
   );
   await screen.findByRole("heading", { level: 1, name: "I The Magician" });
+  const studyActionBounds = screen
+    .getByRole("group", { name: "Card actions" })
+    .getBoundingClientRect()
+    .toJSON();
   await userEvent.click(screen.getByRole("button", { name: "Edit" }));
   await screen.findByRole("combobox", { name: "Other names" }, { timeout: 4000 });
+  const notes = screen.getByRole("textbox", { name: "Notes" });
+  const saveHeight = screen.getByRole("button", { name: "Save" }).getBoundingClientRect().height;
+  expect(notes.getBoundingClientRect().height).toBe(saveHeight);
+  await userEvent.click(notes);
+  await userEvent.keyboard("One{Enter}Two{Enter}Three{Enter}Four{Enter}Five");
+  expect(notes.getBoundingClientRect().height).toBeGreaterThan(saveHeight);
+  const editFooter = screen.getByRole("button", { name: "Save" }).closest("footer");
+  if (!editFooter) {
+    throw new Error("Missing edit footer");
+  }
+  expect(notes.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+    editFooter.getBoundingClientRect().top
+  );
   await clearUprightKeywords();
+  expect(
+    screen.getByRole("group", { name: "Edit card actions" }).getBoundingClientRect().toJSON()
+  ).toEqual(studyActionBounds);
   await userEvent.click(screen.getByRole("button", { name: "Reverse card" }));
   await userEvent.click(screen.getByRole("button", { name: "Add an upright keyword to save." }));
   const keywords = screen.getByLabelText("Keywords", { exact: false });
@@ -215,6 +248,8 @@ test.each(["reduce", "no-preference"] as const)(
     const shuffle = screen.getByRole("button", { name: "Shuffle" }).getBoundingClientRect();
     await userEvent.click(trigger);
     expect(screen.getByRole("button", { name: "Open suggested card" })).toBe(trigger);
+    expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Reverse card" })).toBeNull();
     await waitFor(() => {
       const end = trigger.getBoundingClientRect();
       expect(end.left).toBeCloseTo(shuffle.left, 0);
@@ -239,6 +274,19 @@ test.each(["reduce", "no-preference"] as const)(
       expect(document.activeElement).toBe(trigger);
       expect(trigger.getBoundingClientRect().left).toBeCloseTo(start.left, 0);
     });
+    const actions = screen.getByRole("group", { name: "Card actions" });
+    const actionButtons = within(actions).getAllByRole("button");
+    expect(actionButtons).toHaveLength(3);
+    expect(actions.getBoundingClientRect().left).toBeGreaterThan(
+      trigger.getBoundingClientRect().right
+    );
+    expect(actions.getBoundingClientRect().right).toBeLessThanOrEqual(innerWidth);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Edit" }));
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Reverse card" }));
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Shuffle" }));
   }
 );
 
@@ -275,3 +323,97 @@ test("shuffling keeps a visible footer layer throughout the native page transiti
     }
   );
 });
+
+// Observe every animation frame rather than only the settled before/after layouts.
+async function expectStableModeExit(trigger: HTMLElement, ordinaryMotion: boolean) {
+  const scene = trigger.closest<HTMLElement>(".tarot-mode");
+  if (!scene) {
+    throw new Error("Missing mode scene");
+  }
+  await waitFor(() => expect(Number(getComputedStyle(scene).opacity)).toBe(1), { timeout: 3000 });
+  const parts = [
+    ...scene.querySelectorAll(
+      ".tarot-screen, .tarot-header, .tarot-body, .tarot-fields, .tarot-footer"
+    ),
+  ];
+  const before = parts.map((part) => part.getBoundingClientRect().toJSON());
+  const frames: { opacity: number; rects: DOMRect[] }[] = [];
+  const finished = new Promise<void>((resolve) => {
+    function sample() {
+      if (!scene?.isConnected) {
+        resolve();
+        return;
+      }
+      frames.push({
+        opacity: Number(getComputedStyle(scene).opacity),
+        rects: parts.map((part) => part.getBoundingClientRect().toJSON()),
+      });
+      requestAnimationFrame(sample);
+    }
+    requestAnimationFrame(sample);
+  });
+  await userEvent.click(trigger);
+  await finished;
+  for (const frame of frames) {
+    expect(frame.rects).toEqual(before);
+  }
+  if (ordinaryMotion) {
+    expect(frames.some((frame) => frame.opacity > 0 && frame.opacity < 0.05)).toBe(true);
+  }
+}
+
+test.each(["reduce", "no-preference"] as const)(
+  "%s: edit and view retain the entire outgoing layout with grouped actions and scrolled notes",
+  async (motionPreference) => {
+    await page.viewport(1280, 800);
+    await browserAction(() =>
+      cdp().send("Emulation.setEmulatedMedia", {
+        features: [{ name: "prefers-reduced-motion", value: motionPreference }],
+      })
+    );
+    const { container } = await setup();
+    await document.fonts.ready;
+    const studyActions = screen.getByRole("group", { name: "Card actions" });
+    const studyActionBounds = studyActions.getBoundingClientRect().toJSON();
+    const shuffleBounds = screen
+      .getByRole("button", { name: "Shuffle" })
+      .getBoundingClientRect()
+      .toJSON();
+    await expectStableModeExit(
+      screen.getByRole("button", { name: "Edit" }),
+      motionPreference === "no-preference"
+    );
+    const names = await screen.findByRole("combobox", { name: "Other names" });
+    await waitFor(() => expect(document.activeElement).toBe(names));
+    expect(
+      screen.getByRole("group", { name: "Edit card actions" }).getBoundingClientRect().toJSON()
+    ).toEqual(studyActionBounds);
+    expect(screen.getByRole("button", { name: "Save" }).getBoundingClientRect().toJSON()).toEqual(
+      shuffleBounds
+    );
+    const editSize = screen
+      .getByRole("button", { name: "Close editor" })
+      .getBoundingClientRect().height;
+    const selects = container.querySelectorAll('[data-ui="select-trigger"]');
+    for (const select of selects) {
+      const box = select.getBoundingClientRect();
+      const icon = select.querySelector('[data-ui="select-icon"] svg')?.getBoundingClientRect();
+      expect(box.height).toBe(editSize);
+      if (!icon) {
+        throw new Error("Missing select caret");
+      }
+      expect(icon.top + icon.height / 2).toBeCloseTo(box.top + box.height / 2, 1);
+    }
+    const notes = screen.getByRole("textbox", { name: "Notes" });
+    expect(notes.getBoundingClientRect().height).toBeGreaterThan(editSize);
+    notes.scrollIntoView({ block: "end" });
+    await expectStableModeExit(
+      screen.getByRole("button", { name: "Close editor" }),
+      motionPreference === "no-preference"
+    );
+    await waitFor(() =>
+      expect(document.activeElement).toBe(screen.getByRole("button", { name: "Edit" }))
+    );
+    expect(screen.getByRole("button", { name: "Search cards" })).toBeTruthy();
+  }
+);

@@ -122,24 +122,21 @@ function assertGlassContrast() {
 
 test("translucent text retains contrast on glass across any sRGB background", assertGlassContrast);
 
-test("word-button ink retains small-text contrast at the shaded end of the frosted face", () => {
-  const fill = rgba("--cmp-color-button-word-fill");
+test.each([
+  ["legacy word", "--cmp-color-button-word-fill"],
+  ["primary word and icon", "--sys-color-action-glass-primary"],
+  ["selected primary word and icon", "--sys-color-action-glass-primary-selected"],
+])("%s ink retains small-text contrast at the shaded end of the frosted face", (role, token) => {
+  const fill = rgba(token);
   const shade = rgba("--sys-color-frost-shade");
   const ink = rgba("--sys-color-ink-on-glass");
   // Bound the face on black and the dark lettering on white, including the face gradient.
   const darkestFace = composite(shade.rgb, shade.alpha, composite(fill.rgb, fill.alpha, [0, 0, 0]));
   const lightestInk = composite(ink.rgb, ink.alpha, [1, 1, 1]);
-  console.info(
-    JSON.stringify({
-      material: "shaded word-button",
-      minimumContrast: (luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05),
-      target: 4.5,
-    })
-  );
+  const minimumContrast = (luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05);
+  console.info(JSON.stringify({ material: `shaded ${role}`, minimumContrast, target: 4.5 }));
   expect(luminance(darkestFace)).toBeGreaterThan(luminance(lightestInk));
-  expect((luminance(darkestFace) + 0.05) / (luminance(lightestInk) + 0.05)).toBeGreaterThanOrEqual(
-    4.5
-  );
+  expect(minimumContrast).toBeGreaterThanOrEqual(4.5);
 });
 
 test("the muted timestamp stays legible on timeline glass", () => {
@@ -177,21 +174,22 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
   let minimumDialogFocus = Number.POSITIVE_INFINITY;
   const glass = rgba("--sys-color-well-fill-emphasized");
   // Portalled dialogs use the root fallback ink, not Atmosphere's adaptive scope.
+  const dialogFill = rgba("--cmp-surface-dialog-fill");
   const dialogInk = rgba("--cmp-color-dialog-ink");
   const dialogFocus = rgba("--ref-color-paper");
   const sheen = rgba("--sys-color-frost-sheen");
   const reveal = rgba("--sys-color-frost-reveal");
   const fill = rgba("--sys-color-frost-fill");
+  const secondary = rgba("--sys-color-action-glass-secondary");
   const selected = rgba("--sys-color-frost-fill-selected");
   const well = rgba("--sys-color-well-fill");
   const selectedWell = rgba("--sys-color-well-shade");
   const faces = [
-    { fill, grouped: false, well },
-    { fill: selected, grouped: false, well: selectedWell },
-    { fill: sheen, grouped: true, well },
-    { fill: selected, grouped: true, well: selectedWell },
+    { fill, well },
+    { fill: secondary, well },
+    { fill: selected, well: selectedWell },
   ];
-  for (const layer of [fill, selected, sheen, reveal]) {
+  for (const layer of [fill, secondary, selected, sheen, reveal]) {
     expect(layer.rgb).toEqual([1, 1, 1]);
   }
   expect(well.rgb).toEqual([0, 0, 0]);
@@ -221,11 +219,7 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
             const bg = sample.map(
               (c) => (c * (1 - Math.abs(grain)) + Math.max(0, grain)) * (1 - dim)
             );
-            const dialogSurface = composite(
-              fill.rgb,
-              fill.alpha,
-              composite(glass.rgb, glass.alpha, bg)
-            );
+            const dialogSurface = composite(dialogFill.rgb, dialogFill.alpha, bg);
             minimumDialog = Math.min(
               minimumDialog,
               contrastRatio(composite(dialogInk.rgb, dialogInk.alpha, dialogSurface), dialogSurface)
@@ -242,11 +236,10 @@ test("adaptive light ink meets its targets through bold palette changes, grain a
             }
             minimumSmall = Math.min(minimumSmall, contrast(ink.text));
             minimumLarge = Math.min(minimumLarge, contrast(ink.display));
-            // Actual group/well/fill layers, then the brightest gradient stop and hover overlay.
+            // Standalone and grouped controls use the same well, face, sheen and hover layers.
             // Pressed face shading/contact shadows darken the surface, so cannot reduce white contrast.
-            for (const { fill: faceFill, well: faceWell, grouped } of faces) {
-              const group = grouped ? composite(sheen.rgb, sheen.alpha, bg) : bg;
-              const backing = composite(faceWell.rgb, faceWell.alpha, group);
+            for (const { fill: faceFill, well: faceWell } of faces) {
+              const backing = composite(faceWell.rgb, faceWell.alpha, bg);
               const face = composite(faceFill.rgb, faceFill.alpha, backing);
               const litFace = composite(sheen.rgb, sheen.alpha, face);
               const hoverFace = composite(reveal.rgb, reveal.alpha, litFace);

@@ -8,7 +8,7 @@ import { LinkButton } from "../link-button";
 import { Button } from ".";
 
 describe("public control contracts", () => {
-  test.each(["frost", "inset", "liquid"] as const)(
+  test.each(["frost", "inset", "primary", "liquid"] as const)(
     "%s owns the shared moving face and feedback",
     (appearance) => {
       render(
@@ -16,6 +16,18 @@ describe("public control contracts", () => {
           Run
         </Button>
       );
+      const button = screen.getByRole("button", { name: "Run" });
+      expect(button.getAttribute("data-appearance")).toBe(appearance);
+      expect(button.querySelector("[data-frost]")).not.toBeNull();
+      expect(button.querySelector('[data-ripple="pressure"]')).not.toBeNull();
+      expect(button.querySelector('[data-ripple="release"]')).not.toBeNull();
+    }
+  );
+
+  test.each(["primary", "secondary"] as const)(
+    "%s icons keep the shared frost feedback and an accessible name",
+    (appearance) => {
+      render(<Button appearance={appearance} aria-label="Run" iconOnly />);
       const button = screen.getByRole("button", { name: "Run" });
       expect(button.getAttribute("data-appearance")).toBe(appearance);
       expect(button.querySelector("[data-frost]")).not.toBeNull();

@@ -1,0 +1,125 @@
+@layer components {
+  .tarot-section {
+    min-inline-size: 0;
+  }
+  .tarot-section h2 {
+    margin: 0 0 var(--ref-space-12);
+    font-family: var(--sys-font-family-heading);
+    font-size: 1.15rem;
+    font-weight: 400;
+  }
+  .tarot-section p {
+    margin: 0;
+  }
+  .tarot-reveal {
+    position: relative;
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: var(--ref-space-12);
+    align-items: start;
+    border-radius: var(--ref-radius-sm);
+  }
+  .tarot-answer {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    outline: none;
+  }
+  .tarot-study-item {
+    position: relative;
+    display: grid;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    border-radius: var(--ref-radius-sm);
+  }
+  .tarot-study-content {
+    display: block;
+    min-inline-size: 0;
+    border-radius: inherit;
+  }
+  .tarot-study-mask {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--sys-color-frost-reveal);
+    border-radius: inherit;
+    -webkit-backdrop-filter: var(--sys-filter-glass-content);
+    backdrop-filter: var(--sys-filter-glass-content);
+    transition: background-color var(--sys-motion-control-feedback);
+  }
+  .tarot-study-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 2.375rem;
+  }
+  .tarot-study-label-icon {
+    opacity: 0.65;
+  }
+  .tarot-study-mask::before {
+    position: absolute;
+    inset: -10%;
+    pointer-events: none;
+    content: "";
+    background: linear-gradient(
+      115deg,
+      transparent 20%,
+      var(--sys-color-frost-sheen) 50%,
+      transparent 80%
+    );
+    animation: tarot-shimmer 28s ease-in-out infinite;
+  }
+  .tarot-reveal[data-revealed="true"] .tarot-study-mask::before {
+    animation: none;
+  }
+  .tarot-reveal:has(.tarot-reveal-control:hover) .tarot-study-mask {
+    background-color: var(--sys-color-frost-sheen);
+  }
+  .tarot-reveal:has(.tarot-reveal-control:active) .tarot-study-mask {
+    background-color: var(--sys-color-frost-reveal);
+  }
+  .tarot-reveal-control {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: inherit;
+  }
+  .tarot-reveal-control:focus-visible {
+    outline: 2px solid var(--sys-color-focus);
+    outline-offset: 3px;
+  }
+  @keyframes tarot-shimmer {
+    0%,
+    100% {
+      opacity: 0.12;
+      transform: translateX(-2%);
+    }
+    50% {
+      opacity: 0.32;
+      transform: translateX(2%);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .tarot-study-mask {
+      background: var(--sys-color-frost-fallback);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .tarot-study-mask {
+      color: ButtonText;
+      background: ButtonFace;
+      border: 1px solid ButtonText;
+    }
+    .tarot-study-label-icon {
+      opacity: 1;
+    }
+  }
+}

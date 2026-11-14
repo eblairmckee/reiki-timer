@@ -62,6 +62,7 @@ test("rotation previews detents, commits once on release, and cancellation resto
   fireEvent.pointerDown(dial, pointer(120));
   fireEvent.pointerMove(dial, pointer(156));
   fireEvent.pointerUp(dial, pointer(156));
+  expect(input.getAttribute("aria-valuetext")).toBe("20");
   expect(change).toHaveBeenCalledWith(26);
   expect(change).toHaveBeenCalledTimes(1);
 });
@@ -133,22 +134,51 @@ test("native changes, unchanged release, and center taps request exactly one val
 
 test("Escape and lost capture cancel preview without committing", () => {
   const change = vi.fn();
-  render(<Dial label="Amount" max={60} min={5} onValueChange={change} value={20} />);
+  const view = render(<Dial label="Amount" max={60} min={5} onValueChange={change} value={20} />);
   const input = screen.getByRole("slider", { name: "Amount" });
   const dial = geometry(input);
-  for (const action of ["Escape", "lostcapture"]) {
+  for (const [action, value] of [
+    ["Escape", 25],
+    ["lostcapture", 30],
+  ] as const) {
+    view.rerender(<Dial label="Amount" max={60} min={5} onValueChange={change} value={20} />);
     fireEvent.pointerDown(dial, pointer(120));
     fireEvent.pointerMove(dial, pointer(156));
     expect(input.getAttribute("aria-valuetext")).toBe("26");
+    view.rerender(<Dial label="Amount" max={60} min={5} onValueChange={change} value={value} />);
     if (action === "Escape") {
       fireEvent.keyDown(input, { key: "Escape" });
     } else {
       fireEvent.lostPointerCapture(dial, pointer(156));
     }
-    expect(input.getAttribute("aria-valuetext")).toBe("20");
+    expect(input.getAttribute("aria-valuetext")).toBe(String(value));
+    expect(dial.hasAttribute("data-dragging")).toBe(false);
     fireEvent.pointerUp(dial, pointer(156));
   }
   expect(change).not.toHaveBeenCalled();
+});
+
+test("disabling a dial cancels the gesture even after it is re-enabled", () => {
+  const change = vi.fn();
+  const view = render(<Dial label="Amount" max={60} min={5} onValueChange={change} value={20} />);
+  const input = screen.getByRole<HTMLInputElement>("slider", { name: "Amount" });
+  const dial = geometry(input);
+  fireEvent.pointerDown(dial, pointer(120));
+  fireEvent.pointerMove(dial, pointer(156));
+  expect(input.value).toBe("26");
+  view.rerender(
+    <Dial disabled label="Amount" max={60} min={5} onValueChange={change} value={35} />
+  );
+  expect(input.value).toBe("35");
+  expect(input.disabled).toBe(true);
+  expect(dial.hasAttribute("data-dragging")).toBe(false);
+  view.rerender(<Dial label="Amount" max={60} min={5} onValueChange={change} value={35} />);
+  fireEvent.pointerUp(dial, pointer(156));
+  expect(change).not.toHaveBeenCalled();
+
+  fireEvent.pointerDown(dial, pointer(120));
+  fireEvent.pointerUp(dial, pointer(120));
+  expect(change).toHaveBeenCalledExactlyOnceWith(20);
 });
 
 test("dragging crosses the top continuously and clamps at both ends", () => {

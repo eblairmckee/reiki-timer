@@ -1,6 +1,6 @@
 @layer components {
   .control-surface {
-    --cmp-size-button-icon: clamp(3.5rem, 14vw, 4.25rem);
+    --cmp-size-button-icon: var(--sys-size-control-height);
     --summary-align: flex-end;
     display: grid;
     grid-template-columns: minmax(0, 1fr);

@@ -1,0 +1,11 @@
+diff --git a/.agents/skills/visual-design/rules/motion.md b/.agents/skills/visual-design/rules/motion.md
+--- a/.agents/skills/visual-design/rules/motion.md
++++ b/.agents/skills/visual-design/rules/motion.md
+@@ -2,5 +2,7 @@
+ 
+ Use motion to explain relationships and state without blocking input or making completion depend on animation. Preserve the system's purposeful timing distinctions rather than imposing a universal duration.
+ 
++For page and mode changes, hold the outgoing layout still, fade it out completely, then introduce and fade in the next screen. For individual elements, use the shared snappy, lightly bouncy spring for entrances, exits and reveals; stagger related items briefly and preserve their layout footprint.
++
+ Review ordinary motion separately from reduced motion: entry/exit, quick reversal, interrupted transitions and focus during disappearance where applicable. Hidden/exiting content must not leave actionable invisible controls or stranded focus. Check layout continuity and whether repeated movement distracts from the task.
+ 

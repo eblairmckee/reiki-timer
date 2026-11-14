@@ -52,13 +52,14 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
           id={`${id}-warm`}
           label="Warm up"
         >
-          <Switch
-            aria-controls={config.warmUp ? `${id}-warm-up-panel` : undefined}
-            aria-describedby={`${id}-warm-description`}
-            checked={config.warmUp}
-            id={`${id}-warm`}
-            onCheckedChange={(warmUp) => onChange(normalizeChimes({ ...config, warmUp }))}
-          />
+          {(field) => (
+            <Switch
+              aria-controls={config.warmUp ? `${id}-warm-up-panel` : undefined}
+              checked={config.warmUp}
+              {...field}
+              onCheckedChange={(warmUp) => onChange(normalizeChimes({ ...config, warmUp }))}
+            />
+          )}
         </Field>
         <CollapsiblePanel className="timer-progressive" id={`${id}-warm-up-panel`}>
           <Field dialLayout id={`${id}-warm-duration`} related>
@@ -77,13 +78,14 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
       </Collapsible>
       <Collapsible className="timer-field-group" open={config.coolDown}>
         <Field description="A quiet moment to finish" id={`${id}-cool`} label="Cool down">
-          <Switch
-            aria-controls={config.coolDown ? `${id}-cool-down-panel` : undefined}
-            aria-describedby={`${id}-cool-description`}
-            checked={config.coolDown}
-            id={`${id}-cool`}
-            onCheckedChange={(coolDown) => onChange(normalizeChimes({ ...config, coolDown }))}
-          />
+          {(field) => (
+            <Switch
+              aria-controls={config.coolDown ? `${id}-cool-down-panel` : undefined}
+              checked={config.coolDown}
+              {...field}
+              onCheckedChange={(coolDown) => onChange(normalizeChimes({ ...config, coolDown }))}
+            />
+          )}
         </Field>
         <CollapsiblePanel className="timer-progressive" id={`${id}-cool-down-panel`}>
           <Field dialLayout id={`${id}-cool-duration`} related>
@@ -112,13 +114,14 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
           id={`${id}-show-time`}
           label="Show timer"
         >
-          <Switch
-            aria-controls={config.showTime ? `${id}-breakdown-panel` : undefined}
-            aria-describedby={`${id}-show-time-description`}
-            checked={config.showTime}
-            id={`${id}-show-time`}
-            onCheckedChange={(showTime) => onChange({ ...config, showTime })}
-          />
+          {(field) => (
+            <Switch
+              aria-controls={config.showTime ? `${id}-breakdown-panel` : undefined}
+              checked={config.showTime}
+              {...field}
+              onCheckedChange={(showTime) => onChange({ ...config, showTime })}
+            />
+          )}
         </Field>
         <CollapsiblePanel className="timer-progressive" id={`${id}-breakdown-panel`}>
           <Field
@@ -137,12 +140,13 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
             label="Show breakdown"
             related
           >
-            <Switch
-              aria-describedby={`${id}-breakdown-description`}
-              checked={config.showBreakdown}
-              id={`${id}-breakdown`}
-              onCheckedChange={(showBreakdown) => onChange({ ...config, showBreakdown })}
-            />
+            {(field) => (
+              <Switch
+                checked={config.showBreakdown}
+                {...field}
+                onCheckedChange={(showBreakdown) => onChange({ ...config, showBreakdown })}
+              />
+            )}
           </Field>
         </CollapsiblePanel>
       </Collapsible>
@@ -151,12 +155,13 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
         id={`${id}-repeat`}
         label="Repeat chakras"
       >
-        <Switch
-          aria-describedby={`${id}-repeat-description`}
-          checked={config.repeat}
-          id={`${id}-repeat`}
-          onCheckedChange={(repeat) => onChange({ ...config, repeat })}
-        />
+        {(field) => (
+          <Switch
+            checked={config.repeat}
+            {...field}
+            onCheckedChange={(repeat) => onChange({ ...config, repeat })}
+          />
+        )}
       </Field>
       <Collapsible className="timer-field-group" open={config.chimes}>
         <Field
@@ -164,27 +169,28 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
           id={`${id}-chimes`}
           label="Chimes"
         >
-          <Switch
-            aria-controls={config.chimes ? `${id}-chime-settings-panel` : undefined}
-            aria-describedby={`${id}-chimes-description`}
-            checked={config.chimes}
-            id={`${id}-chimes`}
-            onCheckedChange={(chimes) =>
-              onChange({
-                ...config,
-                chimeOnChange: config.chimeOnChange || (chimes && !hasChimeCue(config)),
-                chimes,
-              })
-            }
-            ref={chimesRef}
-          />
+          {(field) => (
+            <Switch
+              aria-controls={config.chimes ? `${id}-chime-settings-panel` : undefined}
+              checked={config.chimes}
+              {...field}
+              onCheckedChange={(chimes) =>
+                onChange({
+                  ...config,
+                  chimeOnChange: config.chimeOnChange || (chimes && !hasChimeCue(config)),
+                  chimes,
+                })
+              }
+              ref={chimesRef}
+            />
+          )}
         </Field>
         <CollapsiblePanel className="timer-progressive" id={`${id}-chime-settings-panel`}>
           <div className="timer-field timer-chime-field" data-related="">
             <span
-              className="timer-label"
               data-ink="label"
               data-lettering="etched"
+              data-slot="label"
               id={`${id}-chime-sound`}
             >
               Tone
@@ -209,17 +215,19 @@ export function TimerSettings({ config, onChange, onPreviewChime, audioError }: 
             {availableChimeCues(config).map((cue) => (
               <Reveal className="timer-cue-disclosure" key={cue}>
                 <Field id={`${id}-${cue}`} label={chimeLabels[cue]} related>
-                  <Switch
-                    checked={config[cue]}
-                    id={`${id}-${cue}`}
-                    onCheckedChange={(checked) => {
-                      const next = normalizeChimes({ ...config, [cue]: checked });
-                      if (!next.chimes) {
-                        chimesRef.current?.focus({ preventScroll: true });
-                      }
-                      onChange(next);
-                    }}
-                  />
+                  {(field) => (
+                    <Switch
+                      checked={config[cue]}
+                      {...field}
+                      onCheckedChange={(checked) => {
+                        const next = normalizeChimes({ ...config, [cue]: checked });
+                        if (!next.chimes) {
+                          chimesRef.current?.focus({ preventScroll: true });
+                        }
+                        onChange(next);
+                      }}
+                    />
+                  )}
                 </Field>
               </Reveal>
             ))}

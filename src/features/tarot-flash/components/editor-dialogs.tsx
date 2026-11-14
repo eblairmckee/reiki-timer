@@ -10,6 +10,8 @@ import {
 import { correspondenceFields } from "../data/correspondences";
 import type { CardContent, LibraryCard } from "../model/types";
 
+import "./editor-dialogs.css";
+
 export function DiscardDialog({
   open,
   saving,
@@ -40,7 +42,7 @@ export function DiscardDialog({
               : "Your unsaved edits will be lost. Your saved interpretations will stay as they are."}
           </DialogDescription>
           <div className="tarot-dialog-actions">
-            <Button onClick={onStay} type="button">
+            <Button appearance="primary" onClick={onStay} type="button">
               Keep editing
             </Button>
             <Button appearance="text" disabled={saving} onClick={onDiscard} type="button">
@@ -120,7 +122,7 @@ export function ConflictDialog({
             </section>
           </div>
           <div className="tarot-dialog-actions">
-            <Button onClick={onClose} type="button">
+            <Button appearance="primary" onClick={onClose} type="button">
               Keep editing
             </Button>
             <Button appearance="text" onClick={onUseSaved} type="button">

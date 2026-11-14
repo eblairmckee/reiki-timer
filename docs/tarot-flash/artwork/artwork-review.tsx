@@ -3,13 +3,12 @@ import { type CSSProperties, useId, useState } from "react";
 import { Atmosphere } from "@/components/design-system/atmosphere";
 import { Button } from "@/components/design-system/button";
 import { Icon } from "@/components/design-system/icon";
+import { CardIllustration } from "@/features/tarot-flash/components/card-illustration";
+import { tarotPalette } from "@/features/tarot-flash/data/appearance";
+import { catalog } from "@/features/tarot-flash/data/catalog";
 import { chakraPalettes } from "@/features/timer/data/chakra-palettes";
 import { chakras } from "@/features/timer/data/chakras";
-import manifest from "../../../../docs/tarot-flash/artwork/manifest.json";
-import { CardIllustration } from "../components/card-illustration";
-import { tarotPalette } from "../data/appearance";
-import { catalog } from "../data/catalog";
-import "./style.css";
+import manifest from "./manifest.json";
 import "./artwork-review.css";
 
 const backgrounds = [tarotPalette, ...chakraPalettes];
@@ -124,7 +123,7 @@ export function ArtworkReview() {
   };
   return (
     <Atmosphere palette={backgrounds[background]} transitionSeconds={0}>
-      <div className="tarot-shell artwork-review" style={style}>
+      <div className="artwork-review" style={style}>
         <header className="artwork-review-toolbar">
           <div className="artwork-review-heading">
             <h1>

@@ -32,14 +32,16 @@
   [data-frost] {
     position: relative;
     display: block;
-    background:
+    background: var(
+      --frost-face-background,
       linear-gradient(
         140deg,
         var(--sys-color-frost-sheen),
         transparent 52%,
         var(--sys-color-frost-shade)
       ),
-      var(--sys-color-frost-fill);
+      var(--sys-color-frost-fill)
+    );
     border-radius: inherit;
     box-shadow:
       inset 0 1px 1px var(--sys-color-frost-light),
@@ -91,9 +93,11 @@
     outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
     outline-offset: 5px;
   }
-  @media (prefers-reduced-transparency: reduce) {
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     [data-frost] {
       background: var(--sys-color-frost-fallback);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
     }
   }
   @supports not (
@@ -114,6 +118,7 @@
       background: ButtonFace;
       border: 1px solid ButtonText;
       box-shadow: none;
+      -webkit-backdrop-filter: none;
       backdrop-filter: none;
     }
     [data-frost-control]:focus-visible,

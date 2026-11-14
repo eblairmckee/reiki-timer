@@ -1,6 +1,9 @@
 @layer components {
   .artwork-review {
+    min-block-size: 100svh;
     padding: var(--ref-space-24);
+    font: var(--sys-font-body-lg);
+    color: var(--sys-color-ink-on-atmosphere);
   }
   .artwork-review-toolbar {
     position: sticky;

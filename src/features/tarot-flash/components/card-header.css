@@ -1,0 +1,41 @@
+@layer components {
+  .tarot-header {
+    z-index: 2;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-block-size: calc(
+      var(--sys-size-control-height) +
+      2 *
+      var(--ref-space-16)
+    );
+    padding: var(--ref-space-16) clamp(1rem, 4vw, 2rem);
+    padding-block-start: max(var(--ref-space-16), env(safe-area-inset-top));
+  }
+  .tarot-identity {
+    flex: 1;
+    min-inline-size: 0;
+  }
+  .tarot-identity h1 {
+    max-block-size: 24dvh;
+    margin: 0;
+    overflow: auto;
+    font: var(--sys-font-headline-lg);
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    line-height: 1.18;
+    text-align: center;
+    overflow-wrap: anywhere;
+    outline: none;
+  }
+  .tarot-numeral {
+    margin-inline-end: 0.5em;
+  }
+  .tarot-other-names {
+    max-block-size: 12dvh;
+    margin: var(--ref-space-8) 0 0;
+    overflow: auto;
+    font: var(--sys-font-body-md);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { LibraryCard, StudyLibrary, TarotService } from "../model/types";
 import { createTarotService, storageMessage } from "../services/library-storage";
 import { createShuffleSession, tabStorage } from "../services/shuffle-session";
@@ -48,18 +48,26 @@ export function useLibrary() {
       service.close();
     };
   }, [connection]);
-  function updateCard(card: LibraryCard) {
-    setState((previous) =>
-      previous.kind === "ready"
-        ? {
-            ...previous,
-            resource: {
-              ...previous.resource,
-              cards: previous.resource.cards.map((entry) => (entry.id === card.id ? card : entry)),
-            },
-          }
-        : previous
-    );
-  }
+  const updateCard = useCallback((card: LibraryCard) => {
+    setState((previous) => {
+      if (previous.kind !== "ready" || previous.resource.library.id !== card.libraryId) {
+        return previous;
+      }
+      const { cards } = previous.resource;
+      const existing = cards.find((entry) => entry.catalogCardId === card.catalogCardId);
+      if (existing === card) {
+        return previous;
+      }
+      return {
+        ...previous,
+        resource: {
+          ...previous.resource,
+          cards: existing
+            ? cards.map((entry) => (entry === existing ? card : entry))
+            : [...cards, card],
+        },
+      };
+    });
+  }, []);
   return { retry: () => setConnection({ create: createTarotService }), state, updateCard };
 }

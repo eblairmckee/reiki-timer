@@ -6,7 +6,12 @@ export const motion = {
   disclosure: {
     enter: { duration: 0.5, ease: "easeInOut" },
     exit: { duration: 0.28, ease: "easeOut" },
+    fade: { duration: 0.16, ease: "easeOut" },
+    handoff: { duration: 0.14, ease: "easeOut" },
+    pop: { damping: 22, mass: 1, stiffness: 260, type: "spring" },
     slide: { damping: 29, mass: 1, stiffness: 195, type: "spring" },
+    // Choreograph dependent content after its anchor starts moving.
+    stagger: { content: 0.12, group: 0.22, item: 0.045, lead: 0.06 },
   },
   palette: {
     settle: { duration: 10, ease: "linear" },

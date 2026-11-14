@@ -63,7 +63,6 @@
     block-size: var(--cmp-size-button-group-height);
     border-radius: var(--ref-radius-rounded);
     isolation: isolate;
-    transition: background-color var(--sys-motion-group-feedback);
     [data-icon-only="false"] {
       --sys-color-focus: var(--sys-color-ink-on-glass);
     }
@@ -72,17 +71,12 @@
     [data-slot="button-group-reveal"]
   ) {
     overflow: clip;
-    background: var(--sys-color-frost-sheen);
   }
   [data-ui="button-group"][data-material="frost"][data-expanded]
     > [data-ui="button"] {
     --cmp-radius-button-word: 0 var(--cmp-size-button-group-height)
       var(--cmp-size-button-group-height) 0;
     --cmp-radius-button-icon: var(--cmp-radius-button-word);
-    &[data-icon-only="true"] {
-      --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
-      background: var(--sys-color-well-shade);
-    }
   }
   [data-slot="button-group-reveal"] {
     display: flex;
@@ -93,7 +87,6 @@
   [data-slot="button-group-items"] {
     --cmp-radius-button-word: 0;
     --cmp-radius-button-icon: 0;
-    --sys-color-frost-fill: var(--sys-color-frost-sheen);
     display: flex;
     flex: none;
     align-items: stretch;
@@ -132,10 +125,16 @@
 
 @layer components {
   [data-ui="button-group"][data-variant="expandable"] {
-    --cmp-size-button-group-height: var(--cmp-size-button-icon, 3rem);
+    --cmp-size-button-group-height: var(
+      --cmp-size-button-icon,
+      var(--sys-size-control-height)
+    );
   }
   .button-group-summary {
-    --cmp-size-button-group-height: var(--cmp-size-button-icon, 3rem);
+    --cmp-size-button-group-height: var(
+      --cmp-size-button-icon,
+      var(--sys-size-control-height)
+    );
     --cmp-radius-button-group: 0.4rem;
     --cmp-space-button-group-overlap: 0.75rem;
     display: flex;

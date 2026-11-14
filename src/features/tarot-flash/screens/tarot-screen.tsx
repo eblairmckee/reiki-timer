@@ -1,24 +1,24 @@
 import { AlertCircleIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { Link, useBlocker, useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "motion/react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { AnimatePresence } from "motion/react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { Scene } from "@/components/atoms/scene";
 import { Atmosphere } from "@/components/design-system/atmosphere";
 import { Button } from "@/components/design-system/button";
+import { ButtonGroup } from "@/components/design-system/button-group";
 import { Icon } from "@/components/design-system/icon";
-import { motion as systemMotion } from "@/components/design-system/shared/motion";
-import { Reveal } from "@/components/design-system/shared/reveal";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { EditorFields, StudyFields } from "../components/card-fields";
 import { CardHeader } from "../components/card-header";
+import { CardSecondaryActions } from "../components/card-secondary-actions";
 import { ConflictDialog, DiscardDialog } from "../components/editor-dialogs";
 import { SearchFooter } from "../components/search-footer";
 import { tarotPalette } from "../data/appearance";
 import { cardAtIndex } from "../data/catalog";
+import { useCardEditor } from "../hooks/use-card-editor";
 import { type LibraryResource, useLibrary } from "../hooks/use-library";
-import { useViewport } from "../hooks/use-viewport";
-import type { CardContent, CatalogCard, LibraryCard, Orientation } from "../model/types";
-import { cleanList, hasDraftChanges, validateDraft } from "../model/validation";
+import { useTarotViewport } from "../hooks/use-tarot-viewport";
+import type { CatalogCard, LibraryCard, Orientation } from "../model/types";
+import { cleanList } from "../model/validation";
 import { storageMessage } from "../services/library-storage";
 import "./style.css";
 
@@ -45,7 +45,7 @@ export function TarotScreen({ deckIndex }: { deckIndex: string }) {
       <div className="tarot-state" role="alert">
         <h1>Couldn’t open your library</h1>
         <p>{library.state.message}</p>
-        <Button onClick={library.retry} type="button">
+        <Button appearance="primary" onClick={library.retry} type="button">
           Try again
         </Button>
       </div>
@@ -54,7 +54,7 @@ export function TarotScreen({ deckIndex }: { deckIndex: string }) {
     content = (
       <LoadedCard
         catalogCard={catalogCard}
-        onSaved={library.updateCard}
+        onCardUpdate={library.updateCard}
         resource={library.state.resource}
       />
     );
@@ -71,11 +71,11 @@ export function TarotScreen({ deckIndex }: { deckIndex: string }) {
 function LoadedCard({
   catalogCard,
   resource,
-  onSaved,
+  onCardUpdate,
 }: {
   catalogCard: CatalogCard;
   resource: LibraryResource;
-  onSaved: (card: LibraryCard) => void;
+  onCardUpdate: (card: LibraryCard) => void;
 }) {
   const [loaded, setLoaded] = useState<{ card: LibraryCard; request: { cardId: string } } | null>(
     null
@@ -104,6 +104,7 @@ function LoadedCard({
           return;
         }
         session.visit(loadRequest.cardId);
+        onCardUpdate(card);
         setLoaded({ card, request: loadRequest });
       },
       (cause: unknown) => {
@@ -115,7 +116,7 @@ function LoadedCard({
     return () => {
       current = false;
     };
-  }, [loadRequest, service, session]);
+  }, [loadRequest, onCardUpdate, service, session]);
   const error = failure?.cardId === catalogCard.id ? failure.message : "";
   let unavailable: ReactNode = null;
   if (error) {
@@ -124,6 +125,7 @@ function LoadedCard({
         <h1>Couldn’t open this card</h1>
         <p>{error}</p>
         <Button
+          appearance="primary"
           onClick={() => {
             setFailure(null);
             setLoadRequest({ cardId: catalogCard.id });
@@ -148,73 +150,68 @@ function LoadedCard({
     <CardStudy
       catalogCard={catalogCard}
       initial={record}
-      onSaved={onSaved}
+      onCardUpdate={onCardUpdate}
       resource={resource}
       unavailable={unavailable}
     />
   );
 }
 
-export function CardStudy({
+function CardStudy({
   catalogCard,
   initial,
   resource,
-  onSaved,
+  onCardUpdate,
   unavailable,
 }: {
   catalogCard: CatalogCard;
   initial: LibraryCard;
   unavailable: ReactNode;
   resource: LibraryResource;
-  onSaved: (card: LibraryCard) => void;
+  onCardUpdate: (card: LibraryCard) => void;
 }) {
   const navigate = useNavigate();
-  const reducedMotion = useReducedMotion();
   const [loadedRecord, setLoadedRecord] = useState(initial);
-  const [saved, setSaved] = useState(initial);
-  const [draft, setDraft] = useState<CardContent | null>(null);
   const [orientation, setOrientation] = useState<Orientation>("upright");
   const [revealed, setRevealed] = useState<ReadonlySet<string>>(new Set());
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [discarding, setDiscarding] = useState(false);
-  const [conflict, setConflict] = useState<LibraryCard | null>(null);
-  const [showConflict, setShowConflict] = useState(false);
+  const [navigationError, setNavigationError] = useState("");
   const [focusKeyword, setFocusKeyword] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
   const footer = useRef<HTMLElement>(null);
-  const edit = useRef<HTMLButtonElement>(null);
-  const operation = useRef(0);
-  const pending = useRef(false);
-  useViewport(root);
+  const restoreEditFocus = useRef(false);
+  const attachEdit = useCallback((node: HTMLButtonElement | null) => {
+    if (node && restoreEditFocus.current) {
+      restoreEditFocus.current = false;
+      node.focus({ preventScroll: true });
+    }
+  }, []);
+  useTarotViewport(root);
   // Card-local study state resets on a new storage result; the footer keeps its DOM and motion.
   if (loadedRecord !== initial) {
     setLoadedRecord(initial);
-    setSaved(initial);
-    setDraft(null);
     setOrientation("upright");
     setRevealed(new Set());
-    setSaving(false);
-    setError("");
-    setNotice("");
-    setDiscarding(false);
-    setConflict(null);
-    setShowConflict(false);
+    setNavigationError("");
     setFocusKeyword(0);
   }
-  const dirty = hasDraftChanges(draft, saved.content);
+  const editor = useCardEditor({
+    catalogCardId: catalogCard.id,
+    initial,
+    onCardUpdate,
+    onFinish: finishEditing,
+    onInvalid: showValidation,
+    service: resource.service,
+  });
+  const { dirty, draft, saved, saving, validationError } = editor;
   const blocker = useBlocker({
     enableBeforeUnload: dirty || saving,
     shouldBlockFn: () => dirty || saving,
     withResolver: true,
   });
-  const content = draft ?? saved.content;
-  const otherNames = cleanList(content.otherNames);
-  const errors = draft ? validateDraft(draft) : [];
-  const invalid = errors.length > 0;
+  const otherNames = cleanList((draft ?? saved.content).otherNames);
+  const invalid = Boolean(validationError);
   const editing = draft !== null && !unavailable;
 
   useEffect(() => {
@@ -226,22 +223,14 @@ export function CardStudy({
       }
       body.current?.scrollTo({ top: 0 });
     }
-    pending.current = false;
-    return () => {
-      operation.current += 1;
-    };
   }, [initial, catalogCard.id]);
 
   function toggleEdit() {
     if (!editing) {
-      beginEdit();
-      return;
+      setFocusKeyword(0);
+      setNavigationError("");
     }
-    if (dirty) {
-      setDiscarding(true);
-    } else {
-      cancel();
-    }
+    editor.toggle();
   }
   function resetReveals() {
     setRevealed(new Set());
@@ -253,82 +242,13 @@ export function CardStudy({
         new Set([...previous].filter((field) => field !== "keywords" && field !== "notes"))
     );
   }
-  function beginEdit() {
-    setFocusKeyword(0);
-    setDraft(structuredClone(saved.content));
-    setError("");
-    setNotice("");
-  }
-  function cancel() {
-    setDraft(null);
-    setError("");
-    setDiscarding(false);
-    setConflict(null);
-    setShowConflict(false);
+  function finishEditing() {
     resetReveals();
-    requestAnimationFrame(() => edit.current?.focus());
+    restoreEditFocus.current = true;
   }
   function showValidation() {
     setOrientation("upright");
     setFocusKeyword((value) => value + 1);
-  }
-  async function save(expectedRevision = saved.revision) {
-    if (!draft || invalid || pending.current) {
-      return;
-    }
-    pending.current = true;
-    operation.current += 1;
-    const token = operation.current;
-    setSaving(true);
-    setError("");
-    setShowConflict(false);
-    try {
-      const result = await resource.service.saveCard(saved.id, draft, expectedRevision);
-      if (operation.current !== token) {
-        return;
-      }
-      switch (result.kind) {
-        case "saved":
-          setSaved(result.card);
-          onSaved(result.card);
-          setDraft(null);
-          setConflict(null);
-          resetReveals();
-          setNotice("Saved in this browser.");
-          requestAnimationFrame(() => edit.current?.focus());
-          break;
-        case "conflict":
-          setConflict(result.current);
-          setShowConflict(true);
-          setError("This card changed elsewhere. Review both versions before saving.");
-          break;
-        case "missing":
-          setError(
-            "This saved card is missing. Your draft is still here; try again after restoring access to your library."
-          );
-          break;
-        case "storage":
-          setError(result.message);
-          break;
-        case "validation":
-          setError(result.errors[0]?.message ?? "Check your draft.");
-          showValidation();
-          break;
-        default: {
-          const unreachable: never = result;
-          throw new Error(`Unexpected save result: ${unreachable}`);
-        }
-      }
-    } catch (cause) {
-      if (operation.current === token) {
-        setError(storageMessage(cause));
-      }
-    } finally {
-      if (operation.current === token) {
-        pending.current = false;
-        setSaving(false);
-      }
-    }
   }
   function openCard(card: CatalogCard, fromSearch: boolean) {
     if (fromSearch) {
@@ -337,182 +257,174 @@ export function CardStudy({
     if (card.id === catalogCard.id) {
       setOrientation("upright");
       resetReveals();
-      setNotice("");
+      editor.clearNotice();
       title.current?.focus();
       return;
     }
     navigate({
       params: { deckIndex: String(card.deckIndex) },
       to: "/tarot-flash/$deckIndex",
-    }).catch(() => setError("Couldn’t open that card. Try again."));
+    }).catch(() => setNavigationError("Couldn’t open that card. Try again."));
   }
   function stay() {
-    setDiscarding(false);
+    editor.closeDiscard();
     blocker.reset?.();
   }
   function discard() {
-    if (saving) {
+    if (!editor.discardDraft()) {
       return;
     }
     if (blocker.status === "blocked") {
-      setDraft(null);
-      setError("");
-      setDiscarding(false);
-      setConflict(null);
-      setShowConflict(false);
       blocker.proceed();
     } else {
-      cancel();
+      finishEditing();
     }
   }
 
-  function replaceDraft() {
-    if (conflict) {
-      save(conflict.revision);
-    }
-  }
-  function acceptSavedVersion() {
-    if (!conflict) {
-      return;
-    }
-    setSaved(conflict);
-    onSaved(conflict);
-    cancel();
-    setNotice("Opened the saved version.");
-  }
-
+  const secondaryActions = (
+    <CardSecondaryActions
+      disabled={saving || Boolean(unavailable)}
+      editing={editing}
+      editRef={attachEdit}
+      onEdit={toggleEdit}
+      onReverse={reverse}
+      orientation={orientation}
+    />
+  );
   return (
-    <div className="tarot-screen" data-editing={editing} ref={root}>
-      <div className="tarot-foreground">
-        {unavailable ?? (
-          <>
-            <CardHeader
-              catalogCard={catalogCard}
-              editing={editing}
-              editRef={edit}
-              onEdit={toggleEdit}
-              onReverse={reverse}
-              orientation={orientation}
-              otherNames={otherNames}
-              saving={saving}
-              titleRef={title}
-            />
-            <div className="tarot-body" ref={body}>
-              <AnimatePresence initial={false} mode="wait">
-                <Scene className="tarot-fields" key={editing ? "edit" : "view"}>
-                  {editing ? (
-                    <EditorFields
-                      content={draft}
-                      focusKeyword={focusKeyword}
-                      invalid={invalid}
-                      keywordOptions={[
-                        ...new Set(
-                          resource.cards.flatMap((card) => [
-                            ...card.content.meanings.upright.keywords,
-                            ...(card.content.meanings.reversed?.keywords ?? []),
-                          ])
-                        ),
-                      ]}
-                      onChange={setDraft}
-                      orientation={orientation}
-                      saving={saving}
-                    />
-                  ) : (
-                    <StudyFields
-                      catalogCardId={catalogCard.id}
-                      content={saved.content}
-                      onReveal={(id) => setRevealed((previous) => new Set([...previous, id]))}
-                      orientation={orientation}
-                      revealed={revealed}
-                    />
-                  )}
-                </Scene>
-              </AnimatePresence>
+    <div ref={root}>
+      {/* A mode owns all of its geometry. Keep the complete outgoing tree until it is hidden.
+          Card navigation keeps the study key, so shuffling never remounts the footer. */}
+      <AnimatePresence initial={false} mode="wait">
+        <Scene className="tarot-mode" key={editing ? "edit" : "view"}>
+          <div className="tarot-screen" data-editing={editing}>
+            <div className="tarot-foreground">
+              {unavailable ?? (
+                <>
+                  <CardHeader
+                    catalogCard={catalogCard}
+                    editing={editing}
+                    otherNames={otherNames}
+                    titleRef={title}
+                  />
+                  <div className="tarot-body" ref={body}>
+                    <div className="tarot-fields">
+                      {editing ? (
+                        <EditorFields
+                          content={draft}
+                          focusKeyword={focusKeyword}
+                          invalid={invalid}
+                          keywordOptions={[
+                            ...new Set(
+                              resource.cards.flatMap((card) => [
+                                ...card.content.meanings.upright.keywords,
+                                ...(card.content.meanings.reversed?.keywords ?? []),
+                              ])
+                            ),
+                          ]}
+                          onChange={editor.changeDraft}
+                          orientation={orientation}
+                          saving={saving}
+                        />
+                      ) : (
+                        <StudyFields
+                          catalogCardId={catalogCard.id}
+                          content={saved.content}
+                          onReveal={(id) => setRevealed((previous) => new Set([...previous, id]))}
+                          orientation={orientation}
+                          revealed={revealed}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-          </>
-        )}
-      </div>
-      <motion.footer
-        className="tarot-footer"
-        layout="position"
-        ref={footer}
-        transition={reducedMotion ? { duration: 0 } : systemMotion.disclosure.slide}
-      >
-        <AnimatePresence initial={false} mode="wait">
-          <Reveal key={editing ? "edit" : "study"} reveal="overlay">
-            {editing ? (
-              <div className="tarot-edit-actions">
-                <div className="tarot-save-feedback">
-                  {invalid && (
-                    <button
-                      className="tarot-validation"
-                      id="tarot-validation"
-                      onClick={showValidation}
-                      type="button"
-                    >
-                      {errors[0].message}
-                    </button>
-                  )}
-                  {Boolean(error) && <p role="alert">{error}</p>}
-                  {Boolean(conflict) && (
+            <footer className="tarot-footer" ref={footer}>
+              {editing ? (
+                <div className="tarot-edit-actions">
+                  <div className="tarot-save-feedback">
+                    {validationError !== undefined && (
+                      <Button
+                        appearance="text"
+                        className="tarot-validation"
+                        id="tarot-validation"
+                        onClick={showValidation}
+                        type="button"
+                      >
+                        {validationError.message}
+                      </Button>
+                    )}
+                    {Boolean(editor.error) && <p role="alert">{editor.error}</p>}
+                    {editor.conflict !== null && (
+                      <Button
+                        appearance="text"
+                        aria-label="Review versions"
+                        disabled={saving}
+                        iconOnly
+                        onClick={editor.reviewConflict}
+                        title="Review versions"
+                        type="button"
+                      >
+                        <Icon icon={AlertCircleIcon} />
+                      </Button>
+                    )}
+                    {Boolean(saving) && (
+                      <p className="visually-hidden" role="status">
+                        Saving…
+                      </p>
+                    )}
+                  </div>
+                  <ButtonGroup
+                    actions={secondaryActions}
+                    aria-label="Edit card actions"
+                    variant="expandable"
+                  >
                     <Button
-                      appearance="text"
-                      aria-label="Review versions"
+                      appearance="primary"
+                      aria-busy={saving}
+                      aria-label={saving ? "Saving…" : "Save"}
+                      disabled={invalid || saving}
                       iconOnly
-                      onClick={() => setShowConflict(true)}
-                      title="Review versions"
+                      onClick={editor.save}
+                      title="Save"
                       type="button"
                     >
-                      <Icon icon={AlertCircleIcon} />
+                      <Icon icon={Tick02Icon} />
                     </Button>
-                  )}
-                  {Boolean(saving) && (
-                    <p className="tarot-sr-only" role="status">
-                      Saving…
-                    </p>
-                  )}
+                  </ButtonGroup>
                 </div>
-                <Button
-                  aria-busy={saving}
-                  aria-label={saving ? "Saving…" : "Save"}
-                  disabled={invalid || saving}
-                  iconOnly
-                  onClick={() => save()}
-                  title="Save"
-                  type="button"
-                >
-                  <Icon icon={Tick02Icon} />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <p className="tarot-sr-only" role="status">
-                  {notice}
-                </p>
-                {Boolean(error) && <p role="alert">{error}</p>}
-                <SearchFooter
-                  cards={resource.cards}
-                  onSelect={(card) => openCard(card, true)}
-                  onShuffle={() => openCard(resource.session.shuffle(catalogCard.id), false)}
-                />
-              </>
-            )}
-          </Reveal>
-        </AnimatePresence>
-      </motion.footer>
+              ) : (
+                <>
+                  <p className="visually-hidden" role="status">
+                    {editor.notice}
+                  </p>
+                  {Boolean(navigationError) && <p role="alert">{navigationError}</p>}
+                  <SearchFooter
+                    actions={secondaryActions}
+                    cards={resource.cards}
+                    onSelect={(card) => openCard(card, true)}
+                    onShuffle={() => openCard(resource.session.shuffle(catalogCard.id), false)}
+                  />
+                </>
+              )}
+            </footer>
+          </div>
+        </Scene>
+      </AnimatePresence>
       <DiscardDialog
         onDiscard={discard}
         onStay={stay}
-        open={discarding || blocker.status === "blocked"}
+        open={editor.discarding || blocker.status === "blocked"}
         saving={saving}
       />
       <ConflictDialog
-        current={conflict}
+        current={editor.conflict}
         draft={draft}
-        onClose={() => setShowConflict(false)}
-        onReplace={replaceDraft}
-        onUseSaved={acceptSavedVersion}
-        open={showConflict}
+        onClose={editor.closeConflict}
+        onReplace={editor.replaceDraft}
+        onUseSaved={editor.acceptSavedVersion}
+        open={editor.showConflict}
       />
     </div>
   );

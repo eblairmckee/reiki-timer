@@ -2,8 +2,8 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { createRef, type Ref } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import { cdp, page } from "vitest/browser";
+import { ControlSurface } from "@/components/molecules/control-surface";
 import { SummaryList } from "@/components/molecules/summary-list";
-import { ControlSurface } from "@/components/organisms/control-surface";
 import { browserAction, userEvent } from "./react-browser";
 import "@/app/styles/global.css";
 

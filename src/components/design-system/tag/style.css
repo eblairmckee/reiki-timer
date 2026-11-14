@@ -1,0 +1,35 @@
+@layer components {
+  [data-ui="tag"] {
+    display: inline-block;
+    max-inline-size: 100%;
+    padding: var(--ref-space-6) var(--ref-space-12);
+    vertical-align: top;
+    color: var(--sys-color-ink-on-frost-field);
+    overflow-wrap: anywhere;
+    background: var(--cmp-surface-tag-fill);
+    border: var(--cmp-border-tag);
+    border-radius: var(--ref-radius-rounded);
+    box-shadow: var(--cmp-shadow-tag);
+    -webkit-backdrop-filter: var(--sys-filter-frost);
+    backdrop-filter: var(--sys-filter-frost);
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    [data-ui="tag"] {
+      background: var(--sys-color-frost-fallback);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-ui="tag"] {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+}

@@ -14,7 +14,7 @@ export function TimerSaved({ onDone }: { onDone: () => void }) {
       <h1 data-ink="display" data-lettering="frosted" ref={title} tabIndex={-1}>
         Timer saved
       </h1>
-      <Button onClick={onDone} size="lg">
+      <Button appearance="primary" onClick={onDone} size="lg">
         Done
       </Button>
     </div>

@@ -50,6 +50,15 @@ function storedSession(): Session {
 }
 
 test("Back and Forward freeze a running session; Resume excludes time spent editing", async () => {
+  // Exercise history and the session clock without waiting for a real-time scene fade.
+  const matchMedia = window.matchMedia.bind(window);
+  vi.spyOn(window, "matchMedia").mockImplementation((query) => {
+    const result = matchMedia(query);
+    if (query === "(prefers-reduced-motion: reduce)") {
+      Object.defineProperty(result, "matches", { value: true });
+    }
+    return result;
+  });
   const { router } = await setup("/reiki-on/edit", {
     elapsed: 45_000,
     mode: "paused",

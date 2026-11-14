@@ -48,24 +48,25 @@
     padding-block-end: var(--dial-label-clearance);
     margin-block-start: var(--dial-label-clearance);
   }
-  .timer-field-copy {
+  .timer-field > [data-slot="copy"] {
     text-align: left;
   }
-  .timer-label {
+  .timer-field :where([data-slot="label"]) {
     display: block;
     font-size: clamp(1.125rem, 4.25vw, 1.5rem);
     font-weight: 400;
     line-height: 1.25;
     letter-spacing: 0.015em;
   }
-  .timer-field[data-related] :is(.timer-label, .timer-description) {
+  .timer-field[data-related]
+    :is([data-slot="label"], [data-slot="description"]) {
     padding-inline-start: clamp(0.5rem, 2vw, 1.25rem);
   }
-  .timer-field[data-related] .timer-label {
+  .timer-field[data-related] [data-slot="label"] {
     font-size: clamp(0.9375rem, 3.6vw, 1.125rem);
     text-transform: capitalize;
   }
-  .timer-description {
+  .timer-field :where([data-slot="description"]) {
     margin-top: 0.6rem;
     font-size: clamp(0.9375rem, 3.25vw, 1rem);
     font-weight: 400;
@@ -94,7 +95,7 @@
   .timer-preview-reserve {
     visibility: hidden;
   }
-  .timer-field-control {
+  .timer-field > [data-slot="control"] {
     display: grid;
     grid-column: 2;
     justify-items: center;
@@ -115,7 +116,7 @@
     margin-inline: -0.75rem;
   }
   /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
-  .timer-chime-field > .timer-label {
+  .timer-chime-field > [data-slot="label"] {
     grid-column: 1 / -1;
   }
   .timer-chime-picker {
@@ -132,11 +133,11 @@
   }
   @media (width < 60rem) {
     /* The breakdown can use both columns beneath its label and switch. */
-    .timer-field[data-related]:has(.timer-description) {
-      .timer-field-copy {
+    .timer-field[data-related]:has([data-slot="description"]) {
+      & > [data-slot="copy"] {
         display: contents;
       }
-      .timer-description {
+      [data-slot="description"] {
         grid-area: 2 / 1 / auto / -1;
         margin-block-start: 0;
       }
@@ -156,13 +157,13 @@
       grid-template-columns: var(--settings-copy-width) minmax(0, 1fr);
       column-gap: var(--settings-column-gap);
     }
-    .timer-label {
+    .timer-field :where([data-slot="label"]) {
       font-size: 2.25rem;
     }
-    .timer-field[data-related] .timer-label {
+    .timer-field[data-related] [data-slot="label"] {
       font-size: 1.5rem;
     }
-    .timer-description {
+    .timer-field :where([data-slot="description"]) {
       font-size: 1rem;
     }
     .timer-chime-picker {
@@ -170,7 +171,7 @@
       margin-inline: 0;
     }
     /* biome-ignore lint/style/noDescendingSpecificity: These state, orientation or forced-color selectors intentionally follow base rules; preserve their cascade order. */
-    .timer-chime-field > .timer-label {
+    .timer-chime-field > [data-slot="label"] {
       grid-column: 1;
     }
   }
@@ -181,11 +182,11 @@
           --settings-column-gap
         ) 1fr auto 1fr;
       column-gap: 0;
-      .timer-field-copy {
+      & > [data-slot="copy"] {
         grid-column: 1 / 4;
         padding-inline-end: 1rem;
       }
-      .timer-field-control {
+      & > [data-slot="control"] {
         grid-column: 4;
       }
     }

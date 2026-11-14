@@ -1,0 +1,134 @@
+@layer components {
+  .tarot-prose {
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .tarot-correspondences {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--ref-space-16);
+  }
+  .tarot-correspondences:empty {
+    display: none;
+  }
+  .tarot-correspondence-item .tarot-study-content,
+  .tarot-notes-item .tarot-study-content {
+    padding: var(--ref-space-12);
+  }
+  .tarot-correspondences .tarot-study-label {
+    align-self: center;
+  }
+  .tarot-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ref-space-8);
+  }
+  .tarot-keyword {
+    border-radius: var(--ref-radius-rounded);
+  }
+  .tarot-shared-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-24);
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  .tarot-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-8);
+    min-inline-size: 0;
+  }
+  .tarot-field > [data-slot="control"] {
+    min-inline-size: 0;
+  }
+  .tarot-field [data-slot="label"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ref-space-8);
+    align-items: baseline;
+    justify-content: space-between;
+    font-family: var(--sys-font-family-heading);
+    font-size: 1.15rem;
+  }
+  .tarot-element-symbol,
+  .tarot-correspondence-symbol {
+    flex-shrink: 0;
+    inline-size: 1.65rem;
+    block-size: 1.65rem;
+  }
+  .tarot-selected-correspondences {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ref-space-8);
+  }
+  .tarot-select-value {
+    min-inline-size: 0;
+  }
+  .tarot-editor-fields .tarot-selected-correspondences {
+    flex-wrap: nowrap;
+    overflow: auto;
+  }
+  .tarot-correspondence-value {
+    display: inline-flex;
+    gap: var(--ref-space-8);
+    align-items: center;
+  }
+  .tarot-field [data-slot="required"] {
+    font: var(--sys-font-body-sm);
+  }
+  .tarot-editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-32);
+    min-inline-size: 0;
+    padding-block: var(--ref-space-16);
+  }
+  .tarot-editor-fields .tarot-shared-fields,
+  .tarot-editor-fields .tarot-correspondences {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ref-space-32);
+  }
+  .tarot-editor-fields .tarot-field {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--ref-space-16);
+    align-items: center;
+  }
+  .tarot-editor-fields .tarot-field [data-slot="label"] {
+    display: block;
+    font-size: clamp(1.125rem, 4.25vw, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: 0.015em;
+  }
+  .tarot-editor-fields .tarot-field [data-slot="required"] {
+    display: block;
+    margin-block-start: var(--ref-space-8);
+  }
+  @media (min-width: 760px) {
+    .tarot-editor-fields {
+      gap: calc(var(--ref-space-32) + var(--ref-space-16));
+      padding-block: var(--ref-space-32);
+    }
+    .tarot-editor-fields .tarot-shared-fields,
+    .tarot-editor-fields .tarot-correspondences {
+      gap: calc(var(--ref-space-32) + var(--ref-space-16));
+    }
+    .tarot-editor-fields .tarot-field {
+      column-gap: clamp(2rem, 5vw, 4rem);
+    }
+    .tarot-editor-fields .tarot-field [data-slot="label"] {
+      font-size: 2.25rem;
+    }
+  }
+  @media (max-width: 380px) {
+    .tarot-editor-fields .tarot-field {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--ref-space-12);
+    }
+  }
+}

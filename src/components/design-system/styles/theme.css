@@ -48,7 +48,10 @@
 
   --sys-color-ink-on-glass: rgb(18 12 7 / 98%);
   --sys-color-focus: var(--sys-color-ink-on-glass);
+  --sys-color-focus-on-dark-glass: var(--ref-color-paper);
   --sys-size-focus-ring: var(--ref-space-2);
+  /* Single-line fields and base icon buttons share a 60px control box. */
+  --sys-size-control-height: 3.75rem;
   --sys-color-error: #9e2e43;
   --ref-color-shade: #000;
   --ref-color-paper: #fff;
@@ -69,7 +72,6 @@
   --sys-opacity-well-shade: 0.36;
   --sys-color-well-fill: rgb(0 0 0 / var(--sys-opacity-well-fill));
   --sys-color-well-shade: rgb(0 0 0 / var(--sys-opacity-well-shade));
-  --cmp-color-summary-details-surface: rgb(21 22 24 / 94%);
   --sys-color-ink-on-dark-glass: rgb(255 255 255 / 90%);
   --cmp-color-dialog-ink: rgb(255 255 255 / 94%);
   --cmp-color-timeline-time: rgb(255 255 255 / 62%);
@@ -77,6 +79,7 @@
   /* Shared by the rendered layers and Atmosphere's contrast bounds. Unit interval. */
   --sys-opacity-well-emphasized: 0.18;
   --sys-opacity-frost-fill: 0.12;
+  --sys-opacity-frost-secondary: 0.1;
   --sys-opacity-frost-selected: 0.26;
   --sys-opacity-frost-sheen: 0.1;
   --sys-opacity-frost-reveal: 0.04;
@@ -89,7 +92,7 @@
     255 255 255 /
     var(--sys-opacity-frost-selected)
   );
-  --cmp-color-button-word-fill: rgb(255 255 255 / 60%);
+  --cmp-color-button-word-fill: var(--sys-color-action-glass-primary);
   --sys-color-frost-light: rgb(255 255 255 / 51%);
   --sys-color-frost-sheen: rgb(255 255 255 / var(--sys-opacity-frost-sheen));
   --sys-color-frost-shade: rgb(0 0 0 / 6%);
@@ -97,11 +100,67 @@
   --sys-color-frost-contact: rgb(0 0 0 / 22%);
   --sys-color-frost-reveal: rgb(255 255 255 / var(--sys-opacity-frost-reveal));
   --sys-color-frost-fallback: #34363c;
-  --cmp-color-choice-popup-fill: color-mix(
+  /* Primary and secondary share frost lighting; primary increases face opacity. */
+  --sys-color-action-glass-primary: rgb(255 255 255 / 60%);
+  --sys-color-action-glass-primary-selected: var(--sys-color-glass-fill);
+  --sys-color-action-glass-primary-fallback: #e2e3e8;
+  --sys-color-action-glass-primary-selected-fallback: var(--ref-color-paper);
+  --sys-color-action-glass-secondary: rgb(
+    255 255 255 /
+    var(--sys-opacity-frost-secondary)
+  );
+
+  --sys-color-ink-on-frost-field: rgb(255 255 255 / 94%);
+  --sys-color-ink-placeholder-on-frost-field: rgb(255 255 255 / 77%);
+  --sys-color-frost-field-fill: var(--sys-color-well-fill-emphasized);
+  --sys-color-frost-field-invalid: #ffc4cd;
+  --sys-border-frost-field: 1px solid var(--sys-color-well-light);
+  --sys-shadow-frost-field: inset 0 1px 4px var(--sys-color-frost-shade);
+
+  --ref-color-overlay: #151618;
+  --sys-color-overlay-fill: color-mix(
     in srgb,
-    var(--sys-color-frost-fallback) 90%,
+    var(--ref-color-overlay) 86%,
     transparent
   );
+  --sys-color-overlay-edge: var(--sys-color-well-light);
+  --sys-color-choice-highlight: var(--sys-color-frost-fill);
+  --sys-filter-overlay: blur(32px) saturate(1.12);
+  --sys-filter-glass-content: blur(18px) saturate(1.12);
+  --sys-shadow-overlay-rim: inset 0 1px 1px var(--sys-color-frost-sheen);
+  --cmp-surface-choice-popup-fill: var(--sys-color-overlay-fill);
+  --cmp-color-choice-popup-fill: var(--cmp-surface-choice-popup-fill);
+  --cmp-shadow-choice-popup:
+    var(--sys-shadow-overlay-rim), 0 10px 24px var(--sys-color-frost-shadow),
+    0 2px 5px var(--sys-color-frost-contact);
+  --cmp-surface-dialog-fill: color-mix(
+    in srgb,
+    var(--ref-color-overlay) 93%,
+    transparent
+  );
+  --cmp-border-dialog: 1px solid var(--sys-color-overlay-edge);
+  --cmp-shadow-dialog:
+    var(--sys-shadow-overlay-rim), 0 22px 55px var(--sys-color-frost-shadow),
+    0 5px 12px var(--sys-color-frost-contact);
+  --cmp-filter-dialog-surface: var(--sys-filter-overlay);
+  --cmp-filter-dialog-backdrop: blur(8px);
+  --cmp-color-summary-details-surface: color-mix(
+    in srgb,
+    var(--ref-color-overlay) 94%,
+    transparent
+  );
+
+  --cmp-surface-tag-fill:
+    linear-gradient(
+      145deg,
+      var(--sys-color-frost-sheen),
+      var(--sys-color-frost-reveal)
+    ),
+    rgb(0 0 0 / 24%);
+  --cmp-border-tag: 1px solid var(--sys-color-well-light);
+  --cmp-shadow-tag:
+    inset 0 1px 1px var(--sys-color-well-light),
+    0 3px 10px var(--sys-color-frost-shade);
   --sys-color-etch-ink: rgb(0 0 0 / 46%);
   --sys-color-etch-light: rgb(255 255 255 / 44%);
   --sys-color-letterpress-shade: rgb(0 0 0 / 68%);
@@ -201,4 +260,14 @@
   --sys-motion-link-feedback: var(--sys-motion-control-feedback);
   --sys-motion-control-settle: 200ms cubic-bezier(0.34, 0.8, 0.34, 1);
   --sys-motion-group-feedback: 300ms cubic-bezier(0.34, 0.88, 0.34, 1);
+  --cmp-motion-button-reshape: 420ms ease-in-out;
+  --cmp-motion-button-hint: 1.4s ease-in-out 3s;
+  --cmp-motion-button-group-expand: 480ms cubic-bezier(0.22, 0.65, 0.28, 1);
+  --cmp-motion-button-group-surface: 400ms ease-in-out;
+  --cmp-motion-choice-fade: var(--sys-motion-control-feedback);
+  --cmp-motion-choice-slide: var(--sys-motion-control-settle);
+  --cmp-offset-choice-entry: 3px;
+  --cmp-motion-dialog-fade: 360ms ease-in-out;
+  --cmp-motion-dialog-slide: 420ms cubic-bezier(0.23, 0.68, 0.3, 1);
+  --cmp-offset-dialog-entry: 4px;
 }

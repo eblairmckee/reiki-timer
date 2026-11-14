@@ -1,13 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { Tag } from "@/components/design-system/tag";
+import { Textarea } from "@/components/design-system/textarea";
+import { FormField } from "@/components/molecules/form-field";
+import { TagInput } from "@/components/molecules/tag-input";
 import { correspondenceFields } from "../data/correspondences";
 import { illustrations } from "../data/illustrations";
 import type { CardContent, Orientation } from "../model/types";
 import { CardIllustration } from "./card-illustration";
-import { CardListField } from "./card-list-field";
 import { CorrespondenceSelect } from "./correspondence-select";
 import { CorrespondenceValue } from "./correspondence-value";
 import { StudyItem } from "./study-item";
 import { StudySection } from "./study-section";
+import "./card-fields.css";
 
 export type Reveals = ReadonlySet<string>;
 interface SharedProps {
@@ -30,6 +34,7 @@ export function StudyFields({
       <div className="tarot-correspondences">
         {correspondenceFields.map(({ id: field, label }) => (
           <StudySection
+            field={field}
             key={field}
             label={label}
             onReveal={() => onReveal(field)}
@@ -37,8 +42,8 @@ export function StudyFields({
             revealed={revealed.has(field)}
           >
             <div className="tarot-selected-correspondences">
-              {(content.correspondences[field] ?? []).map((value) => (
-                <StudyItem className="tarot-correspondence-item" field={field} key={value}>
+              {(content.correspondences[field] ?? []).map((value, index) => (
+                <StudyItem className="tarot-correspondence-item" key={value} order={index}>
                   <CorrespondenceValue field={field} value={value} />
                 </StudyItem>
               ))}
@@ -47,26 +52,28 @@ export function StudyFields({
         ))}
       </div>
       <StudySection
+        field="keywords"
         label="Keywords"
         onReveal={() => onReveal("keywords")}
         populated={!!meaning?.keywords.length}
         revealed={revealed.has("keywords")}
       >
         <div className="tarot-keywords">
-          {[...new Set(meaning?.keywords ?? [])].map((word) => (
-            <StudyItem className="tarot-keyword" field="keywords" key={word}>
-              {word}
+          {[...new Set(meaning?.keywords ?? [])].map((word, index) => (
+            <StudyItem className="tarot-keyword" key={word} order={index}>
+              <Tag>{word}</Tag>
             </StudyItem>
           ))}
         </div>
       </StudySection>
       <StudySection
+        field="notes"
         label="Notes"
         onReveal={() => onReveal("notes")}
         populated={!!meaning?.notes}
         revealed={revealed.has("notes")}
       >
-        <StudyItem className="tarot-notes-item" field="notes">
+        <StudyItem className="tarot-notes-item">
           <span className="tarot-prose">{meaning?.notes}</span>
         </StudyItem>
       </StudySection>
@@ -101,6 +108,15 @@ export function EditorFields({
     return () => cancelAnimationFrame(frame);
   }, [focusKeyword]);
   const meaning = content.meanings[orientation] ?? { keywords: [], notes: "" };
+  const notes = useRef<HTMLTextAreaElement>(null);
+  const upright = orientation === "upright";
+  const sharedDisabled = !upright || saving;
+  // A growing textarea must stay above the persistent footer while the user types.
+  useLayoutEffect(() => {
+    if (meaning.notes && document.activeElement === notes.current) {
+      notes.current?.scrollIntoView({ behavior: "instant", block: "nearest" });
+    }
+  }, [meaning.notes]);
   function updateMeaning(next: Partial<typeof meaning>) {
     onChange({
       ...content,
@@ -112,22 +128,22 @@ export function EditorFields({
   }
   return (
     <div className="tarot-editor-fields" ref={fields}>
-      <fieldset className="tarot-shared-fields" disabled={orientation === "reversed" || saving}>
-        <legend className="tarot-sr-only">Shared card information</legend>
-        <CardListField
-          disabled={orientation === "reversed" || saving}
-          id="tarot-other-names"
-          invalid={false}
-          label="Other names"
-          onChange={(otherNames) => onChange({ ...content, otherNames })}
-          options={[]}
-          required={false}
-          values={content.otherNames}
-        />
+      <fieldset className="tarot-shared-fields" disabled={sharedDisabled}>
+        <legend className="visually-hidden">Shared card information</legend>
+        <FormField className="tarot-field" controlId="tarot-other-names" label="Other names">
+          {(field) => (
+            <TagInput
+              {...field}
+              disabled={sharedDisabled}
+              onValuesChange={(otherNames) => onChange({ ...content, otherNames })}
+              values={content.otherNames}
+            />
+          )}
+        </FormField>
         <div className="tarot-correspondences">
           {correspondenceFields.map(({ id: field }) => (
             <CorrespondenceSelect
-              disabled={orientation === "reversed" || saving}
+              disabled={sharedDisabled}
               field={field}
               key={field}
               onChange={(values) =>
@@ -144,29 +160,38 @@ export function EditorFields({
           ))}
         </div>
       </fieldset>
-      <CardListField
-        disabled={saving}
-        id={`tarot-${orientation}-keywords`}
-        invalid={orientation === "upright" && invalid}
+      <FormField
+        className="tarot-field"
+        controlId={`tarot-${orientation}-keywords`}
+        describedBy={upright && invalid ? "tarot-validation" : undefined}
         key={orientation}
         label="Keywords"
-        onChange={(keywords) => updateMeaning({ keywords })}
-        options={keywordOptions}
-        required={orientation === "upright"}
-        values={meaning.keywords}
-      />
-      <label className="tarot-field" htmlFor={`tarot-${orientation}-notes`}>
-        <span data-ink="label" data-lettering="etched">
-          Notes
-        </span>
-        <textarea
-          disabled={saving}
-          id={`tarot-${orientation}-notes`}
-          onChange={(event) => updateMeaning({ notes: event.target.value })}
-          rows={6}
-          value={meaning.notes}
-        />
-      </label>
+        requiredIndicator={upright ? "Required" : undefined}
+      >
+        {(field) => (
+          <TagInput
+            {...field}
+            aria-invalid={upright && invalid}
+            disabled={saving}
+            onValuesChange={(keywords) => updateMeaning({ keywords })}
+            options={keywordOptions}
+            required={upright}
+            values={meaning.keywords}
+          />
+        )}
+      </FormField>
+      <FormField className="tarot-field" controlId={`tarot-${orientation}-notes`} label="Notes">
+        {(field) => (
+          <Textarea
+            {...field}
+            disabled={saving}
+            onChange={(event) => updateMeaning({ notes: event.target.value })}
+            ref={notes}
+            rows={1}
+            value={meaning.notes}
+          />
+        )}
+      </FormField>
     </div>
   );
 }

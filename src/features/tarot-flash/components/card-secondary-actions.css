@@ -1,0 +1,13 @@
+@layer components {
+  .tarot-reverse-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    block-size: 100%;
+    transition: transform var(--sys-motion-control-settle);
+  }
+  .tarot-reverse-icon[data-reversed="true"] {
+    transform: rotateY(180deg);
+  }
+}

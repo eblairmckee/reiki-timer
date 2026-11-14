@@ -31,12 +31,17 @@ function thumbTravel(root: HTMLElement, thumb: HTMLElement) {
   );
 }
 
+type SwitchProps = Omit<SwitchPrimitive.Root.Props, "children"> & {
+  /** The switch renders its own thumb. Provide an associated label for visible text. */
+  children?: never;
+};
+
 /** Interactive Base UI switch; provide a visible associated label or an ARIA name.
  * The root ref accepts HTMLElement and targets a span by default; custom render can replace it.
- * inputRef targets the separate native HTMLInputElement.
- * Children are the internal thumb; native props and refs pass through. onCheckedChange fires
- * once per committed tap/key activation or drag release, never for drag previews; cancellation
- * and controlled updates retain Base UI semantics. Repeated activations toggle each time.
+ * inputRef targets the separate native HTMLInputElement. Native props and refs pass through.
+ * onCheckedChange fires once per committed tap/key activation or drag release, never for drag
+ * previews. Cancellation and controlled updates retain Base UI semantics. Repeated activations
+ * toggle each time.
  *
  * Public CSS hook: --cmp-size-switch-block sets the root's block size (inline size is twice
  * that value); set it on the root or a caller-owned ancestor. Thumb geometry, material attributes
@@ -49,7 +54,7 @@ function Switch({
   inputRef,
   ref,
   ...props
-}: SwitchPrimitive.Root.Props) {
+}: SwitchProps) {
   const [internalChecked, setInternalChecked] = useState(defaultChecked);
   const isChecked = checked ?? internalChecked;
   const reduced = useReducedMotion();

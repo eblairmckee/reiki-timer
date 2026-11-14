@@ -1,10 +1,13 @@
 import { createElement, useEffect, useId, useState } from "react";
+import { catalog } from "../data/catalog";
 import { illustrations } from "../data/illustrations";
 import {
   type Illustration,
   parseIllustration,
   type VectorShape,
 } from "../services/illustration-svg";
+
+import "./card-illustration.css";
 
 function VectorNode({ shape }: { shape: VectorShape }) {
   if (!shape.outline) {
@@ -39,42 +42,45 @@ function FillNode({
   return fillRole === target ? createElement(shape.tag, shape.attributes) : null;
 }
 
-export function CardIllustration({ catalogCardId }: { catalogCardId: string }) {
+type ArtworkState =
+  | { status: "loading" }
+  | { status: "failed" }
+  | { status: "ready"; illustration: Illustration };
+
+function CardArtwork({ cardName, source }: { cardName: string; source: () => Promise<string> }) {
   const titleId = useId();
   const drawingId = useId();
-  const source = illustrations[catalogCardId];
-  const [artwork, setArtwork] = useState<{
-    id: string;
-    illustration?: Illustration;
-    failed?: boolean;
-  } | null>(null);
+  const [artwork, setArtwork] = useState<ArtworkState>({ status: "loading" });
   useEffect(() => {
-    if (!source) {
-      return;
-    }
     let current = true;
     source()
-      .then((raw) => parseIllustration(raw))
+      .then(parseIllustration)
       .then(
         (parsed) => {
           if (current) {
-            setArtwork({ id: catalogCardId, illustration: parsed });
+            setArtwork({ illustration: parsed, status: "ready" });
           }
         },
         () => {
           if (current) {
-            setArtwork({ failed: true, id: catalogCardId });
+            setArtwork({ status: "failed" });
           }
         }
       );
     return () => {
       current = false;
     };
-  }, [catalogCardId, source]);
-  const illustration = artwork?.id === catalogCardId ? artwork.illustration : undefined;
-  if (!illustration) {
-    return source ? <div aria-hidden="true" className="tarot-artwork" /> : null;
+  }, [source]);
+  if (artwork.status !== "ready") {
+    return (
+      <p className="tarot-artwork tarot-artwork-status" role="status">
+        {artwork.status === "loading"
+          ? `Loading illustration for ${cardName}…`
+          : `Illustration unavailable for ${cardName}.`}
+      </p>
+    );
   }
+  const { illustration } = artwork;
   return (
     <svg
       aria-labelledby={titleId}
@@ -100,4 +106,12 @@ export function CardIllustration({ catalogCardId }: { catalogCardId: string }) {
       <use className="tarot-artwork-ink" href={`#${drawingId}`} />
     </svg>
   );
+}
+
+export function CardIllustration({ catalogCardId }: { catalogCardId: string }) {
+  const card = catalog.find(({ id }) => id === catalogCardId);
+  const source = card && illustrations[card.id];
+  return card && source ? (
+    <CardArtwork cardName={card.defaultName} key={card.id} source={source} />
+  ) : null;
 }

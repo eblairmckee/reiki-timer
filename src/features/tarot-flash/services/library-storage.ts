@@ -3,6 +3,7 @@ import { correspondenceFields } from "../data/correspondences";
 import { createSeed, schemaVersion } from "../data/seed";
 import { addDefaultCorrespondences } from "../model/migrate-default-correspondences";
 import { addDefaultOtherNames } from "../model/migrate-default-other-names";
+import { migrateSchemaOneCard } from "../model/migrate-schema-one-card";
 import { replaceDefaultMeanings } from "../model/replace-default-meanings";
 import type {
   CardContent,
@@ -117,42 +118,13 @@ function readLibrary(value: unknown): StudyLibrary {
   return value;
 }
 function readCard(value: unknown, libraryId: string): LibraryCard {
-  if (!isLibraryCard(value, libraryId)) {
-    throw new LibraryStorageError(
-      "damaged",
-      "A saved card is damaged. Your stored content has been left untouched."
-    );
+  if (isLibraryCard(value, libraryId)) {
+    return value;
   }
-  return value;
-}
-
-/** Schema 1 stored the title among editable names and had an imagery-notes field.
- * Keep personal aliases and meanings; the catalog now owns the immutable title. */
-function migrateCard(value: unknown, libraryId: string): LibraryCard {
-  if (!(isObject(value) && isObject(value.content))) {
-    return readCard(value, libraryId);
-  }
-  const catalogCard = catalog.find((card) => card.id === value.catalogCardId);
-  const { names, imagery: _imagery, ...content } = value.content;
-  if (!(catalogCard && Array.isArray(names) && names.every((name) => typeof name === "string"))) {
-    throw new LibraryStorageError(
-      "damaged",
-      "A saved card is damaged. Your stored content has been left untouched."
-    );
-  }
-  const migrated = readCard(
-    {
-      ...value,
-      content: {
-        ...content,
-        otherNames: names.filter(
-          (name) => name.trim().toLowerCase() !== catalogCard.defaultName.toLowerCase()
-        ),
-      },
-    },
-    libraryId
+  throw new LibraryStorageError(
+    "damaged",
+    "A saved card is damaged. Your stored content has been left untouched."
   );
-  return { ...migrated, revision: crypto.randomUUID() };
 }
 
 function migrateDefaults(card: LibraryCard, previousVersion: number, updatedAt: string) {
@@ -179,7 +151,7 @@ async function prepareLibrary(tx: IDBTransaction, libraryId: string) {
   }
   const records: unknown[] = await request(cards.index("library").getAll(existing.id));
   const parsed = records.map((card) =>
-    previousVersion === 1 ? migrateCard(card, existing.id) : readCard(card, existing.id)
+    readCard(previousVersion === 1 ? migrateSchemaOneCard(card) : card, existing.id)
   );
   if (
     parsed.length !== catalog.length ||

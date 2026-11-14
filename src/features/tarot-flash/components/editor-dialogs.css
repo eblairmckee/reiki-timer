@@ -1,0 +1,36 @@
+@layer components {
+  .tarot-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ref-space-12);
+    justify-content: flex-end;
+    margin-block-start: var(--ref-space-24);
+  }
+  .tarot-conflict-dialog {
+    inline-size: min(44rem, calc(100% - 2rem));
+  }
+  .tarot-conflict-versions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ref-space-24);
+  }
+  .tarot-conflict-content {
+    font: var(--sys-font-body-md);
+  }
+  .tarot-conflict-content div {
+    margin-block: var(--ref-space-12);
+  }
+  .tarot-conflict-content dt {
+    font-weight: 600;
+  }
+  .tarot-conflict-content dd {
+    margin: var(--ref-space-4) 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  @media (max-width: 480px) {
+    .tarot-conflict-versions {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

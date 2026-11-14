@@ -40,7 +40,7 @@ Freeze this order for `/tarot-flash/{deckIndex}`:
 
 Within each suit, 1 is Ace; 11–14 are Page, Knight, Queen, King. Use Roman numerals for the title's catalog number/rank, with `0` for The Fool. Court quick-selection controls use icons; their numeric search equivalents remain 11–14. A URL index is never interpreted as the card's printed number in search.
 
-The catalog’s RWS name is the fixed title; title editing is outside MVP. Users may add alternative names without changing any identity, numeral, route, or asset association. Other names start empty.
+The catalog’s RWS name is the fixed title. The Other names field starts with the applicable Thoth aliases and is empty for cards without a distinct Thoth name. Users may add, edit, or remove aliases independently of card identity, numeral, route, and artwork. See [seed content](#seed-content).
 
 ## Contracts
 
@@ -80,7 +80,7 @@ interface CardMeaning {
 }
 
 interface CardContent {
-  otherNames: string[]; // Ordered personal aliases, shown as a subtitle and included in search.
+  otherNames: string[]; // Ordered editable aliases, shown as a subtitle and included in search.
   correspondences: Record<string, string[]>;
   meanings: {
     upright: CardMeaning;
@@ -107,7 +107,7 @@ Other names and correspondences are shared across orientations. Upright and reve
 
 For every catalog card, initialize:
 
-- `otherNames`: distinct Thoth names from [default-other-names.ts](../../src/features/tarot-flash/data/default-other-names.ts); the fixed title still comes from `CatalogCard.defaultName`.
+- `otherNames`: distinct Thoth aliases where applicable, from [default-other-names.ts](../../src/features/tarot-flash/data/default-other-names.ts).
 - `correspondences`: editable defaults from [default-correspondences.ts](../../src/features/tarot-flash/data/default-correspondences.ts).
 - `meanings.upright` and `meanings.reversed`: editable keywords from [default-keywords.ts](../../src/features/tarot-flash/data/default-keywords.ts), with empty notes in both orientations.
 - Stable library/card IDs, an initial revision, and valid timestamps.
@@ -143,21 +143,21 @@ Resolve the active local library at the feature boundary. All operations are asy
 
 | Operation | Contract |
 | --- | --- |
-| `initializeLibrary()` | Idempotently open/migrate the existing library or create the seed library with correspondence defaults on genuine first use. Return explicit initialization/storage/schema failures. |
+| `initializeLibrary()` | Open or migrate the existing library idempotently. Create the seed library and its sourced defaults on genuine first use. Return explicit initialization, storage, and schema failures. |
 | `getLibrary()` | Return library metadata and correspondence definitions. |
 | `listCards()` | Return the active library's saved card records, including cards with empty meanings. |
 | `getCard(catalogCardId)` | Return the active library's record for a catalog identity, or an explicit missing result. |
 | `saveCard(cardId, content, expectedRevision)` | Validate and save the whole content draft. Return the saved record or field validation, stale-revision conflict, missing-record, or storage failure. |
 
-Routes resolve `deckIndex` through the catalog, then read the corresponding library card by `catalogCardId`. Screens combine catalog identity, saved content, and illustration metadata; they do not persist a duplicate UI projection.
+Routes resolve `deckIndex` through the catalog, then read the corresponding library card by `catalogCardId`. The library hook starts with `listCards()` and updates its in-memory collection with each successfully loaded or saved record. Search aliases and keyword suggestions use that collection, so opening a card reflects edits saved by another tab. The screen combines catalog identity, saved content, and illustration metadata at render time.
 
 ### Persistence and drafts
 
 - Drafts contain all shared content and both meanings. Present `null` reversed content as empty editor fields without mutating storage.
 - Correspondence arrays remain storage-compatible. New Element selections come from Fire/Water/Air/Earth; Zodiac selections come from the twelve signs; Planet selections come from Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Older free-text values remain visible and removable, without being silently discarded on save. Keywords remain editable strings; the combobox derives suggestions from saved library meanings, including defaults, and supports new personal values.
-- Schema 2 replaces `names` with `otherNames` and removes `imagery`. Initialization migrates schema 1 in one transaction, removes the catalog title from aliases, preserves personal aliases/meanings/correspondences and all identities, and rotates revisions to reject stale saves. Invalid records abort the migration without partial writes; initialization never reseeds existing data.
-- Schema 3 adds correspondence defaults once to existing cards whose entire study content is blank. Preserve personalized cards in full, including blank fields, because earlier schemas have no per-field edit history. The schema 1 name migration runs first when needed. Apply defaults and the version change atomically, preserving identities and rotating revisions only for changed records; repeated initialization never reapplies defaults.
-- Schema 4 appends applicable Thoth aliases once, preserving existing names, spelling, ordering, and all other content. Deduplicate case-insensitively. Run earlier migrations in order only when upgrading their older schemas; never reapply correspondence defaults to schema 3. Rotate changed card revisions and commit the migration atomically. Later edits or removal of these aliases survive initialization.
+- Schema 2 replaces `names` with `otherNames` and removes `imagery`. The model removes entries matching the catalog title and carries forward personal aliases, meanings, correspondences, and card identities. The storage service validates the converted records before writing the migration. Invalid records abort the transaction without partial writes.
+- Schema 3 adds correspondence defaults once to existing cards whose entire study content is blank. Preserve personalized cards in full, including blank fields, because earlier schemas have no per-field edit history. Apply these defaults after the name conversion for schema 1 records.
+- Schema 4 appends applicable Thoth aliases once, preserving spelling, order, and other content. Compare names case-insensitively before adding an alias. Later edits or removal of these aliases survive initialization.
 - Schema 5 intentionally replaces all existing upright/reversed keywords with the sourced defaults and clears notes in both orientations, as authorized for the MVP's test content. Preserve card/library identity, aliases, and correspondences, including cleared values. Apply earlier migrations only to their relevant old schemas, then replace meanings and rotate card revisions in the same transaction. Repeated/concurrent initialization is idempotent; subsequent personal edits and cleared reversals survive reload.
 - Records without `planet` treat it as empty. Initialization adds missing Planet metadata. Saving includes its Planet array; missing and empty Planet values are equivalent for draft-change detection.
 - Explicit Save checks `expectedRevision` and writes the whole draft in one transaction, returning the new revision/timestamps. UI-only revision checks are insufficient.
@@ -167,7 +167,7 @@ Routes resolve `deckIndex` through the catalog, then read the corresponding libr
 
 ## Search contract
 
-Derive search from catalog titles and saved Other names, without a persisted search index or unsaved drafts. See [search behavior](product-brief.md#search-typing-and-buttons-together) for controls and presentation.
+Derive search at runtime from catalog titles and saved Other names. See [search behavior](product-brief.md#search-typing-and-buttons-together) for controls and presentation.
 
 - Match names case-insensitively with normalized whitespace. Support name prefixes/partial matches for autocomplete.
 - Normalize complete number tokens: Arabic, Roman, and spelled-out forms. `2 of swords`, `II of swords`, and `two of swords` identify the same catalog card. Recognize Ace/one and Page/Knight/Queen/King as ranks 1 and 11–14 respectively.
@@ -188,7 +188,7 @@ Keep study state separate from persisted interpretations:
 | Revealed fields | Current card view. Reset on card navigation or return from editing; keep shared reveals on reversal, reset orientation-specific reveals on every reversal. |
 | Search query/filter | Open search interaction; no persistent filter preferences or restriction of Shuffle. |
 | Visited cards | Current tab/library, retained across refreshes; separate from IndexedDB card records. |
-| Editor draft | Current edit interaction; retained across orientation toggles and failed saves, discarded only through explicit save/cancel/navigation policy. |
+| Editor draft | Owned by the card editor hook for the current edit interaction. Retained across orientation toggles and failed saves. Released after saving, canceling, or discarding before navigation. |
 
 Store visited catalog IDs in validated, library-scoped tab-session storage. Apply the [shuffle/reset rules](product-brief.md#shuffle-session). Failure to restore transient session data may start a fresh pass without changing saved interpretations.
 
@@ -208,7 +208,7 @@ Follow the separate [illustration prompt](illustration-prompt.md). Keep the 78 b
 | --- | --- |
 | `src/routes/` | Thin Tarot Flash route adapters outside the timer layout. |
 | `src/features/tarot-flash/model/` | Contracts, validation, search normalization, shuffle rules, and schema migrations. |
-| `src/features/tarot-flash/data/` | Fixed catalog, sourced correspondence defaults, versioned seed library, and illustration manifest. |
+| `src/features/tarot-flash/data/` | Fixed catalog, sourced defaults, versioned seed library, and illustration manifest. |
 | `src/features/tarot-flash/services/` | IndexedDB initialization/reads/writes, migration I/O, and tab-session storage. |
 | `src/features/tarot-flash/state/`, `hooks/` | Feature state and React lifetimes where needed. |
 | `src/features/tarot-flash/screens/`, `components/` | Route composition and tarot-specific UI. Reuse shared design-system public contracts. |

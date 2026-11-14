@@ -1,9 +1,9 @@
 @layer utilities {
-  [data-ui="input"],
+  [data-ui="input"]:not([data-appearance="frost"]),
   [data-ui="input-group-wrapper"],
   [data-ui="number-field-control-group"] {
     --surface-low: var(--sys-color-surface-container-low);
-    height: 36px;
+    height: var(--sys-size-control-height);
     background-color: var(--sys-color-surface-container-lowest);
     border: 1px solid var(--sys-color-surface-container-highest);
     border-radius: var(--ref-radius-md);
@@ -15,7 +15,7 @@
       color var(--sys-motion-control-feedback);
   }
 
-  [data-ui="input"]:focus-within,
+  [data-ui="input"]:not([data-appearance="frost"]):focus-within,
   [data-ui="input-group-wrapper"]:focus-within,
   [data-ui="number-field-control-group"]:has(input:focus-within) {
     border-color: var(--sys-color-primary);
@@ -23,7 +23,7 @@
       color-mix(in oklab, var(--sys-color-primary) 35%, transparent);
   }
 
-  [data-ui="input"]:disabled,
+  [data-ui="input"]:not([data-appearance="frost"]):disabled,
   [data-ui="input-group-wrapper"]:has(input:disabled),
   [data-ui="number-field-control-group"][data-disabled] {
     background-color: var(--surface-low);
@@ -31,7 +31,7 @@
     box-shadow: none;
   }
 
-  [data-ui="input"],
+  [data-ui="input"]:not([data-appearance="frost"]),
   [data-ui="input-group-wrapper"] {
     --icon-size: 16px;
     --inline-padding: var(--ref-space-10);
@@ -75,7 +75,7 @@
     }
   }
 
-  [data-ui="input"] {
+  [data-ui="input"]:not([data-appearance="frost"]) {
     padding-inline: var(--inline-padding);
   }
 }

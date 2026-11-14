@@ -15,7 +15,7 @@ function SelectTrigger({ children, ...props }: ComponentProps<typeof SelectPrimi
   return (
     <SelectPrimitive.Trigger data-ui="select-trigger" {...props}>
       {children}
-      <SelectPrimitive.Icon>
+      <SelectPrimitive.Icon data-ui="select-icon">
         <Icon icon={ArrowDown01Icon} />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>

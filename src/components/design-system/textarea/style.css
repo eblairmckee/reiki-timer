@@ -1,0 +1,22 @@
+@layer components {
+  [data-ui="textarea"] {
+    box-sizing: border-box;
+    display: block;
+    inline-size: 100%;
+    min-block-size: var(--sys-size-control-height);
+    padding: var(--ref-space-16) var(--ref-space-12);
+    font: var(--sys-font-body-lg);
+  }
+
+  @supports (resize: vertical) {
+    [data-ui="textarea"] {
+      resize: vertical;
+    }
+  }
+
+  @supports (field-sizing: content) {
+    [data-ui="textarea"] {
+      field-sizing: content;
+    }
+  }
+}

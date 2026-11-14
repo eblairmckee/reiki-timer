@@ -77,9 +77,13 @@ function visits() {
 }
 
 test("default upright and reversed keywords reveal separately and are editable", async () => {
-  records = structuredClone(seed.cards);
+  const [fool] = records;
+  const [seededFool] = seed.cards;
+  // Exercise both sourced meanings with a small suggestion list. The tag input's own
+  // tests cover typing and committing individual characters and suggestions.
+  fool.content.meanings = structuredClone(seededFool.content.meanings);
+  const original = structuredClone(fool.content.meanings);
   const { user } = await setup();
-  const original = structuredClone(records[0].content.meanings);
   expect(screen.queryByText(original.upright.keywords[0])).toBeTruthy();
   const region = screen.getByRole("region", { name: "Keywords" });
   expect(
@@ -91,10 +95,16 @@ test("default upright and reversed keywords reveal separately and are editable",
   ).toBeNull();
   await user.click(screen.getByRole("button", { name: "Reverse card" }));
   await user.click(screen.getByRole("button", { name: "Reveal keywords" }));
-  expect(within(region).getByText(original.reversed?.keywords[0] ?? "")).toBeTruthy();
+  expect(
+    within(region)
+      .getByText(original.reversed?.keywords[0] ?? "")
+      .closest("[aria-hidden='true']")
+  ).toBeNull();
   await user.click(screen.getByRole("button", { name: "Edit" }));
-  await screen.findByRole("combobox", { name: keywordLabel }, { timeout: 4000 });
-  await user.type(screen.getByRole("combobox", { name: keywordLabel }), "my interpretation{Enter}");
+  const keywords = await screen.findByRole("combobox", { name: keywordLabel }, { timeout: 4000 });
+  await user.click(keywords);
+  await user.paste("my interpretation");
+  await user.keyboard("{Enter}");
   await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByRole("button", { name: "Edit" });
   expect(records[0].content.meanings.reversed?.keywords).toContain("my interpretation");
@@ -157,9 +167,53 @@ test("search stays open for its controls and dismisses on outside pointer or foc
   await user.click(screen.getByRole("heading", { level: 1 }));
   expect(screen.queryByRole("searchbox")).toBeNull();
   await user.click(screen.getByRole("button", { name: "Search cards" }));
-  await user.tab();
-  await user.tab();
+  act(() => screen.getByRole("heading", { level: 1 }).focus());
   await waitFor(() => expect(screen.queryByRole("searchbox")).toBeNull());
+});
+
+test("card actions live in footer groups with one primary action in each mode", async () => {
+  const { user, container } = await setup();
+  expect(container.querySelector(".tarot-header button")).toBeNull();
+  const study = screen.getByRole("group", { name: "Card actions" });
+  expect(study.closest("footer")).not.toBeNull();
+  expect(
+    within(study)
+      .getAllByRole("button")
+      .map((button) => button.getAttribute("aria-label"))
+  ).toEqual(["Edit", "Reverse card", "Shuffle"]);
+  expect(within(study).getByRole("button", { name: "Edit" }).getAttribute("data-appearance")).toBe(
+    "secondary"
+  );
+  expect(
+    within(study).getByRole("button", { name: "Reverse card" }).getAttribute("data-appearance")
+  ).toBe("secondary");
+  expect(
+    within(study).getByRole("button", { name: "Shuffle" }).getAttribute("data-appearance")
+  ).toBe("primary");
+  await user.click(screen.getByRole("button", { name: "Edit" }));
+  const editor = await screen.findByRole("group", { name: "Edit card actions" }, { timeout: 4000 });
+  expect(editor.closest("footer")).not.toBeNull();
+  expect(container.querySelector(".tarot-header button")).toBeNull();
+  expect(
+    within(editor)
+      .getAllByRole("button")
+      .map((button) => button.getAttribute("aria-label"))
+  ).toEqual(["Close editor", "Reverse card", "Save"]);
+  expect(
+    within(editor).getByRole("button", { name: "Close editor" }).getAttribute("data-appearance")
+  ).toBe("secondary");
+  expect(
+    within(editor).getByRole("button", { name: "Reverse card" }).getAttribute("data-appearance")
+  ).toBe("secondary");
+  expect(within(editor).getByRole("button", { name: "Save" }).getAttribute("data-appearance")).toBe(
+    "primary"
+  );
+  await user.click(within(editor).getByRole("button", { name: "Reverse card" }));
+  expect(
+    within(editor).getByRole("button", { name: "Reverse card" }).getAttribute("aria-pressed")
+  ).toBe("true");
+  await user.click(within(editor).getByRole("button", { name: "Close editor" }));
+  await screen.findByRole("button", { name: "Edit" }, { timeout: 4000 });
 });
 
 test("seeded correspondences reveal while blank meanings still require an upright keyword", async () => {
@@ -301,7 +355,7 @@ test("storage failures preserve the full draft and retry saves it", async () => 
 });
 
 test("pending saves reject duplicate activation and obsolete results cannot update another card", async () => {
-  const { user, unmount } = await setup();
+  const { user, router } = await setup();
   let complete: (result: SaveResult) => void = () => {
     throw new Error("Save has not started");
   };
@@ -315,8 +369,16 @@ test("pending saves reject duplicate activation and obsolete results cannot upda
   await user.dblClick(screen.getByRole("button", { name: "Save" }));
   expect(service.saveCard).toHaveBeenCalledTimes(1);
   expect(screen.getByRole("button", { name: "Saving…" }).hasAttribute("disabled")).toBe(true);
-  unmount();
-  await setup("/tarot-flash/2");
+  await act(async () => {
+    await router.navigate({
+      ignoreBlocker: true,
+      params: { deckIndex: "2" },
+      to: "/tarot-flash/$deckIndex",
+    });
+  });
+  await user.click(await screen.findByRole("button", { name: "Edit" }, { timeout: 4000 }));
+  await screen.findByRole("combobox", { name: "Other names" }, { timeout: 4000 });
+  await user.type(screen.getByRole("combobox", { name: keywordLabel }), "current draft{Enter}");
   await act(async () => {
     complete({
       card: {
@@ -330,6 +392,7 @@ test("pending saves reject duplicate activation and obsolete results cannot upda
   });
   expect(screen.getByRole("heading", { level: 1, name: "I The Magician" })).toBeTruthy();
   expect(screen.queryByText("Obsolete card result")).toBeNull();
+  expect(screen.getByRole("button", { name: "Remove current draft" })).toBeTruthy();
 });
 
 test("invalid card paths have an explicit recovery route", async () => {
@@ -372,6 +435,30 @@ test("stale saves do not overwrite newer content and explicit replacement uses t
   await screen.findByRole("button", { name: "Search cards" }, { timeout: 4000 });
   expect(records[0].content.meanings.upright.keywords).toEqual(["my draft"]);
   expect(vi.mocked(service.saveCard).mock.calls.at(-1)?.[2]).toBe("newer");
+});
+
+test("a dismissed conflict can be reopened and the saved version restores study mode", async () => {
+  const { user } = await setup();
+  await user.click(screen.getByRole("button", { name: "Edit" }));
+  const keywords = await screen.findByRole("combobox", { name: keywordLabel }, { timeout: 4000 });
+  await user.type(keywords, "my draft{Enter}");
+  const [fool] = records;
+  const savedAlias = "The Outsider";
+  records[0] = {
+    ...fool,
+    content: { ...fool.content, otherNames: [savedAlias] },
+    revision: "other-tab",
+  };
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  const dialog = await screen.findByRole("dialog");
+  await user.click(within(dialog).getByRole("button", { name: "Keep editing" }));
+  expect(screen.getByRole("button", { name: "Remove my draft" })).toBeTruthy();
+  await user.click(screen.getByRole("button", { name: "Review versions" }));
+  await user.click(await screen.findByRole("button", { name: "Use saved version" }));
+  const edit = await screen.findByRole("button", { name: "Edit" }, { timeout: 4000 });
+  expect(screen.getByText(savedAlias)).toBeTruthy();
+  expect(document.activeElement).toBe(edit);
+  expect(service.saveCard).toHaveBeenCalledTimes(1);
 });
 
 test("other names and comma-delimited keywords save without changing the fixed title", async () => {
@@ -424,6 +511,11 @@ test("search keeps its button identity and can reopen while its rows are closing
 });
 
 test("the footer survives shuffling and a late card load cannot interrupt a newer search", async () => {
+  const [, magician] = records;
+  sessionStorage.setItem(
+    `tarot-flash:visited:v1:${seed.library.id}`,
+    JSON.stringify(records.filter((card) => card !== magician).map((card) => card.catalogCardId))
+  );
   const { user, router } = await setup();
   const shuffle = screen.getByRole("button", { name: "Shuffle" });
   const footer = shuffle.closest("footer");
@@ -448,13 +540,55 @@ test("the footer survives shuffling and a late card load cannot interrupt a newe
   expect(document.activeElement).toBe(input);
   expect((input as HTMLInputElement).value).toBe("two of cups");
   await act(async () => {
-    finish(records[1]);
+    finish(magician);
     await delayed;
   });
   expect(screen.getByRole("heading", { level: 1, name: "II The High Priestess" })).toBeTruthy();
   expect(screen.getByRole("searchbox")).toBe(input);
   await user.keyboard("{Escape}");
   expect(screen.getByRole("button", { name: "Shuffle" })).toBe(shuffle);
+});
+
+test("opening a card reconciles edits from another tab into search and keyword suggestions", async () => {
+  const { user, router } = await setup();
+  const alias = "The Astrologer";
+  const keyword = "stargazing";
+  await user.click(screen.getByRole("button", { name: "Search cards" }));
+  const input = screen.getByRole("searchbox", { name: "Search cards" });
+  await user.type(input, alias);
+  expect(screen.getByRole("button", { name: "Open suggested card" }).hasAttribute("disabled")).toBe(
+    true
+  );
+
+  const [, magician] = records;
+  records[1] = {
+    ...magician,
+    content: {
+      ...magician.content,
+      meanings: { reversed: null, upright: { keywords: [keyword], notes: "" } },
+      otherNames: [alias],
+    },
+    revision: "other-tab",
+  };
+  await act(async () => {
+    await router.navigate({ params: { deckIndex: "2" }, to: "/tarot-flash/$deckIndex" });
+  });
+  await screen.findByRole("heading", { level: 1, name: "I The Magician" });
+  expect(document.activeElement).toBe(input);
+  expect(screen.getByRole("button", { name: "Open suggested card" }).hasAttribute("disabled")).toBe(
+    false
+  );
+  expect(
+    vi.mocked(service.getCard).mock.calls.filter(([id]) => id === magician.catalogCardId)
+  ).toHaveLength(1);
+
+  await user.keyboard("{Escape}");
+  await act(async () => router.history.back());
+  await screen.findByRole("heading", { level: 1, name: "0 The Fool" });
+  await user.click(screen.getByRole("button", { name: "Edit" }));
+  const keywords = await screen.findByRole("combobox", { name: keywordLabel }, { timeout: 4000 });
+  await user.type(keywords, "starg");
+  expect(await screen.findByRole("option", { name: keyword })).toBeTruthy();
 });
 
 test("a failed card load keeps the footer available and retry opens the requested card", async () => {

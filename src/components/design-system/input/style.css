@@ -1,0 +1,10 @@
+@layer components {
+  [data-ui="input"][data-appearance="frost"] {
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0;
+    block-size: var(--sys-size-control-height);
+    padding-inline: var(--ref-space-12)
+      var(--cmp-space-input-inline-end, var(--ref-space-12));
+  }
+}

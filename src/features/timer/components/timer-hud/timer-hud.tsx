@@ -2,7 +2,7 @@ import type { ReactNode, RefObject } from "react";
 import { EditIcon, ExitIcon, PauseIcon, PlayIcon, ResetIcon } from "@/components/atoms/icons";
 import { Button } from "@/components/design-system/button";
 import { ButtonGroupSeparator } from "@/components/design-system/button-group";
-import { ControlSurface } from "@/components/organisms/control-surface";
+import { ControlSurface } from "@/components/molecules/control-surface";
 
 import "./style.css";
 
@@ -51,6 +51,7 @@ export function TimerHud({
   const action = actions[mode];
   const primary = (
     <Button
+      appearance="primary"
       aria-label={action.label}
       disabled={hidden}
       iconOnly
@@ -69,6 +70,7 @@ export function TimerHud({
       {showSessionActions === true && (
         <>
           <Button
+            appearance="secondary"
             aria-haspopup="dialog"
             aria-label="Finish timer"
             iconOnly
@@ -79,7 +81,13 @@ export function TimerHud({
             <ExitIcon />
           </Button>
           <ButtonGroupSeparator aria-hidden="true" />
-          <Button aria-label="Edit timer" iconOnly onClick={onEdit} title="Edit timer">
+          <Button
+            appearance="secondary"
+            aria-label="Edit timer"
+            iconOnly
+            onClick={onEdit}
+            title="Edit timer"
+          >
             <EditIcon />
           </Button>
           {showRestart === true && <ButtonGroupSeparator aria-hidden="true" />}
@@ -87,6 +95,7 @@ export function TimerHud({
       )}
       {showRestart === true && (
         <Button
+          appearance="secondary"
           aria-label={restart.label}
           iconOnly
           onClick={restart.activate}

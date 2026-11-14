@@ -1,10 +1,3 @@
-@layer tokens {
-  :root {
-    --cmp-motion-button-reshape: 420ms ease-in-out;
-    --cmp-motion-button-hint: 1.4s ease-in-out 3s;
-  }
-}
-
 @layer components {
   [data-ui="button"] {
     --svg-size: 18px;
@@ -237,47 +230,16 @@
   }
 }
 
-@layer utilities {
-  [data-ui="button"][data-appearance="liquid"] {
-    --cmp-radius-button-word: var(--ref-radius-rounded);
-    --sys-color-frost-fill: var(--sys-color-frost-reveal);
-    --sys-color-frost-fallback: var(--cmp-color-choice-popup-fill);
-    color: var(--sys-color-ink-on-atmosphere);
-    box-shadow: inset 0 0 0 1px var(--sys-color-well-light);
-    [data-frost] {
-      padding-inline: var(--ref-space-16);
-      box-shadow:
-        inset 0 1px 1px var(--sys-color-well-light),
-        0 3px 10px var(--sys-color-frost-shade);
-    }
-  }
-  [data-ui="button"][data-appearance="secondary"] {
-    --sys-color-frost-fill: var(--sys-color-frost-reveal);
-    background: var(--sys-color-well-fill);
-    box-shadow: inset 0 0 0 1px var(--sys-color-well-light);
-    [data-frost] {
-      box-shadow: inset 0 1px 0 var(--sys-color-well-light);
-    }
-    &[aria-pressed="true"] {
-      --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
-    }
-  }
-}
-
 @layer components {
-  [data-ui="button"]:is(
-    [data-appearance="frost"],
-    [data-appearance="inset"],
-    [data-appearance="secondary"],
-    [data-appearance="liquid"]
-  ) {
+  [data-ui="button"][data-frost-control] {
     /* Root well inset; callers never target the moving face. */
     --button-face-inset: var(--cmp-space-button-frost-inset, 0px);
+    --button-well: var(--sys-color-well-fill);
     /* Standard word height; large words intentionally use the fixed height below. */
     height: var(--cmp-size-button-frost-height, 2.75rem);
     padding: var(--button-face-inset);
     color: var(--sys-color-ink-on-glass);
-    background: var(--sys-color-well-fill);
+    background: var(--button-well);
     border: 0;
     /* Root radius also shapes the inherited face and its lighting. */
     border-radius: var(--cmp-radius-button-word, 0.3rem);
@@ -301,15 +263,20 @@
         z-index: -1;
       }
     }
-    &[data-icon-only="false"]:not([data-appearance="liquid"]) {
-      --sys-color-frost-fill: var(--cmp-color-button-word-fill);
-      --sys-color-frost-fallback: var(--ref-color-paper);
+    &[data-icon-only="false"] {
       [data-ripple="release"] {
         background: none;
         box-shadow:
           0 0 0 1px var(--sys-color-ripple-light),
           0 0 8px var(--sys-color-ripple-diffusion);
       }
+    }
+    &:is(
+        [data-appearance="frost"],
+        [data-appearance="inset"]
+      )[data-icon-only="false"] {
+      --sys-color-frost-fill: var(--cmp-color-button-word-fill);
+      --sys-color-frost-fallback: var(--ref-color-paper);
     }
     &[data-icon-only="false"][data-size="lg"] {
       min-width: 7rem;
@@ -320,10 +287,10 @@
     }
     &[data-icon-only="true"] {
       /* Icon dimensions are root hooks; data-size does not resize frost icons. */
-      width: var(--cmp-size-button-icon, 3rem);
+      width: var(--cmp-size-button-icon, var(--sys-size-control-height));
       height: var(
         --cmp-size-button-frost-height,
-        var(--cmp-size-button-icon, 3rem)
+        var(--cmp-size-button-icon, var(--sys-size-control-height))
       );
       border-radius: var(--cmp-radius-button-icon, var(--ref-radius-circled));
       transition: border-radius var(--cmp-motion-button-reshape);
@@ -337,9 +304,13 @@
       }
     }
     &:focus-visible {
-      outline: var(--sys-size-focus-ring) solid var(--sys-color-focus);
+      outline: var(--sys-size-focus-ring) solid
+        var(--button-focus-color, var(--sys-color-focus));
       /* Groups inset the root focus ring without changing button internals. */
-      outline-offset: var(--cmp-space-button-focus-offset, 5px);
+      outline-offset: var(
+        --cmp-space-button-focus-offset,
+        var(--button-focus-offset, 5px)
+      );
     }
     &:disabled {
       cursor: default;
@@ -358,15 +329,67 @@
     &[data-appearance="inset"][data-icon-only="true"] {
       --button-face-inset: var(
         --cmp-space-button-frost-inset,
-        calc(var(--cmp-size-button-icon, 3rem) * var(--sys-ratio-frost-inset))
+        calc(
+          var(--cmp-size-button-icon, var(--sys-size-control-height)) *
+          var(--sys-ratio-frost-inset)
+        )
       );
     }
-    &[aria-pressed="true"] {
+    &:is(
+        [data-appearance="frost"],
+        [data-appearance="inset"]
+      )[aria-pressed="true"] {
       --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
       /* Keep white glyphs legible as the selected face catches more light. */
-      background: var(--sys-color-well-shade);
+      --button-well: var(--sys-color-well-shade);
       &[data-icon-only="false"] {
         --sys-color-frost-fill: var(--sys-color-glass-fill);
+      }
+    }
+    &[data-appearance="primary"] {
+      --button-focus-color: var(--sys-color-ink-on-glass);
+      --button-focus-offset: -4px;
+      --sys-color-frost-fill: var(--sys-color-action-glass-primary);
+      --sys-color-frost-fallback: var(
+        --sys-color-action-glass-primary-fallback
+      );
+      [data-ink="control"] {
+        color: inherit;
+      }
+      &[aria-pressed="true"] {
+        --sys-color-frost-fill: var(--sys-color-action-glass-primary-selected);
+        --sys-color-frost-fallback: var(
+          --sys-color-action-glass-primary-selected-fallback
+        );
+      }
+    }
+    &[data-appearance="secondary"] {
+      --button-focus-color: var(--sys-color-ink-on-frost);
+      --sys-color-frost-fill: var(--sys-color-action-glass-secondary);
+      &[aria-pressed="true"] {
+        --button-well: var(--sys-color-well-shade);
+        --sys-color-frost-fill: var(--sys-color-frost-fill-selected);
+      }
+    }
+    &[data-appearance="liquid"][data-icon-only="false"] {
+      --button-well: transparent;
+      --button-liquid-ink: var(--sys-color-ink-on-frost-field);
+      --button-focus-color: var(--button-liquid-ink);
+      --cmp-radius-button-word: var(--ref-radius-rounded);
+      --frost-face-background: var(--cmp-surface-tag-fill);
+      box-shadow: none;
+      [data-frost] {
+        padding-inline: var(--ref-space-16);
+        color: var(--button-liquid-ink);
+        border: var(--cmp-border-tag);
+        box-shadow: var(--cmp-shadow-tag);
+      }
+      @media (forced-colors: active) {
+        --button-liquid-ink: ButtonText;
+        [data-frost] {
+          border-color: ButtonText;
+          box-shadow: none;
+        }
       }
     }
     &[aria-pressed="true"]::after {
@@ -379,6 +402,9 @@
       scale: 1.04;
     }
     @media (forced-colors: active) {
+      &:focus-visible {
+        outline-color: Highlight;
+      }
       &[aria-pressed="true"]::after {
         border: 2px solid Highlight;
       }
@@ -498,10 +524,7 @@
         transition: none;
       }
     }
-    [data-ui="button"]:is(
-        [data-appearance="frost"],
-        [data-appearance="inset"]
-      )[data-icon-only="true"] {
+    [data-ui="button"][data-frost-control][data-icon-only="true"] {
       transition: none;
     }
     [data-ui="button"][data-appearance][data-activation-hint]

@@ -1,0 +1,54 @@
+@layer components {
+  .tarot-artwork {
+    display: block;
+    inline-size: 100%;
+    block-size: clamp(10rem, 30svh, 17rem);
+    margin-block-end: var(--ref-space-16);
+    overflow: visible;
+  }
+  .tarot-artwork-status {
+    display: grid;
+    place-items: center;
+    padding: var(--ref-space-16);
+    font: var(--sys-font-body-md);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .tarot-artwork-ink {
+    opacity: var(--tarot-stroke-opacity, 0.7);
+    filter: drop-shadow(
+      0 0 var(--tarot-edge-glow, 0px)
+        var(--tarot-ink, var(--cmp-color-tarot-illustration-fill))
+    );
+    stroke: var(--tarot-ink, var(--cmp-color-tarot-illustration-fill));
+    stroke-width: var(--tarot-stroke-width, 2.25);
+  }
+  .tarot-artwork-fills {
+    fill: var(--cmp-color-tarot-illustration-fill);
+  }
+  .tarot-artwork-fills[data-fill="secondary"] {
+    opacity: var(--tarot-secondary-fill-opacity, 0.2);
+  }
+  .tarot-artwork-fills[data-fill="primary"] {
+    opacity: var(--tarot-primary-fill-opacity, 0.65);
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .tarot-artwork-ink {
+      opacity: 1;
+      filter: none;
+      stroke: var(--sys-color-ink-on-atmosphere);
+    }
+    .tarot-artwork-fills {
+      fill: var(--sys-color-ink-on-atmosphere);
+    }
+  }
+  @media (forced-colors: active) {
+    .tarot-artwork-ink {
+      filter: none;
+      stroke: CanvasText;
+    }
+    .tarot-artwork-fills {
+      fill: CanvasText;
+    }
+  }
+}

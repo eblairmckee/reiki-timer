@@ -22,7 +22,7 @@ export function CorrespondenceValue({
     <span className="tarot-correspondence-value" title={value}>
       {Boolean(isElement) && <ElementSymbol element={value} />}
       {icon !== undefined && <Icon className="tarot-correspondence-symbol" icon={icon} />}
-      <span className={iconOnly && hasIcon ? "tarot-sr-only" : undefined}>{value}</span>
+      <span className={iconOnly && hasIcon ? "visually-hidden" : undefined}>{value}</span>
     </span>
   );
 }

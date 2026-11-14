@@ -3,7 +3,16 @@ import "../shared/recessed-frost.css";
 import "./style.css";
 import type { AnimationPlaybackControls } from "motion";
 import { motion, useMotionValue, useTransform } from "motion/react";
-import { type KeyboardEvent, type PointerEvent, useEffect, useId, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type PointerEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { settleMotionValue } from "../shared/settle-motion-value";
 import { useFrostMotion } from "../shared/use-frost-motion";
@@ -27,7 +36,7 @@ export interface DialProps {
   onValueChange: (value: number) => void;
   /** Positive finite increment, relative to min. Defaults to 1; (max - min) must be a whole number of steps. */
   step?: number;
-  /** Controlled numeric value; caller updates it after change requests. */
+  /** Controlled numeric value. The dial returns to this value when a gesture ends. */
   value: number;
 }
 interface Drag {
@@ -35,7 +44,6 @@ interface Drag {
   centerX: number;
   centerY: number;
   id: number;
-  initial: number;
   lastAngle: number;
   moved: boolean;
   x: number;
@@ -135,7 +143,8 @@ export function Dial({
   const rootRef = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag | null>(null);
   const [preview, setPreview] = useState<number | null>(null);
-  const angle = useMotionValue(((value - origin) / extent) * 360);
+  const controlledAngle = ((value - origin) / extent) * 360;
+  const angle = useMotionValue(controlledAngle);
   const valueLeft = useTransform(angle, (degrees) => {
     const radial = Math.sin((degrees * Math.PI) / 180);
     return `calc(${50 + radial * 50}% + ${radial} * var(--cmp-space-dial-value-gap, 1.5rem))`;
@@ -147,7 +156,7 @@ export function Dial({
   const animation = useRef<AnimationPlaybackControls | null>(null);
   const reduced = useReducedMotion();
   const feedback = useFrostMotion({ disabled });
-  const displayed = preview ?? value;
+  const displayed = disabled ? value : (preview ?? value);
 
   function toAngle(nextValue: number) {
     return ((nextValue - origin) / extent) * 360;
@@ -155,33 +164,43 @@ export function Dial({
   function toValue(degrees: number) {
     return range.snap(origin + (degrees / 360) * extent);
   }
-  function settle(nextValue: number) {
-    animation.current = settleMotionValue(angle, toAngle(nextValue), reduced, animation.current);
-  }
+  const settle = useCallback(() => {
+    animation.current = settleMotionValue(angle, controlledAngle, reduced, animation.current);
+  }, [angle, controlledAngle, reduced]);
 
   useEffect(() => {
     if (!drag.current) {
-      const target = ((value - origin) / extent) * 360;
-      animation.current = settleMotionValue(angle, target, reduced, animation.current);
+      settle();
     }
     return () => animation.current?.stop();
-  }, [value, origin, extent, reduced, angle]);
+  }, [settle]);
+
+  const endDrag = useCallback(() => {
+    const { current } = drag;
+    if (!current) {
+      return;
+    }
+    drag.current = null;
+    setPreview(null);
+    const root = rootRef.current;
+    root?.removeAttribute("data-dragging");
+    if (root?.hasPointerCapture?.(current.id)) {
+      root.releasePointerCapture(current.id);
+    }
+    settle();
+  }, [settle]);
+
+  useLayoutEffect(() => {
+    if (disabled) {
+      endDrag();
+    }
+  }, [disabled, endDrag]);
 
   function pointAngle(x: number, y: number, centerX: number, centerY: number) {
     return (Math.atan2(x - centerX, centerY - y) * 180) / Math.PI;
   }
-  function cancel() {
-    if (!drag.current) {
-      return;
-    }
-    const { initial } = drag.current;
-    drag.current = null;
-    setPreview(null);
-    rootRef.current?.removeAttribute("data-dragging");
-    settle(initial);
-  }
   function begin(event: PointerEvent<HTMLDivElement>) {
-    if (disabled || event.button !== 0 || event.isPrimary === false) {
+    if (disabled || drag.current || event.button !== 0 || event.isPrimary === false) {
       return;
     }
     event.preventDefault(); // The native range supplies semantics; this control uses angular input.
@@ -195,7 +214,6 @@ export function Dial({
       centerX,
       centerY,
       id: event.pointerId,
-      initial: value,
       lastAngle: pointAngle(event.clientX, event.clientY, centerX, centerY),
       moved: false,
       x: event.clientX,
@@ -236,18 +254,12 @@ export function Dial({
       const clockwise = (raw + 360) % 360;
       next = toValue(clockwise === 0 ? 360 : clockwise);
       if (Math.hypot(event.clientX - current.centerX, event.clientY - current.centerY) < 20) {
-        next = current.initial;
+        next = value;
       }
     }
-    drag.current = null;
-    event.currentTarget.removeAttribute("data-dragging");
-    setPreview(null);
-    onValueChange(next);
-    settle(next);
     feedback.onPointerUp(event);
-    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
+    endDrag();
+    onValueChange(next);
   }
   function keyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (disabled) {
@@ -276,7 +288,7 @@ export function Dial({
         next = max;
         break;
       case "Escape":
-        cancel();
+        endDrag();
         return;
       default:
         return;
@@ -295,12 +307,16 @@ export function Dial({
         ref={rootRef}
         {...feedback}
         onLostPointerCapture={(event) => {
-          cancel();
-          feedback.onLostPointerCapture(event);
+          if (drag.current?.id === event.pointerId) {
+            endDrag();
+            feedback.onLostPointerCapture(event);
+          }
         }}
         onPointerCancel={(event) => {
-          cancel();
-          feedback.onPointerCancel(event);
+          if (drag.current?.id === event.pointerId) {
+            endDrag();
+            feedback.onPointerCancel(event);
+          }
         }}
         onPointerDown={begin}
         onPointerMove={move}
@@ -332,7 +348,11 @@ export function Dial({
           id={id}
           max={max}
           min={min}
-          onChange={(event) => onValueChange(range.snap(Number(event.target.value)))}
+          onChange={(event) => {
+            if (!disabled) {
+              onValueChange(range.snap(Number(event.target.value)));
+            }
+          }}
           onKeyDown={keyDown}
           ref={inputRef}
           step={step}
