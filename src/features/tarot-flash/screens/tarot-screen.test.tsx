@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { StrictMode } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
 import { routeTree } from "@/routeTree.gen";
-import { createSeed } from "../data/seed";
+import { createSeed, emptyContent } from "../data/seed";
 import type { LibraryCard, SaveResult, TarotService } from "../model/types";
 import { normalizeContent, validateDraft } from "../model/validation";
 import { createTarotService } from "../services/library-storage";
@@ -20,6 +20,10 @@ let records: LibraryCard[];
 let service: TarotService;
 beforeEach(() => {
   records = structuredClone(seed.cards);
+  // Existing editing/validation journeys exercise deliberately blank user meanings.
+  for (const card of records) {
+    card.content.meanings = emptyContent().meanings;
+  }
   sessionStorage.clear();
   service = {
     close: vi.fn(),
@@ -71,6 +75,31 @@ async function setup(path = "/tarot-flash/1") {
 function visits() {
   return JSON.parse(sessionStorage.getItem(`tarot-flash:visited:v1:${seed.library.id}`) ?? "[]");
 }
+
+test("default upright and reversed keywords reveal separately and are editable", async () => {
+  records = structuredClone(seed.cards);
+  const { user } = await setup();
+  const original = structuredClone(records[0].content.meanings);
+  expect(screen.queryByText(original.upright.keywords[0])).toBeTruthy();
+  const region = screen.getByRole("region", { name: "Keywords" });
+  expect(
+    within(region).queryByText(original.upright.keywords[0])?.closest("[aria-hidden='true']")
+  ).toBeTruthy();
+  await user.click(screen.getByRole("button", { name: "Reveal keywords" }));
+  expect(
+    within(region).getByText(original.upright.keywords[0]).closest("[aria-hidden='true']")
+  ).toBeNull();
+  await user.click(screen.getByRole("button", { name: "Reverse card" }));
+  await user.click(screen.getByRole("button", { name: "Reveal keywords" }));
+  expect(within(region).getByText(original.reversed?.keywords[0] ?? "")).toBeTruthy();
+  await user.click(screen.getByRole("button", { name: "Edit" }));
+  await screen.findByRole("combobox", { name: keywordLabel }, { timeout: 4000 });
+  await user.type(screen.getByRole("combobox", { name: keywordLabel }), "my interpretation{Enter}");
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  await screen.findByRole("button", { name: "Edit" });
+  expect(records[0].content.meanings.reversed?.keywords).toContain("my interpretation");
+  expect(records[0].content.meanings.upright).toEqual(original.upright);
+});
 
 test("fixed correspondences and personal keyword chips save through the shared draft", async () => {
   // Records saved before Planet was introduced must still open and edit.
@@ -133,10 +162,13 @@ test("search stays open for its controls and dismisses on outside pointer or foc
   await waitFor(() => expect(screen.queryByRole("searchbox")).toBeNull());
 });
 
-test("empty seeds open, validation points upright, and reversed notes save without reversed keywords", async () => {
+test("seeded correspondences reveal while blank meanings still require an upright keyword", async () => {
   const { user } = await setup();
   expect(screen.queryByRole("alert")).toBeNull();
-  expect(screen.queryByRole("region", { name: "Planet" })).toBeNull();
+  expect(screen.getByRole("button", { name: "Reveal planet" })).toBeTruthy();
+  expect(screen.queryByRole("region", { name: "Zodiac" })).toBeNull();
+  await user.click(screen.getByRole("button", { name: "Reveal planet" }));
+  expect(within(screen.getByRole("region", { name: "Planet" })).getByText("Uranus")).toBeTruthy();
   expect(await screen.findByRole("img")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Reveal symbology & imagery" })).toBeNull();
   await user.click(screen.getByRole("button", { name: "Edit" }));

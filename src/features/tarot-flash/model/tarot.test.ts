@@ -15,7 +15,7 @@ import {
 
 const seed = createSeed("library", "owner", "2026-11-13T00:00:00.000Z");
 
-test("all 78 identities, routes, and empty records are stable and unique", () => {
+test("all 78 identities and routes are stable, with keywords for both orientations", () => {
   expect(catalog).toHaveLength(78);
   expect(new Set(catalog.map((card) => card.id)).size).toBe(78);
   expect(catalog.map((card) => card.deckIndex)).toEqual(
@@ -38,9 +38,11 @@ test("all 78 identities, routes, and empty records are stable and unique", () =>
   expect(displayNumeral(catalog[8])).toBe("VIII");
   for (const card of seed.cards) {
     expect(isLibraryCard(card, seed.library.id)).toBe(true);
-    expect(card.content.meanings).toEqual({ reversed: null, upright: { keywords: [], notes: "" } });
-    expect(card.content.correspondences).toEqual({ element: [], planet: [], zodiac: [] });
-    expect(card.content.otherNames).toEqual([]);
+    expect(card.content.meanings.upright.keywords.length).toBeGreaterThan(0);
+    expect(card.content.meanings.reversed?.keywords.length).toBeGreaterThan(0);
+    expect(card.content.meanings.upright.notes).toBe("");
+    expect(card.content.meanings.reversed?.notes).toBe("");
+    expect(card.content.correspondences.element).toHaveLength(1);
   }
   expect(isLibrary(seed.library)).toBe(true);
 });

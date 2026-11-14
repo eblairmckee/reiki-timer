@@ -6,6 +6,7 @@ import { CardIllustration } from "./card-illustration";
 import { CardListField } from "./card-list-field";
 import { CorrespondenceSelect } from "./correspondence-select";
 import { CorrespondenceValue } from "./correspondence-value";
+import { StudyItem } from "./study-item";
 import { StudySection } from "./study-section";
 
 export type Reveals = ReadonlySet<string>;
@@ -37,7 +38,9 @@ export function StudyFields({
           >
             <div className="tarot-selected-correspondences">
               {(content.correspondences[field] ?? []).map((value) => (
-                <CorrespondenceValue field={field} key={value} value={value} />
+                <StudyItem className="tarot-correspondence-item" field={field} key={value}>
+                  <CorrespondenceValue field={field} value={value} />
+                </StudyItem>
               ))}
             </div>
           </StudySection>
@@ -51,9 +54,9 @@ export function StudyFields({
       >
         <div className="tarot-keywords">
           {[...new Set(meaning?.keywords ?? [])].map((word) => (
-            <span className="tarot-keyword" key={word}>
+            <StudyItem className="tarot-keyword" field="keywords" key={word}>
               {word}
-            </span>
+            </StudyItem>
           ))}
         </div>
       </StudySection>
@@ -63,7 +66,9 @@ export function StudyFields({
         populated={!!meaning?.notes}
         revealed={revealed.has("notes")}
       >
-        <p className="tarot-prose">{meaning?.notes}</p>
+        <StudyItem className="tarot-notes-item" field="notes">
+          <span className="tarot-prose">{meaning?.notes}</span>
+        </StudyItem>
       </StudySection>
     </>
   );

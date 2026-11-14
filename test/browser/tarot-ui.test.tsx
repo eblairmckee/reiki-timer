@@ -1,5 +1,5 @@
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import axe from "axe-core";
 import { afterEach, expect, test } from "vitest";
 import { cdp, page } from "vitest/browser";
@@ -9,6 +9,22 @@ import { browserAction, userEvent } from "./react-browser";
 import "@/app/styles/global.css";
 
 const originalViewport = { height: innerHeight, width: innerWidth };
+const revealName = /^Reveal /u;
+const removeKeywordName = /^Remove /u;
+
+async function clearUprightKeywords() {
+  const field = screen
+    .getByLabelText("Keywords", { exact: false })
+    .closest<HTMLElement>(".tarot-field");
+  if (!field) {
+    throw new Error("Missing keyword field");
+  }
+  const [remove] = within(field).queryAllByRole("button", { name: removeKeywordName });
+  if (remove) {
+    await userEvent.click(remove);
+    await clearUprightKeywords();
+  }
+}
 // This database is in Vitest's isolated Chromium profile and test-server origin.
 async function deleteTestLibrary() {
   await new Promise<void>((resolve, reject) => {
@@ -41,8 +57,10 @@ async function setup(viewTransitions = false) {
   content.otherNames = ["The Fool", "The traveler setting out into a world of possibility"];
 
   content.correspondences.element = ["Air"];
+  content.correspondences.planet = ["Uranus", "Mercury"];
+  content.correspondences.zodiac = ["Aries", "Leo", "Sagittarius"];
   content.meanings.upright = {
-    keywords: ["Beginnings", "Trust", "Curiosity"],
+    keywords: ["Beginnings", "Trust", "Curiosity", "Taking a leap into the unknown"],
     notes: "A personal interpretation with room to keep growing.\n".repeat(30),
   };
   await service.saveCard(card.id, content, card.revision);
@@ -69,23 +87,63 @@ test.each(["reduce", "no-preference"] as const)(
       })
     );
     const { router, container } = await setup();
-    const section = screen.getByRole("region", { name: "Element" });
-    const before = section.getBoundingClientRect().height;
+    await document.fonts.ready;
     const reveal = screen.getByRole("button", { name: "Reveal element" });
+    const mask = screen.getByRole("region", { name: "Element" }).querySelector(".tarot-study-mask");
+    if (!mask) {
+      throw new Error("Missing element skeleton");
+    }
     expect(await screen.findByRole("img")).toBeTruthy();
-    expect(getComputedStyle(reveal, "::before").animationName).toBe(
+    expect(getComputedStyle(mask, "::before").animationName).toBe(
       motion === "reduce" ? "none" : "tarot-shimmer"
     );
     if (motion === "no-preference") {
-      expect(getComputedStyle(reveal, "::before").animationDuration).toBe("28s");
+      expect(getComputedStyle(mask, "::before").animationDuration).toBe("28s");
     }
+    const items = [...container.querySelectorAll(".tarot-study-item")];
+    const before = items.map((item) => item.getBoundingClientRect().toJSON());
+    const hints = container.querySelectorAll(".tarot-study-hint");
+    expect(hints).toHaveLength(items.length);
+    for (const hint of hints) {
+      expect(Number(getComputedStyle(hint).opacity)).toBeGreaterThan(0);
+      expect(Number(getComputedStyle(hint).opacity)).toBeLessThan(0.35);
+    }
+    const keyword = container.querySelector(".tarot-keyword");
+    if (!keyword) {
+      throw new Error("Missing keyword skeleton");
+    }
+    expect(Number.parseFloat(getComputedStyle(keyword).borderRadius)).toBeGreaterThanOrEqual(
+      keyword.getBoundingClientRect().height / 2
+    );
     reveal.focus();
     await userEvent.keyboard("{Enter}");
     await waitFor(() =>
       expect(screen.queryByRole("button", { name: "Reveal element" })).toBeNull()
     );
-    expect(section.getBoundingClientRect().height).toBeCloseTo(before, 1);
-    expect(screen.getByRole("button", { name: "Reveal notes" })).toBeTruthy();
+    const answer = container.querySelector(".tarot-study-content");
+    if (!answer) {
+      throw new Error("Missing revealed content");
+    }
+    expect(getComputedStyle(answer).animationName).toBe(
+      motion === "reduce" ? "none" : "tarot-reveal-in"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Reveal planet" }));
+    await userEvent.click(screen.getByRole("button", { name: "Reveal zodiac" }));
+    await userEvent.click(screen.getByRole("button", { name: "Reveal keywords" }));
+    await userEvent.click(screen.getByRole("button", { name: "Reveal notes" }));
+    // Compare every item and its siblings: width, height, wrapping and downstream positions.
+    // Scroll can change after revealing the long notes; document coordinates stay stable.
+    expect(items.map((item) => item.getBoundingClientRect().width)).toEqual(
+      before.map((rect) => rect.width)
+    );
+    expect(items.map((item) => item.getBoundingClientRect().height)).toEqual(
+      before.map((rect) => rect.height)
+    );
+    const offsets = items.map(
+      (item) => item.getBoundingClientRect().top - items[0].getBoundingClientRect().top
+    );
+    expect(offsets).toEqual(before.map((rect) => rect.top - before[0].top));
+    expect(screen.queryByRole("button", { name: revealName })).toBeNull();
     expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(innerWidth + 1);
     const audit = await axe.run(container);
     expect(audit.violations.map((violation) => violation.id)).toEqual([]);
@@ -126,6 +184,7 @@ test("validation focus reaches the upright field after reversal in a reduced vie
   await screen.findByRole("heading", { level: 1, name: "I The Magician" });
   await userEvent.click(screen.getByRole("button", { name: "Edit" }));
   await screen.findByRole("combobox", { name: "Other names" }, { timeout: 4000 });
+  await clearUprightKeywords();
   await userEvent.click(screen.getByRole("button", { name: "Reverse card" }));
   await userEvent.click(screen.getByRole("button", { name: "Add an upright keyword to save." }));
   const keywords = screen.getByLabelText("Keywords", { exact: false });

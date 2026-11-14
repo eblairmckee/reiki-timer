@@ -1,6 +1,9 @@
 import { catalog } from "../data/catalog";
 import { correspondenceFields } from "../data/correspondences";
 import { createSeed, schemaVersion } from "../data/seed";
+import { addDefaultCorrespondences } from "../model/migrate-default-correspondences";
+import { addDefaultOtherNames } from "../model/migrate-default-other-names";
+import { replaceDefaultMeanings } from "../model/replace-default-meanings";
 import type {
   CardContent,
   LibraryCard,
@@ -152,18 +155,31 @@ function migrateCard(value: unknown, libraryId: string): LibraryCard {
   return { ...migrated, revision: crypto.randomUUID() };
 }
 
+function migrateDefaults(card: LibraryCard, previousVersion: number, updatedAt: string) {
+  const correspondences = previousVersion < 3 ? addDefaultCorrespondences(card) : card;
+  const aliases = previousVersion < 4 ? addDefaultOtherNames(correspondences) : correspondences;
+  return { ...replaceDefaultMeanings(aliases), revision: crypto.randomUUID(), updatedAt };
+}
+
 async function prepareLibrary(tx: IDBTransaction, libraryId: string) {
   const libraries = tx.objectStore("libraries");
   const cards = tx.objectStore("cards");
   const stored: unknown = await request(libraries.get(libraryId));
-  const migrating = isObject(stored) && stored.schemaVersion === 1;
-  const existing = readLibrary(migrating ? { ...stored, schemaVersion } : stored);
+  const previousVersion = isObject(stored) ? stored.schemaVersion : undefined;
+  const migrating =
+    previousVersion === 1 ||
+    previousVersion === 2 ||
+    previousVersion === 3 ||
+    previousVersion === 4;
+  const existing = readLibrary(
+    migrating && isObject(stored) ? { ...stored, schemaVersion } : stored
+  );
   if (existing.id !== libraryId) {
     throw new LibraryStorageError("damaged", "The saved library identity does not match.");
   }
   const records: unknown[] = await request(cards.index("library").getAll(existing.id));
   const parsed = records.map((card) =>
-    migrating ? migrateCard(card, existing.id) : readCard(card, existing.id)
+    previousVersion === 1 ? migrateCard(card, existing.id) : readCard(card, existing.id)
   );
   if (
     parsed.length !== catalog.length ||
@@ -189,7 +205,7 @@ async function prepareLibrary(tx: IDBTransaction, libraryId: string) {
     libraries.put(extended);
     if (migrating) {
       for (const card of parsed) {
-        cards.put(card);
+        cards.put(migrateDefaults(card, previousVersion, extended.updatedAt));
       }
     }
     return extended;

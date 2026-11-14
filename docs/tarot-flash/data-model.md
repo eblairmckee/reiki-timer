@@ -9,13 +9,13 @@ Use **repository seed data plus IndexedDB**. The deployed app reads and explicit
 - Data is scoped to the site's origin and browser profile. Localhost, deployment previews, and production have separate stores; there is no cross-device synchronization.
 - Browser storage can be cleared or evicted. Import/export, backup controls, authentication, and a remote backend are outside MVP.
 - Keep storage versioned. Initialize atomically and idempotently across tabs, creating starter records only on genuine first use.
-- Distinguish absent, damaged, unsupported, and unreadable data. Failed reads or newer deployments must never reset personal content to seed data.
+- Distinguish absent, damaged, unsupported, and unreadable data. Failed reads or unsupported versions must never reset personal content to seed data. Data replacement requires an explicit versioned migration.
 
 ## Entities and ownership
 
 | Entity | Responsibility |
 | --- | --- |
-| Card catalog | Immutable card identity, RWS default name, arcana/suit/rank, and fixed route order. No seeded meanings or correspondences. |
+| Card catalog | Immutable card identity, RWS default name, arcana/suit/rank, and fixed route order. Sourced study defaults live separately from identity. |
 | Study library | Local ownership, schema version, and correspondence definitions. One active library in MVP. |
 | Library card | Editable alternative names and study content for one catalog card within one library, plus revision and timestamps. |
 | Illustration manifest | Bundled SVG asset/renderer and descriptive alternative text, keyed by catalog ID. Separate from user edits. |
@@ -107,13 +107,20 @@ Other names and correspondences are shared across orientations. Upright and reve
 
 For every catalog card, initialize:
 
-- `otherNames`: an empty array; the title comes from `CatalogCard.defaultName`.
-- `correspondences`: empty element/zodiac/planet arrays.
-- `meanings.upright`: empty keywords and notes.
-- `meanings.reversed`: `null`.
+- `otherNames`: distinct Thoth names from [default-other-names.ts](../../src/features/tarot-flash/data/default-other-names.ts); the fixed title still comes from `CatalogCard.defaultName`.
+- `correspondences`: editable defaults from [default-correspondences.ts](../../src/features/tarot-flash/data/default-correspondences.ts).
+- `meanings.upright` and `meanings.reversed`: editable keywords from [default-keywords.ts](../../src/features/tarot-flash/data/default-keywords.ts), with empty notes in both orientations.
 - Stable library/card IDs, an initial revision, and valid timestamps.
 
-Artwork ships separately and does not populate editable study fields. Do not insert card names as placeholder keywords or seed researched meanings.
+Sources and coverage:
+
+- Keywords: the individual RWS meaning pages linked from [Labyrinthos's 78-card guide](https://labyrinthos.co/blogs/tarot-card-meanings-list), reviewed 2026-11-14. Each data entry records its exact source URL. Both orientations have published keyword tables for every card; no inferred fallbacks are needed. Remove duplicate/blank entries and formatting artifacts, correct obvious typos, and use a concise selection for Eight of Pentacles. These are general card keywords, not the separate love/career/finance lists. If a future source lacks a list, derive 2–3 keywords from its orientation-specific meaning and identify that provenance.
+- Other names: [Labyrinthos's tradition comparison](https://labyrinthos.co/blogs/learn-tarot-with-labyrinthos-academy/tarot-deck-types-rider-waite-smith-vs-marseille-vs-thoth). Seed the seven renamed major arcana, Page → Princess, Knight → Prince, King → Knight, and Pentacles → Disks. Combine court and suit changes; omit unchanged names. Keep the RWS identities, order, and numbering. This source's equivalence tables do not list pip epithets, so none are inferred.
+- Major arcana: [Tarot Elements](https://tarotelements.com/major-arcana-correspondences/), using the RWS sequence. Copy its element and its listed zodiac sign or planet; do not infer additional astrological rulers.
+- Minor arcana: [Labyrinthos](https://labyrinthos.co/blogs/learn-tarot-with-labyrinthos-academy/astrology-and-tarot-correspondences-the-minor-arcana-pip-cards). Every card receives its suit element. Ranks 2–10 receive the listed decan sign and planet; aces receive their element's three zodiac signs and no planet. Court zodiac and planet fields stay empty because this source does not assign them.
+- Defaults are copied into each library's editable card content. Clearing a default remains a saved choice; reads never fall back to bundled values.
+
+Artwork ships separately and does not populate editable study fields. Do not insert card names as placeholder keywords or copy meaning prose into notes.
 
 ## Validation and empty cards
 
@@ -126,7 +133,7 @@ Separate **stored-record validity** from **editor save validity**:
 | Reversed meaning | `null` means unconfigured. Either reversed keywords or notes may be entered independently; no reversed keyword requirement is introduced. Normalize both-empty content to `null` on save. |
 | Other names and list values | Trim list entries and ignore blanks. Free-entry controls commit on comma and split comma-separated paste, ignoring duplicates. The catalog title is always displayed/searchable independently of aliases. |
 
-The save rule applies to the whole draft, even when only a shared field or reversed meaning was edited. A blank starter card therefore opens normally, but entering its editor immediately shows the missing-upright-keyword error and disables Save.
+The save rule applies to the whole draft, even when only a shared field or reversed meaning was edited. Seeded keywords satisfy it. A stored card with no upright keywords remains viewable; its editor shows the missing-keyword error and disables Save until an upright keyword is added.
 
 Return field-addressable errors for orientation selection and focus. Validate runtime data as `unknown`; preserve valid empty values and report malformed records separately.
 
@@ -136,7 +143,7 @@ Resolve the active local library at the feature boundary. All operations are asy
 
 | Operation | Contract |
 | --- | --- |
-| `initializeLibrary()` | Idempotently open/migrate the existing library or create the empty seed library on genuine first use. Return explicit initialization/storage/schema failures. |
+| `initializeLibrary()` | Idempotently open/migrate the existing library or create the seed library with correspondence defaults on genuine first use. Return explicit initialization/storage/schema failures. |
 | `getLibrary()` | Return library metadata and correspondence definitions. |
 | `listCards()` | Return the active library's saved card records, including cards with empty meanings. |
 | `getCard(catalogCardId)` | Return the active library's record for a catalog identity, or an explicit missing result. |
@@ -147,13 +154,16 @@ Routes resolve `deckIndex` through the catalog, then read the corresponding libr
 ### Persistence and drafts
 
 - Drafts contain all shared content and both meanings. Present `null` reversed content as empty editor fields without mutating storage.
-- Correspondence arrays remain storage-compatible. New Element selections come from Fire/Water/Air/Earth; Zodiac selections come from the twelve signs; Planet selections come from Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Older free-text values remain visible and removable, without being silently discarded on save. Keywords remain user-authored strings; the combobox derives suggestions from saved library meanings and supports new values without seeding interpretations.
+- Correspondence arrays remain storage-compatible. New Element selections come from Fire/Water/Air/Earth; Zodiac selections come from the twelve signs; Planet selections come from Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Older free-text values remain visible and removable, without being silently discarded on save. Keywords remain editable strings; the combobox derives suggestions from saved library meanings, including defaults, and supports new personal values.
 - Schema 2 replaces `names` with `otherNames` and removes `imagery`. Initialization migrates schema 1 in one transaction, removes the catalog title from aliases, preserves personal aliases/meanings/correspondences and all identities, and rotates revisions to reject stale saves. Invalid records abort the migration without partial writes; initialization never reseeds existing data.
+- Schema 3 adds correspondence defaults once to existing cards whose entire study content is blank. Preserve personalized cards in full, including blank fields, because earlier schemas have no per-field edit history. The schema 1 name migration runs first when needed. Apply defaults and the version change atomically, preserving identities and rotating revisions only for changed records; repeated initialization never reapplies defaults.
+- Schema 4 appends applicable Thoth aliases once, preserving existing names, spelling, ordering, and all other content. Deduplicate case-insensitively. Run earlier migrations in order only when upgrading their older schemas; never reapply correspondence defaults to schema 3. Rotate changed card revisions and commit the migration atomically. Later edits or removal of these aliases survive initialization.
+- Schema 5 intentionally replaces all existing upright/reversed keywords with the sourced defaults and clears notes in both orientations, as authorized for the MVP's test content. Preserve card/library identity, aliases, and correspondences, including cleared values. Apply earlier migrations only to their relevant old schemas, then replace meanings and rotate card revisions in the same transaction. Repeated/concurrent initialization is idempotent; subsequent personal edits and cleared reversals survive reload.
 - Records without `planet` treat it as empty. Initialization adds missing Planet metadata. Saving includes its Planet array; missing and empty Planet values are equivalent for draft-change detection.
 - Explicit Save checks `expectedRevision` and writes the whole draft in one transaction, returning the new revision/timestamps. UI-only revision checks are insufficient.
 - Validation/storage failures and conflicts preserve the draft and saved content. Recovery must not silently overwrite newer data; Cancel restores the saved snapshot. There is no autosave.
 - Scope pending/error state and async results to their owning card/operation; obsolete completions must not update another screen.
-- Schema migrations preserve card IDs and user edits. New seed versions are not migrations and never reset existing content.
+- Schema migrations preserve card IDs. Apart from the explicitly authorized schema 5 test-content replacement, preserve user edits. New seed versions alone never reset existing content.
 
 ## Search contract
 
@@ -198,7 +208,7 @@ Follow the separate [illustration prompt](illustration-prompt.md). Keep the 78 b
 | --- | --- |
 | `src/routes/` | Thin Tarot Flash route adapters outside the timer layout. |
 | `src/features/tarot-flash/model/` | Contracts, validation, search normalization, shuffle rules, and schema migrations. |
-| `src/features/tarot-flash/data/` | Fixed catalog, versioned empty seed library, and illustration manifest. |
+| `src/features/tarot-flash/data/` | Fixed catalog, sourced correspondence defaults, versioned seed library, and illustration manifest. |
 | `src/features/tarot-flash/services/` | IndexedDB initialization/reads/writes, migration I/O, and tab-session storage. |
 | `src/features/tarot-flash/state/`, `hooks/` | Feature state and React lifetimes where needed. |
 | `src/features/tarot-flash/screens/`, `components/` | Route composition and tarot-specific UI. Reuse shared design-system public contracts. |

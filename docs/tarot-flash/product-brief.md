@@ -6,7 +6,7 @@ Build a mobile-first tarot study experience: open a card, recall its meaning, re
 
 The [original voice notes](archive/product-brief-voice-notes.md) describe the intended experience. Keep the UI limited to the requested card content and controls; do not add branding, onboarding, explanatory panels, empty-state messages, or other unsolicited UI. Retain the specific validation and recovery feedback required below.
 
-- Ship all 78 Rider–Waite–Smith (RWS) cards with names, numbers, and illustrations. All user-authored study fields start empty; do not seed meanings or placeholder keywords.
+- Ship all 78 Rider–Waite–Smith (RWS) cards with names, numbers, and illustrations. Include editable Thoth aliases, element/zodiac/planet defaults, and upright/reversed keywords from the [seed sources](data-model.md#seed-content). Notes start empty. Use Labyrinthos's general keyword tables, deriving 2–3 keywords from the relevant meaning only where a table is missing.
 - Keep the catalog title fixed. Support editable Other names, element, zodiac, planet, upright keywords and notes, and optional reversed keywords and notes. Title editing and imagery notes are outside MVP.
 - Save edits in the current browser with IndexedDB. Follow the [data model](data-model.md) for identity, ownership, validation, storage, and future account migration.
 - Authentication, remote storage/synchronization, import/export, persistent study filters, scoring, spaced repetition, custom cards/decks, and correspondence-field management are outside MVP. Element, zodiac, and planet values are editable; adding new field definitions has no MVP UI.
@@ -82,9 +82,10 @@ Follow the [search contract](data-model.md#search-contract), including these beh
 
 ### Field reveal
 
-- Initially, card identity and the illustration are exposed. Each populated user-authored study section is concealed behind an interactive skeleton/reveal surface.
+- Initially, card identity and the illustration are exposed. Each populated study section, including default correspondences, is concealed behind an interactive skeleton/reveal surface.
 - Activate each surface independently to reveal its content. Concealment is a study state, distinct from data loading.
-- Reserve the revealed content's actual responsive height to prevent layout shifts; the concealed shape may hint at the amount of content. Recalculate appropriately for orientation/content/viewport changes.
+- Use each item's actual responsive geometry in both states: identical width, height, padding, borders, radius, and wrapping, with no reveal layout shift. Keyword skeletons are individual fully rounded pills matching their tags; correspondence values and notes retain their own shapes. Keep concealed content in layout so content/viewport changes need no measured estimates.
+- Center a very translucent category icon on each skeleton: planet, zodiac wheel, four alchemical elements, keyword tag, or notes. Category hints must not expose the answer. Prefer Hugeicons; use matching custom strokes for the zodiac wheel and four-element symbol.
 - Use actual backdrop blur with a light translucent tint so skeletons follow the atmosphere behind them. A faint 28-second glint adds a slow interaction cue; avoid opaque moving gradients and raised/bubbly rims. Preserve hover, pressed and focus states. Disable shimmer for reduced motion; reveal fades without changing layout.
 - Concealed answers must also be hidden from assistive technology until revealed. The always-visible illustration retains its accessible description. Keep reveal controls meaningfully labeled.
 - Empty study fields render no section, skeleton, placeholder, message, or guidance. Empty starter cards remain viewable without validation errors. Reveal controls are visually skeletons, with accessible labels rather than visible “Reveal” instructions.
@@ -103,13 +104,13 @@ Follow the [search contract](data-model.md#search-contract), including these beh
 ## Editing and saving
 
 - Create a draft of the full card; reveal all editable content. Edit Other names, correspondences, keywords, and notes in that order. Do not show the illustration, a Symbology & imagery label, or an imagery-notes field while editing.
-- Use glass multi-select controls for Element (Fire, Water, Air, Earth), Zodiac (the twelve signs, Aries through Pisces), and Planet (Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto). Draw elemental icons as alchemical triangles: upright Fire/Air, inverted Water/Earth, with a crossbar for Air/Earth. Preserve existing stored values while limiting new choices to these catalogs. Planet is optional and starts empty on both new and existing cards.
+- Use glass multi-select controls for Element (Fire, Water, Air, Earth), Zodiac (the twelve signs, Aries through Pisces), and Planet (Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto). Draw elemental icons as alchemical triangles: upright Fire/Air, inverted Water/Earth, with a crossbar for Air/Earth. Preserve existing stored values while limiting new choices to these catalogs. All three fields remain optional. Start with the sourced defaults where assigned; preserve saved personal choices, including cleared values.
 - Use Hugeicons zodiac glyphs and matching planetary symbols where available; provide custom astrological glyphs for the missing planets. Options show their icon and name. Selected form values show only the icon when one exists, keeping an accessible name and hover title; older values without an icon retain their text. Open menus use the textarea's translucent tint and stronger backdrop blur. Keyword selections remain separate, rounded liquid-glass chips with foreground-colored remove icons.
 - Other names uses the same removable-chip, free-entry combobox as Keywords. A comma immediately commits the typed value; comma-separated paste adds multiple values. Ignore blank and duplicate entries.
 - Keywords use a glass multi-select combobox: suggest existing personal keywords across the library, allow adding a new keyword, and show individually removable selections. Adapt the Olyx/Base UI composition and keyboard behavior. Keep labels simply “Keywords” and “Notes” in both orientations; do not append “Optional” to Notes.
 - Reverse selects which meaning to edit and preserves both orientations' draft values. Shared editable fields stay visible but disabled while reversed; edit them in upright mode. Bundled artwork is shown only in view mode.
 - Reversed content is entirely optional. Adding reversed notes without keywords is valid; neither field becomes required when the other is entered.
-- Saving requires at least one nonblank **upright keyword**. Notes and correspondences are optional. Follow the [validation rules](data-model.md#validation-and-empty-cards); an untouched seed record may be read even though its editor cannot yet be saved.
+- Saving requires at least one nonblank **upright keyword**. Notes and correspondences are optional. Follow the [validation rules](data-model.md#validation-and-empty-cards); defaults satisfy this requirement, while removing every upright keyword disables Save.
 - Show validation when entering edit mode and update it as values change. Disable Save while invalid or saving. Empty reversed content must never disable Save.
 - Place concise validation feedback to the left of Save and associate it with the actual field. Activating the message selects the appropriate orientation, scrolls to the field, and focuses it. For a missing upright keyword while viewing reversed edits, switch to upright.
 - Save explicitly persists the entire draft, including both meanings, as one operation. On success return to the same card and selected orientation in view mode, with study sections concealed.
@@ -135,7 +136,7 @@ Use the [illustration prompt](illustration-prompt.md) as the artwork specificati
 
 Follow repository guidance in [AGENTS.md](../../AGENTS.md). Reuse existing design-system contracts; keep tarot rules, content, state, and I/O feature-owned. Use the [data model's placement](data-model.md#repository-placement) to organize implementation.
 
-1. Build the catalog, empty seed library, validation, IndexedDB service, and identity-based asset mapping.
+1. Build the catalog, seed library with correspondence defaults, validation, IndexedDB service, and identity-based asset mapping.
 2. Add the isolated routes and shared view/edit composition, with loading and storage-error recovery. Leave empty study fields empty.
 3. Implement normalized search, progressive controls, reveal/orientation state, and shuffle sessions.
 4. Complete draft editing, validation focus, save/conflict recovery, and illustration integration.
@@ -143,10 +144,10 @@ Follow repository guidance in [AGENTS.md](../../AGENTS.md). Reuse existing desig
 
 | Acceptance area | Required evidence |
 | --- | --- |
-| Catalog and storage | Exactly 78 stable identities/routes; blank first-run content; saved edits survive reload and seed updates; initialization is safe across tabs. |
+| Catalog and storage | Exactly 78 stable identities/routes; sourced correspondence and upright/reversed keyword defaults with blank notes; saved edits survive reload and seed updates after the authorized one-time test-content replacement; initialization is safe across tabs. |
 | Search | All three forms of “two of swords” resolve identically; Minor quick rows and Major autocomplete work; aliases remain separate results; incomplete/no-match queries and dismissal work. |
 | Study | Independent reveals, stable height, hidden answers, upright-on-navigation, absent fields without added messages, and no-repeat shuffle/reset/exhaustion behavior. |
-| Editing | Empty seeds open; upright keywords gate Save; reversed fields never become required; drafts survive toggles/failures; error links focus the right orientation/field; conflicts do not overwrite. |
+| Editing | Seeds with no personal meanings open; upright keywords gate Save; reversed fields never become required; drafts survive toggles/failures; error links focus the right orientation/field; conflicts do not overwrite. |
 | Mobile and accessibility | Sticky controls remain reachable with keyboard/safe areas; long names/chips/notes fit; keyboard activation/focus, ordinary/reduced motion, and SVG contrast are checked. |
 | Integration | Direct links and Back/Forward work; all 78 illustrations map correctly; Tarot Flash does not change the timer's flow. |
 | Appearance | Atmosphere is the only page background; controls use liquid glass; header/footer actions are icon-only; no product title or unsolicited UI. |

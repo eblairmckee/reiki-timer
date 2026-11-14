@@ -1,7 +1,7 @@
 import { type ReactNode, useRef } from "react";
 
-/** The answer remains in layout while concealed, so wrapping and responsive media
- * reserve their real height. visibility + aria-hidden + inert also conceal its alternatives. */
+/** Items keep their actual layout while concealed. Their masks reveal the field category;
+ * aria-hidden + inert conceal the answer's alternatives and prevent hidden interactions. */
 export function StudySection({
   label,
   populated,
